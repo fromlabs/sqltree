@@ -8,7 +8,7 @@ library sqltree;
 
 export 'src/sqltree_sql.dart';
 
-export 'src/sqltree_node_factory.dart';
+export 'src/sqltree_node_manager.dart';
 
 export 'src/sqltree_node.dart';
 

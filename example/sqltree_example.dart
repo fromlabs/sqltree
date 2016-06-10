@@ -3,6 +3,8 @@
 
 import 'package:sqltree/sqltree.dart' as sql;
 
+// TODO problemi con la where
+
 main() {
   var select = sql.select("*")
         ..from(sql.joins("tabella"))
@@ -16,10 +18,10 @@ main() {
       //..where(sql.enabledGroup("ref1", true, sql.equal("b", sql.parameter("par2"))))
       ;
 
-  select.getSingleNodeByReference("ref1").disable();
-
   select.whereClause.children.last.children.last
       .addChildren(sql.text("OPEN", "CLOSED"));
+
+  select.getSingleNodeByReference("ref1").disable();
 
   select
       .getSingleNodeByReference("ref2")

@@ -2,14 +2,21 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import "sqltree_node.dart";
+import "sqltree_node_impl.dart";
 import "sqltree_statement.dart";
+import "sqltree_statement_impl.dart";
+import "sqltree_custom.dart";
 import "sqltree_parameter.dart";
-import "sqltree_node_factory.dart";
-import "sqltree_node_factory_impl.dart";
+import "sqltree_node_manager.dart";
+import "sqltree_node_manager_impl.dart";
 import "sqltree_formatter.dart";
 import "sqltree_formatter_impl.dart";
 import "sqltree_prettifier.dart";
 import "sqltree_util.dart";
+
+// TODO valutare se rinominare in upper case tutti i metodi
+
+final SqlNodeTypes types = new SqlNodeTypes();
 
 class SqlNodeTypes extends BaseSqlNodeTypes {
   final String TEXT = "'";
@@ -41,6 +48,7 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   SqlNodeTypes() {
     _registerTypes(this);
 
+    // TODO valutare una callback per l'inizializzazione
     _initialize(this);
   }
 
@@ -74,74 +82,14 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   }
 }
 
-final SqlNodeTypes types = new SqlNodeTypes();
-
-SqlNodeFactoryImpl _NODE_FACTORY = new SqlNodeFactoryImpl();
-
-SqlNodeFormatterImpl _NODE_FORMATTER = new SqlNodeFormatterImpl();
-
-SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifier();
-
-SqlNode _NULL;
-
-SqlNamedParameterConverter _NODE_CONVERTER = new SqlNamedParameterConverter();
-
-final SqlFormatRule _namedParameterRule =
-    new SqlFormatRule(prefix: r"${", postfix: "}");
-
-// TODO attenzione agli escape
-final SqlFormatRule _textRule = new SqlFormatRule(
-    prefix: "'", postfix: "'", isFormatEmptyChildrenEnabled: true);
-
-final SqlFormatRule _tupleRule =
-    new SqlFormatRule(prefix: "(", separator: ", ", postfix: ")");
-
-final Set<String> _blockNodes = new Set.from([types.BLOCK, types.TUPLE]);
-
-final Set<String> _postNodes =
-    new Set.from([types.IS_NOT_NULL, types.IS_NULL, types.ASC, types.DESC]);
-
-final Set<String> _prefixNodes =
-    new Set.from([types.INDEXED_PARAMETER, types.NULL]);
-
-void _initialize(SqlNodeTypes types) {
-  _registerFormatters();
-
-  _registerFormatRuleProviders();
-
-  _NULL = _NODE_FACTORY.createNode(types.NULL, 0);
-}
-
-void _registerFormatters() {
-  // è solo un esempio di utilizzo che in realtà non fa niente
-  registerNodeFormatter(new SqlNodeFormatterFunctionWrapper((node) {}));
-}
-
-void _registerFormatRuleProviders() {
-  registerFormatRuleProvider((node) {
-    if (types.NAMED_PARAMETER == node.type) {
-      return _namedParameterRule;
-    } else if (types.TEXT == node.type) {
-      return _textRule;
-    } else if (_blockNodes.contains(node.type)) {
-      return _tupleRule;
-    } else if (types.QUALIFIER == node.type) {
-      return new SqlFormatRule(separator: node.type);
-    } else if (_postNodes.contains(node.type)) {
-      return new SqlFormatRule(postfix: " ${node.type}");
-    } else if (_prefixNodes.contains(node.type)) {
-      return new SqlFormatRule(
-          prefix: node.type, isFormatEmptyChildrenEnabled: true);
-    }
-  });
-}
+/* CONFIGURATION */
 
 void registerNodeType(String type) {
-  _NODE_FACTORY.registerNodeType(type);
+  _NODE_MANAGER.registerNodeType(type);
 }
 
 void registerNode(SqlNode node) {
-  _NODE_FACTORY.registerNode(node);
+  _NODE_MANAGER.registerNode(node);
 }
 
 void registerNodeFormatter(SqlNodeFormatter formatter) {
@@ -152,7 +100,7 @@ void registerFormatRuleProvider(SqlFormatRuleProvider provider) {
   _NODE_FORMATTER.registerFormatRuleProvider(provider);
 }
 
-/* EXTENSIONS */
+/* UTILS */
 
 String format(SqlNode node) => _NODE_FORMATTER.format(node);
 
@@ -160,173 +108,113 @@ String prettify(String sql) => _SQL_PRETTIFIER.prettify(sql);
 
 SqlNamedParameterConversion convert(String sql) => _NODE_CONVERTER.convert(sql);
 
-SqlFormattedNode formatted(String prefix, String separator, String postfix,
-    bool formatEmptyChildrenEnabled, int maxChildrenLength,
-    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var formatted = new SqlFormattedNodeImpl(
-      new SqlFormatRule(
-          prefix: prefix,
-          separator: separator,
-          postfix: postfix,
-          isFormatEmptyChildrenEnabled: formatEmptyChildrenEnabled),
-      maxChildrenLength: maxChildrenLength);
-
-  registerNode(formatted);
-
-  formatted.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
-
-  return formatted;
-}
-
 /* STATEMENT */
 
 SqlSelectStatement select(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createSelectStatement(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlSelectStatementImpl();
 
-SqlUpdateStatement update([node]) => _NODE_FACTORY.createUpdateStatement(node);
+  registerNode(parent);
 
-SqlInsertStatement insert([node]) => _NODE_FACTORY.createInsertStatement(node);
+  parent.selectClause.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlUpdateStatement update([node]) {
+  var parent = new SqlUpdateStatementImpl();
+
+  registerNode(parent);
+
+  parent.updateClause.child = node;
+
+  return parent;
+}
+
+SqlInsertStatement insert([node]) {
+  var parent = new SqlInsertStatementImpl();
+
+  registerNode(parent);
+
+  parent.insertClause.child = node;
+
+  return parent;
+}
 
 SqlDeleteStatement delete(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createDeleteStatement(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlDeleteStatementImpl();
+
+  registerNode(parent);
+
+  parent.fromClause.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
 
 SqlJoins joins(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createSqlJoin(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlJoinsImpl();
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
 
 SqlJoin leftJoin(fromNode,
-        [onNode0,
-        onNode1,
-        onNode2,
-        onNode3,
-        onNode4,
-        onNode5,
-        onNode6,
-        onNode7,
-        onNode8,
-        onNode9]) =>
-    _NODE_FACTORY.createLeftJoin(
-        fromNode,
-        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
-            onNode7, onNode8, onNode9));
+    [onNode0,
+    onNode1,
+    onNode2,
+    onNode3,
+    onNode4,
+    onNode5,
+    onNode6,
+    onNode7,
+    onNode8,
+    onNode9]) {
+  var parent = new SqlJoinImpl(types.LEFT_JOIN);
+
+  registerNode(parent);
+
+  parent.fromClause.addChildren(fromNode);
+  parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
+      onNode5, onNode6, onNode7, onNode8, onNode9);
+
+  return parent;
+}
 
 SqlJoin join(fromNode,
-        [onNode0,
-        onNode1,
-        onNode2,
-        onNode3,
-        onNode4,
-        onNode5,
-        onNode6,
-        onNode7,
-        onNode8,
-        onNode9]) =>
-    _NODE_FACTORY.createInnerJoin(
-        fromNode,
-        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
-            onNode7, onNode8, onNode9));
+    [onNode0,
+    onNode1,
+    onNode2,
+    onNode3,
+    onNode4,
+    onNode5,
+    onNode6,
+    onNode7,
+    onNode8,
+    onNode9]) {
+  var parent = new SqlJoinImpl(types.INNER_JOIN);
 
-/* DECORATORS */
+  registerNode(parent);
 
-SqlNodeList text(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createTypedWrapperNodeList(
-        types.TEXT,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+  parent.fromClause.addChildren(fromNode);
+  parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
+      onNode5, onNode6, onNode7, onNode8, onNode9);
 
-SqlNodeList node(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
-
-SqlNodeList group(reference,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(getVargsList(node0, node1, node2, node3,
-            node4, node5, node6, node7, node8, node9)
-        .map((node) => _NODE_FACTORY.createGroup(reference, node)));
-
-SqlNodeList qualify(String qualifier,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(getVargsList(node0, node1, node2, node3,
-            node4, node5, node6, node7, node8, node9)
-        .map((node) =>
-            _NODE_FACTORY.createNode(types.QUALIFIER, 2, [qualifier, node])));
+  return parent;
+}
 
 /* FUNCTION & OPERATOR */
 
-SqlNode get NULL => _NULL;
+SqlNode get NULL => _node(types.NULL, 0);
 
-SqlNode block([node]) => _NODE_FACTORY.createNode(types.BLOCK, 1, node);
+SqlNode block([node]) => _node(types.BLOCK, 1, node);
 
 SqlNode tuple(
         [node0,
@@ -339,50 +227,43 @@ SqlNode tuple(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createNode(
-        types.TUPLE,
-        null,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+    _node(types.TUPLE, null, node0, node1, node2, node3, node4, node5, node6,
+        node7, node8, node9);
 
 SqlNode parameter([String name]) => name != null
-    ? _NODE_FACTORY.createNode(types.NAMED_PARAMETER, 1, name)
-    : _NODE_FACTORY.createNode(types.INDEXED_PARAMETER, 0);
+    ? _unaryOperator(types.NAMED_PARAMETER, name)
+    : _node(types.INDEXED_PARAMETER, 0);
 
-SqlNode asc(node) => _NODE_FACTORY.createNode(types.ASC, 1, node);
+SqlNode asc(node) => _node(types.ASC, 1, node);
 
-SqlNode desc(node) => _NODE_FACTORY.createNode(types.DESC, 1, node);
+SqlNode desc(node) => _node(types.DESC, 1, node);
 
-SqlNode isNull(node) => _NODE_FACTORY.createNode(types.IS_NULL, 1, node);
+SqlNode isNull(node) => _node(types.IS_NULL, 1, node);
 
-SqlNode isNotNull(node) => _NODE_FACTORY.createNode(types.IS_NOT_NULL, 1, node);
+SqlNode isNotNull(node) => _node(types.IS_NOT_NULL, 1, node);
 
-SqlOperator not(node) => _NODE_FACTORY.createOperator(types.NOT, 1, node);
+SqlNode not(node) => _unaryOperator(types.NOT, node);
 
-SqlFunction count([node]) => _NODE_FACTORY.createCount(node);
+SqlNode count([node]) => _function(types.COUNT, 1, node);
 
-SqlOperator as(node, String alias) =>
-    _NODE_FACTORY.createOperator(types.AS, 2, [node, alias]);
+SqlNode as(node, String alias) => _binaryOperator(types.AS, node, alias);
 
-SqlOperator equal(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.EQUAL, 2, [node0, node1]);
+SqlNode equal(node0, node1) => _binaryOperator(types.EQUAL, node0, node1);
 
-SqlOperator notEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.NOT_EQUAL, 2, [node0, node1]);
+SqlNode notEqual(node0, node1) =>
+    _binaryOperator(types.NOT_EQUAL, node0, node1);
 
-SqlOperator greater(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.GREATER, 2, [node0, node1]);
+SqlNode greater(node0, node1) => _binaryOperator(types.GREATER, node0, node1);
 
-SqlOperator greaterOrEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.GREATER_OR_EQUAL, 2, [node0, node1]);
+SqlNode greaterOrEqual(node0, node1) =>
+    _binaryOperator(types.GREATER_OR_EQUAL, node0, node1);
 
-SqlOperator less(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LESS, 2, [node0, node1]);
+SqlNode less(node0, node1) => _binaryOperator(types.LESS, node0, node1);
 
-SqlOperator lessOrEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LESS_OR_EQUAL, 2, [node0, node1]);
+SqlNode lessOrEqual(node0, node1) =>
+    _binaryOperator(types.LESS_OR_EQUAL, node0, node1);
 
-SqlOperator and(
+SqlNode and(
         [node0,
         node1,
         node2,
@@ -393,13 +274,10 @@ SqlOperator and(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createOperator(
-        types.AND,
-        null,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+    _operator(types.AND, null, node0, node1, node2, node3, node4, node5, node6,
+        node7, node8, node9);
 
-SqlOperator or(
+SqlNode or(
         [node0,
         node1,
         node2,
@@ -410,18 +288,14 @@ SqlOperator or(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createOperator(
-        types.OR,
-        null,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+    _operator(types.OR, null, node0, node1, node2, node3, node4, node5, node6,
+        node7, node8, node9);
 
-SqlOperator sqlIn(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.IN, 2, [node0, node1]);
+SqlNode sqlIn(node0, node1) => _binaryOperator(types.IN, node0, node1);
 
-SqlOperator sqlInBlock(node, [node0]) => sqlIn(node, block(node0));
+SqlNode sqlInBlock(node, [node0]) => sqlIn(node, block(node0));
 
-SqlOperator sqlInTuple(node,
+SqlNode sqlInTuple(node,
         [node0,
         node1,
         node2,
@@ -437,51 +311,250 @@ SqlOperator sqlInTuple(node,
         tuple(node0, node1, node2, node3, node4, node5, node6, node7, node8,
             node9));
 
-SqlOperator like(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LIKE, 2, [node0, node1]);
+SqlNode like(node0, node1) => _binaryOperator(types.LIKE, node0, node1);
 
-SqlFunction upper(node) => _NODE_FACTORY.createFunction(types.UPPER, 1, node);
+SqlNode upper(node) => _function(types.UPPER, 1, node);
 
-SqlFunction lower(node) => _NODE_FACTORY.createFunction(types.LOWER, 1, node);
+SqlNode lower(node) => _function(types.LOWER, 1, node);
+
+/* DECORATORS */
+
+SqlNodeList group(reference,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    new SqlNodeListImpl.from(
+        _NODE_MANAGER
+            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
+                node6, node7, node8, node9))
+            .map((node) {
+          return _NODE_MANAGER.registerNode(new SqlGroupImpl(reference))
+            ..child = node;
+        }),
+        growable: false);
+
+SqlNodeList text(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    new SqlNodeListImpl.from(
+        _NODE_MANAGER
+            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
+                node6, node7, node8, node9))
+            .map((node) {
+          return _node(types.TEXT, 1, node);
+        }),
+        growable: false);
+
+SqlNodeList qualify(String qualifier,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    new SqlNodeListImpl.from(
+        _NODE_MANAGER
+            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
+                node6, node7, node8, node9))
+            .map((node) {
+          return _node(types.QUALIFIER, 2, qualifier, node);
+        }),
+        growable: false);
+
+SqlNodeList normalize(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    _NODE_MANAGER.normalize(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
 /* CUSTOMS */
 
-SqlFunction function(String function,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createCustomFunction(
-        function,
-        null,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+SqlNode function(String function,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  _NODE_MANAGER.registerCustomNodeType(function);
 
-SqlOperator operator(String operator,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    _NODE_FACTORY.createCustomOperator(
-        operator,
-        null,
-        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9));
+  var parent = new CustomSqlFunction(function);
 
-SqlOperator unaryOperator(String operator, node) =>
-    _NODE_FACTORY.createCustomOperator(operator, 1, node);
+  registerNode(parent);
 
-SqlOperator binaryOperator(String operator, node0, node1) =>
-    _NODE_FACTORY.createCustomOperator(operator, 2, [node0, node1]);
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlNode operator(String operator,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  _NODE_MANAGER.registerCustomNodeType(operator);
+
+  var parent = new CustomSqlOperator(operator);
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlNode unaryOperator(String operator, node) {
+  _NODE_MANAGER.registerCustomNodeType(operator);
+
+  var parent = new CustomSqlOperator(operator, maxChildrenLength: 1);
+
+  registerNode(parent);
+
+  parent.addChildren(node);
+
+  return parent;
+}
+
+SqlNode binaryOperator(String operator, node0, node1) {
+  _NODE_MANAGER.registerCustomNodeType(operator);
+
+  var parent = new CustomSqlOperator(operator, maxChildrenLength: 2);
+
+  registerNode(parent);
+
+  parent.addChildren(node0, node1);
+
+  return parent;
+}
+
+SqlFormattedNode formatted(String prefix, String separator, String postfix,
+    bool formatEmptyChildrenEnabled, int maxChildrenLength,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlFormattedNodeImpl(
+      new SqlFormatRule(
+          prefix: prefix,
+          separator: separator,
+          postfix: postfix,
+          isFormatEmptyChildrenEnabled: formatEmptyChildrenEnabled),
+      maxChildrenLength: maxChildrenLength);
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlOperator _unaryOperator(String operator, node) {
+  return _operator(operator, 1, node);
+}
+
+SqlOperator _binaryOperator(String operator, node0, node1) {
+  return _operator(operator, 2, node0, node1);
+}
+
+SqlFunction _function(String function, int maxChildrenLength,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlOperatorImpl(function, maxChildrenLength);
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlOperator _operator(String operator, int maxChildrenLength,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlOperatorImpl(operator, maxChildrenLength);
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlNode _node(String type, int maxChildrenLength,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  var parent = new SqlNodeImpl(type, maxChildrenLength);
+
+  registerNode(parent);
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
+SqlNodeManagerImpl _NODE_MANAGER = new SqlNodeManagerImpl();
+
+SqlNodeFormatterImpl _NODE_FORMATTER = new SqlNodeFormatterImpl();
+
+SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifier();
+
+SqlNamedParameterConverter _NODE_CONVERTER = new SqlNamedParameterConverter();
+
+final Set<String> _blockNodes = new Set.from([types.BLOCK, types.TUPLE]);
+
+final Set<String> _postNodes =
+    new Set.from([types.IS_NOT_NULL, types.IS_NULL, types.ASC, types.DESC]);
+
+final Set<String> _prefixNodes =
+    new Set.from([types.INDEXED_PARAMETER, types.NULL]);
+
+void _initialize(SqlNodeTypes types) {
+  _registerFormatters();
+
+  _registerFormatRuleProviders();
+}
+
+void _registerFormatters() {
+  // è solo un esempio di utilizzo che in realtà non fa niente
+  registerNodeFormatter(new SqlNodeFormatterFunctionWrapper((node) {}));
+}
+
+void _registerFormatRuleProviders() {
+  registerFormatRuleProvider((node) {
+    if (types.NAMED_PARAMETER == node.type) {
+      return new SqlFormatRule(prefix: r"${", postfix: "}");
+    } else if (types.TEXT == node.type) {
+      // TODO attenzione agli escape nel TEXT
+      return new SqlFormatRule(
+          prefix: "'", postfix: "'", isFormatEmptyChildrenEnabled: true);
+    } else if (_blockNodes.contains(node.type)) {
+      return new SqlFormatRule(prefix: "(", separator: ", ", postfix: ")");
+    } else if (types.QUALIFIER == node.type) {
+      return new SqlFormatRule(separator: node.type);
+    } else if (_postNodes.contains(node.type)) {
+      return new SqlFormatRule(postfix: " ${node.type}");
+    } else if (_prefixNodes.contains(node.type)) {
+      return new SqlFormatRule(
+          prefix: node.type, isFormatEmptyChildrenEnabled: true);
+    }
+  });
+}

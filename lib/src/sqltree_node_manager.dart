@@ -2,7 +2,6 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import "sqltree_node.dart";
-import "sqltree_statement.dart";
 
 class BaseSqlNodeTypes {
   final String RAW = "#";
@@ -40,48 +39,12 @@ class BaseSqlNodeTypes {
   static final BaseSqlNodeTypes types = new BaseSqlNodeTypes();
 }
 
-abstract class SqlNodeFactory {
-  SqlSelectStatement createSelectStatement(nodes);
+abstract class SqlNodeManager {
+  registerNode(RegistrableSqlNode node);
 
-  SqlInsertStatement createInsertStatement(node);
-
-  SqlUpdateStatement createUpdateStatement(node);
-
-  SqlDeleteStatement createDeleteStatement(nodes);
-
-  SqlSelectClause createSelectClause();
-
-  SqlJoins createSqlJoin(nodes);
-
-  SqlJoin createInnerJoin(fromNode, onNodes);
-
-  SqlJoin createLeftJoin(fromNode, onNodes);
-
-  SqlFunction createCount([node]);
-
-  SqlGroup createGroup(String reference, node);
-
-  SqlOperator createCustomOperator(
-      String operator, int maxChildrenLength, nodes);
-
-  SqlFunction createCustomFunction(
-      String function, int maxChildrenLength, nodes);
-
-  SqlOperator createOperator(String operator, int maxChildrenLength, nodes);
-
-  SqlFunction createFunction(String function, int maxChildrenLength, nodes);
-
-  SqlNode createNode(String type, int maxChildrenLength, [nodes]);
-
-  // TODO trovare un nome diverso per la funzione che normalizza un array di oggetti
-
-  SqlNodeList createWrapperNodeList(nodes);
-
-  SqlNodeList createTypedWrapperNodeList(String type, nodes);
-
-  void registerNode(RegistrableSqlNode node);
+  SqlNodeList normalize(nodes);
 }
 
 abstract class RegistrableSqlNode implements SqlNode {
-  void registerNode(SqlNodeFactory nodeFactory);
+  void registerNode(SqlNodeManager nodeManager);
 }

@@ -4,9 +4,10 @@
 import "package:collection/collection.dart";
 
 import "sqltree_node.dart";
-import "sqltree_node_factory.dart";
+import "sqltree_node_manager.dart";
 import "sqltree_util.dart";
 
+// TODO verificare altri costruttori e metodi di trasformazione delle liste
 class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
     implements SqlNodeList<T> {
   SqlNodeListImpl() : super([]);
@@ -64,10 +65,11 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
 }
 
 class SqlNodeImpl extends SqlAbstractNodeImpl {
-  SqlNodeImpl.raw(expression) : super.raw(expression?.toString());
-
+  // TODO verificare named parameters
   SqlNodeImpl(String type, int maxChildrenLength)
       : super(type, maxChildrenLength);
+
+  SqlNodeImpl.raw(expression) : super.raw(expression?.toString());
 
   @override
   SqlAbstractNodeImpl createSqlNodeClone() => isRawExpression
@@ -134,7 +136,7 @@ class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   final SqlNodeList _children = new SqlNodeListImpl();
 
-  SqlNodeFactory _nodeFactory;
+  SqlNodeManager _nodeManager;
 
   final String _type;
   final String _rawExpression;
@@ -152,12 +154,12 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   }
 
   @override
-  void registerNode(SqlNodeFactory nodeFactory) {
-    if (_nodeFactory != null) {
+  void registerNode(SqlNodeManager nodeManager) {
+    if (_nodeManager != null) {
       throw new StateError("Node already registered");
     }
 
-    _nodeFactory = nodeFactory;
+    _nodeManager = nodeManager;
 
     onNodeRegistered();
   }
@@ -229,7 +231,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   SqlNode get child {
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
@@ -242,13 +244,13 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   void set child(singleChild) {
     _checkChildrenLocked();
 
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
     _checkNodesCount(1);
 
-    var wrapper = _nodeFactory.createWrapperNodeList(singleChild).singleOrNull;
+    var wrapper = _nodeManager.normalize(singleChild).singleOrNull;
 
     if (_children.isEmpty) {
       _children.add(wrapper);
@@ -259,7 +261,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   SqlNodeList get children {
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
@@ -276,7 +278,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   SqlNode getChild(int index) {
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
@@ -290,11 +292,11 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     _checkChildrenLocked();
 
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(getVargsList(
+    var wrappers = _nodeManager.normalize(getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
     _checkNodesCount(index + wrappers.length);
@@ -307,7 +309,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     _checkChildrenLocked();
 
-    addInternal(getVargsList(
+    _addInternal(getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
@@ -316,11 +318,11 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     _checkChildrenLocked();
 
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(getVargsList(
+    var wrappers = nodeManager.normalize(getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
     _checkNodesCount(_children.length + wrappers.length);
@@ -332,7 +334,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   void clear() {
     _checkChildrenLocked();
 
-    _checkNodeFactory();
+    _checkRegistered();
 
     _checkComposite();
 
@@ -350,17 +352,14 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
     }
   }
 
-  @override
-  SqlNode clone() => completeClone(createSqlNodeClone());
+  SqlNodeManager get nodeManager => _nodeManager;
 
-  SqlNodeFactory get nodeFactory => _nodeFactory;
-
-  void addInternal(nodes) {
-    _checkNodeFactory();
+  void _addInternal(nodes) {
+    _checkRegistered();
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(nodes);
+    var wrappers = _nodeManager.normalize(nodes);
 
     _checkNodesCount(_children.length + wrappers.length);
 
@@ -369,16 +368,25 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   void onNodeRegistered() {}
 
+  // TODO rivedere le fasi del clone
+  @override
+  SqlNode clone() => completeClone(createSqlNodeClone());
+
   SqlAbstractNodeImpl createSqlNodeClone() {
     throw new UnsupportedError("Clone unsupported on $runtimeType");
   }
 
   SqlAbstractNodeImpl completeClone(SqlAbstractNodeImpl targetNode) {
-    targetNode._nodeFactory = _nodeFactory;
+    targetNode._nodeManager = _nodeManager;
     for (var node in _children) {
-      targetNode.addInternal(node.clone());
+      // TODO rivedere perchè deve essere più leggera
+      targetNode._addInternal(node.clone());
     }
     return targetNode;
+  }
+
+  registerAndAddInternal(SqlNode node) {
+    return _addInternal(nodeManager.registerNode(node));
   }
 
   void _checkChildrenLocked() {
@@ -387,8 +395,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
     }
   }
 
-  void _checkNodeFactory() {
-    if (_nodeFactory == null) {
+  void _checkRegistered() {
+    if (_nodeManager == null) {
       throw new StateError("Node not registered");
     }
   }

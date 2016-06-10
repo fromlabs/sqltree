@@ -2,7 +2,7 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import "sqltree_formatter.dart";
-import "sqltree_node_factory.dart";
+import "sqltree_node_manager.dart";
 import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 import "sqltree_statement.dart";

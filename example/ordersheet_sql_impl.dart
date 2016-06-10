@@ -15,13 +15,10 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    var clause = new GroupConcatClauseImpl();
-
-    nodeFactory.registerNode(clause);
-
-    this.addInternal(clause);
-    this.addInternal(nodeFactory.createNode(types.ORDER_BY_CLAUSE, null));
-    this.addInternal(nodeFactory.createNode(types.SEPARATOR_CLAUSE, 1));
+    this.registerAndAddInternal(new GroupConcatClauseImpl());
+    this.registerAndAddInternal(new sql.CustomSqlNode(types.ORDER_BY_CLAUSE));
+    this.registerAndAddInternal(
+        new sql.CustomSqlNode(types.SEPARATOR_CLAUSE, maxChildrenLength: 1));
   }
 
   void clearGroupConcat() {
