@@ -458,7 +458,6 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   void onNodeRegistered() {}
 
-  // TODO rivedere le fasi del clone
   @override
   SqlNode clone() => completeClone(createSqlNodeClone());
 
@@ -467,11 +466,11 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   }
 
   SqlAbstractNodeImpl completeClone(SqlAbstractNodeImpl targetNode) {
+    SqlNodeChildrenListImpl children = _children;
+    SqlNodeChildrenListImpl targetChildren = targetNode._children;
     targetNode._nodeManager = _nodeManager;
-    // TODO rivedere perchè deve essere più leggera
-    for (var node in children) {
-      (targetNode.children as SqlNodeChildrenListImpl)
-          ._addInternal(node.clone());
+    for (var node in children._backedList) {
+      targetChildren._backedList.add(node.clone());
     }
     return targetNode;
   }

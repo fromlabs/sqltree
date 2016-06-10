@@ -39,4 +39,6 @@ main() {
 
   print(sql.prettify(conversion.positionalParameterSql));
   print(conversion.positionalParameterNames);
+
+  print(sql.prettify(sql.format(select.clone())));
 }
