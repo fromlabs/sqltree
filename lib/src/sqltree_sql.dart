@@ -112,6 +112,9 @@ SqlNamedParameterConversion convert(String sql) => _NODE_CONVERTER.convert(sql);
 
 SqlSelectStatement select(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+
+  // TODO sistemare tutti quelli simili a questo
+
   var parent = new SqlSelectStatementImpl();
 
   registerNode(parent);
@@ -330,15 +333,10 @@ SqlNodeList group(reference,
         node7,
         node8,
         node9]) =>
-    new SqlNodeListImpl.from(
-        _NODE_MANAGER
-            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
-                node6, node7, node8, node9))
-            .map((node) {
-          return _NODE_MANAGER.registerNode(new SqlGroupImpl(reference))
-            ..child = node;
-        }),
-        growable: false);
+    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9)
+        .wrap((node) => _NODE_MANAGER.registerNode(new SqlGroupImpl(reference))
+          ..child = node);
 
 SqlNodeList text(
         [node0,
@@ -351,14 +349,9 @@ SqlNodeList text(
         node7,
         node8,
         node9]) =>
-    new SqlNodeListImpl.from(
-        _NODE_MANAGER
-            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
-                node6, node7, node8, node9))
-            .map((node) {
-          return _node(types.TEXT, 1, node);
-        }),
-        growable: false);
+    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9)
+        .wrap((node) => _node(types.TEXT, 1, node));
 
 SqlNodeList qualify(String qualifier,
         [node0,
@@ -371,14 +364,9 @@ SqlNodeList qualify(String qualifier,
         node7,
         node8,
         node9]) =>
-    new SqlNodeListImpl.from(
-        _NODE_MANAGER
-            .normalize(getVargsList(node0, node1, node2, node3, node4, node5,
-                node6, node7, node8, node9))
-            .map((node) {
-          return _node(types.QUALIFIER, 2, qualifier, node);
-        }),
-        growable: false);
+    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9)
+        .wrap((node) => _node(types.QUALIFIER, 2, qualifier, node));
 
 SqlNodeList normalize(
         [node0,

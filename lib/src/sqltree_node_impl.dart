@@ -54,6 +54,9 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
           expand((child) => child.getNodeListByReference(reference)),
           growable: false);
 
+  SqlNodeList wrap(NodeWrapper wrapper) =>
+      new SqlNodeListImpl.from(map(wrapper), growable: false);
+
   @override
   SqlNodeList<T> clone() {
     SqlNodeListImpl clone = new SqlNodeListImpl();

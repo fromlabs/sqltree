@@ -1,6 +1,8 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+typedef SqlNode NodeWrapper(SqlNode node);
+
 abstract class SqlNodeList<T extends SqlNode> implements List<T> {
   SqlNode get singleOrNull;
 
@@ -17,6 +19,8 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
   SqlNode getSingleNodeByReference(String reference);
 
   SqlNodeList getNodeListByReference(String reference);
+
+  SqlNodeList wrap(NodeWrapper wrapper);
 }
 
 abstract class SqlNode {
@@ -56,16 +60,21 @@ abstract class SqlNode {
 
   /* MULTI COMPOSITE NODE */
 
+  // TODO rivedere la gestione del children con una lista che possa essere manipolata
   SqlNodeList get children;
 
+  // TODO togliere: children[index]
   SqlNode getChild(int index);
 
+  // TODO togliere: children.add
   void addChildren(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
+  // TODO togliere: children.add
   void setChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
+  // TODO togliere: children.add
   void insertChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
@@ -90,7 +99,7 @@ abstract class SqlOperator implements SqlNode {
   bool get isUnary;
 }
 
-// TODO rinominare diversamente
+// TODO rinominare diversamente qualcosa con public o private o internal...
 abstract class ChildrenLockedSqlNode implements SqlNode {}
 
 abstract class SqlNodeConvertable {

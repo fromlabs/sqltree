@@ -72,25 +72,19 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   }
 
   @override
-  SqlNodeList normalize(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlNodeList normalize(nodes) {
     var result = new SqlNodeListImpl();
 
-    for (var node in getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)) {
-      if (node is SqlNodeConvertable) {
-        node = node.toNode();
-      }
+    if (nodes is SqlNodeConvertable) {
+      nodes = nodes.toNode();
+    }
 
-      if (node is Iterable) {
-        for (var child in node) {
-          result.addAll(normalize(child));
-        }
-      } else if (node is SqlNode) {
-        result.add(node);
-      } else {
-        result.add(registerNode(new SqlNodeImpl.raw(node)));
-      }
+    if (nodes is Iterable) {
+      result.addAll(nodes.expand((child) => normalize(child)));
+    } else if (nodes is SqlNode) {
+      result.add(nodes);
+    } else {
+      result.add(registerNode(new SqlNodeImpl.raw(nodes)));
     }
     return result;
   }
