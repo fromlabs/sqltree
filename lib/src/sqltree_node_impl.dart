@@ -5,6 +5,7 @@ import "package:collection/collection.dart";
 
 import "sqltree_node.dart";
 import "sqltree_node_factory.dart";
+import "sqltree_util.dart";
 
 class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
     implements SqlNodeList<T> {
@@ -293,8 +294,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    var wrappers = _nodeFactory.createWrapperNodeList(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
     _checkNodesCount(index + wrappers.length);
 
@@ -306,8 +307,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     _checkChildrenLocked();
 
-    addInternal(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    addInternal(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -319,8 +320,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    var wrappers = _nodeFactory.createWrapperNodeList(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
     _checkNodesCount(_children.length + wrappers.length);
 
@@ -354,14 +355,12 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   SqlNodeFactory get nodeFactory => _nodeFactory;
 
-  void addInternal(node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void addInternal(nodes) {
     _checkNodeFactory();
 
     _checkComposite();
 
-    var wrappers = _nodeFactory.createWrapperNodeList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    var wrappers = _nodeFactory.createWrapperNodeList(nodes);
 
     _checkNodesCount(_children.length + wrappers.length);
 

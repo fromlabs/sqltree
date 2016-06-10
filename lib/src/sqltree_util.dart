@@ -1,27 +1,13 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+List getVargsList(
+    [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]) {
+  var args = [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9];
 
-// TODO rinominare con qualcosa che dica che comprime (toglie i null) i varagrs in una lista
+  args.removeWhere((arg) => arg == null);
 
-List getNodes(
-    node0, node1, node2, node3, node4, node5, node6, node7, node8, node9) {
-  var nodes = [
-    node0,
-    node1,
-    node2,
-    node3,
-    node4,
-    node5,
-    node6,
-    node7,
-    node8,
-    node9
-  ];
-
-  nodes.removeWhere((node) => node == null);
-
-  return nodes;
+  return args;
 }
 
 bool isEmptyString(String string) => string?.isEmpty ?? true;

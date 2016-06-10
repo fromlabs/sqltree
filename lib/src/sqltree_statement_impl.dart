@@ -5,6 +5,7 @@ import "sqltree_statement.dart";
 import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 import "sqltree_node_factory.dart";
+import "sqltree_util.dart";
 
 class SqlSelectStatementImpl extends SqlAbstractStatementImpl
     implements SqlSelectStatement {
@@ -421,16 +422,8 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode9]) {
     this.addInternal(nodeFactory.createInnerJoin(
         fromNode,
-        onNode0,
-        onNode1,
-        onNode2,
-        onNode3,
-        onNode4,
-        onNode5,
-        onNode6,
-        onNode7,
-        onNode8,
-        onNode9));
+        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
+            onNode7, onNode8, onNode9)));
   }
 
   @override
@@ -447,16 +440,8 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode9]) {
     this.addInternal(nodeFactory.createLeftJoin(
         fromNode,
-        onNode0,
-        onNode1,
-        onNode2,
-        onNode3,
-        onNode4,
-        onNode5,
-        onNode6,
-        onNode7,
-        onNode8,
-        onNode9));
+        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
+            onNode7, onNode8, onNode9)));
   }
 
   @override

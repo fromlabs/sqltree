@@ -2,7 +2,6 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import "sqltree_node.dart";
-import "sqltree_custom.dart";
 import "sqltree_statement.dart";
 import "sqltree_parameter.dart";
 import "sqltree_node_factory.dart";
@@ -193,8 +192,8 @@ SqlSelectStatement select(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createSelectStatement(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createSelectStatement(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
 SqlUpdateStatement update([node]) => _NODE_FACTORY.createUpdateStatement(node);
 
@@ -211,8 +210,8 @@ SqlDeleteStatement delete(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createDeleteStatement(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createDeleteStatement(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
 SqlJoins joins(
         [node0,
@@ -225,8 +224,8 @@ SqlJoins joins(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createSqlJoin(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createSqlJoin(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
 SqlJoin leftJoin(fromNode,
         [onNode0,
@@ -239,8 +238,10 @@ SqlJoin leftJoin(fromNode,
         onNode7,
         onNode8,
         onNode9]) =>
-    _NODE_FACTORY.createLeftJoin(fromNode, onNode0, onNode1, onNode2, onNode3,
-        onNode4, onNode5, onNode6, onNode7, onNode8, onNode9);
+    _NODE_FACTORY.createLeftJoin(
+        fromNode,
+        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
+            onNode7, onNode8, onNode9));
 
 SqlJoin join(fromNode,
         [onNode0,
@@ -253,8 +254,10 @@ SqlJoin join(fromNode,
         onNode7,
         onNode8,
         onNode9]) =>
-    _NODE_FACTORY.createInnerJoin(fromNode, onNode0, onNode1, onNode2, onNode3,
-        onNode4, onNode5, onNode6, onNode7, onNode8, onNode9);
+    _NODE_FACTORY.createInnerJoin(
+        fromNode,
+        getVargsList(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
+            onNode7, onNode8, onNode9));
 
 /* DECORATORS */
 
@@ -269,8 +272,10 @@ SqlNodeList text(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createTypedWrapperNodeList(types.TEXT, node0, node1, node2,
-        node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createTypedWrapperNodeList(
+        types.TEXT,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlNodeList node(
         [node0,
@@ -283,8 +288,8 @@ SqlNodeList node(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createWrapperNodeList(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
 SqlNodeList group(reference,
         [node0,
@@ -297,7 +302,7 @@ SqlNodeList group(reference,
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(getNodes(node0, node1, node2, node3,
+    _NODE_FACTORY.createWrapperNodeList(getVargsList(node0, node1, node2, node3,
             node4, node5, node6, node7, node8, node9)
         .map((node) => _NODE_FACTORY.createGroup(reference, node)));
 
@@ -312,10 +317,10 @@ SqlNodeList qualify(String qualifier,
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createWrapperNodeList(getNodes(node0, node1, node2, node3,
+    _NODE_FACTORY.createWrapperNodeList(getVargsList(node0, node1, node2, node3,
             node4, node5, node6, node7, node8, node9)
         .map((node) =>
-            _NODE_FACTORY.createNode(types.QUALIFIER, 2, qualifier, node)));
+            _NODE_FACTORY.createNode(types.QUALIFIER, 2, [qualifier, node])));
 
 /* FUNCTION & OPERATOR */
 
@@ -334,8 +339,11 @@ SqlNode tuple(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createNode(types.TUPLE, null, node0, node1, node2, node3,
-        node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createNode(
+        types.TUPLE,
+        null,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlNode parameter([String name]) => name != null
     ? _NODE_FACTORY.createNode(types.NAMED_PARAMETER, 1, name)
@@ -354,25 +362,25 @@ SqlOperator not(node) => _NODE_FACTORY.createOperator(types.NOT, 1, node);
 SqlFunction count([node]) => _NODE_FACTORY.createCount(node);
 
 SqlOperator as(node, String alias) =>
-    _NODE_FACTORY.createOperator(types.AS, 2, node, alias);
+    _NODE_FACTORY.createOperator(types.AS, 2, [node, alias]);
 
 SqlOperator equal(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.EQUAL, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.EQUAL, 2, [node0, node1]);
 
 SqlOperator notEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.NOT_EQUAL, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.NOT_EQUAL, 2, [node0, node1]);
 
 SqlOperator greater(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.GREATER, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.GREATER, 2, [node0, node1]);
 
 SqlOperator greaterOrEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.GREATER_OR_EQUAL, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.GREATER_OR_EQUAL, 2, [node0, node1]);
 
 SqlOperator less(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LESS, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.LESS, 2, [node0, node1]);
 
 SqlOperator lessOrEqual(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LESS_OR_EQUAL, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.LESS_OR_EQUAL, 2, [node0, node1]);
 
 SqlOperator and(
         [node0,
@@ -385,8 +393,11 @@ SqlOperator and(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createOperator(types.AND, null, node0, node1, node2, node3,
-        node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createOperator(
+        types.AND,
+        null,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlOperator or(
         [node0,
@@ -399,11 +410,14 @@ SqlOperator or(
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createOperator(types.OR, null, node0, node1, node2, node3,
-        node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createOperator(
+        types.OR,
+        null,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlOperator sqlIn(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.IN, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.IN, 2, [node0, node1]);
 
 SqlOperator sqlInBlock(node, [node0]) => sqlIn(node, block(node0));
 
@@ -424,7 +438,7 @@ SqlOperator sqlInTuple(node,
             node9));
 
 SqlOperator like(node0, node1) =>
-    _NODE_FACTORY.createOperator(types.LIKE, 2, node0, node1);
+    _NODE_FACTORY.createOperator(types.LIKE, 2, [node0, node1]);
 
 SqlFunction upper(node) => _NODE_FACTORY.createFunction(types.UPPER, 1, node);
 
@@ -443,8 +457,11 @@ SqlFunction function(String function,
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createCustomFunction(function, null, node0, node1, node2,
-        node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createCustomFunction(
+        function,
+        null,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlOperator operator(String operator,
         [node0,
@@ -457,11 +474,14 @@ SqlOperator operator(String operator,
         node7,
         node8,
         node9]) =>
-    _NODE_FACTORY.createCustomOperator(operator, null, node0, node1, node2,
-        node3, node4, node5, node6, node7, node8, node9);
+    _NODE_FACTORY.createCustomOperator(
+        operator,
+        null,
+        getVargsList(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9));
 
 SqlOperator unaryOperator(String operator, node) =>
     _NODE_FACTORY.createCustomOperator(operator, 1, node);
 
 SqlOperator binaryOperator(String operator, node0, node1) =>
-    _NODE_FACTORY.createCustomOperator(operator, 2, node0, node1);
+    _NODE_FACTORY.createCustomOperator(operator, 2, [node0, node1]);

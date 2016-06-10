@@ -47,69 +47,52 @@ class SqlNodeFactoryImpl implements SqlNodeFactory {
   }
 
   @override
-  SqlFunction createCustomFunction(String function, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlFunction createCustomFunction(
+      String function, int maxChildrenLength, nodes) {
     _registerCustomNodeType(function);
 
-    return createFunction(function, maxChildrenLength, node0, node1, node2,
-        node3, node4, node5, node6, node7, node8, node9);
+    return createFunction(function, maxChildrenLength, nodes);
   }
 
   @override
-  SqlOperator createCustomOperator(String operator, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlOperator createCustomOperator(
+      String operator, int maxChildrenLength, nodes) {
     _registerCustomNodeType(operator);
 
-    return createOperator(operator, maxChildrenLength, node0, node1, node2,
-        node3, node4, node5, node6, node7, node8, node9);
+    return createOperator(operator, maxChildrenLength, nodes);
   }
 
   @override
-  SqlDeleteStatement createDeleteStatement(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlDeleteStatement createDeleteStatement(nodes) {
     var statement = new SqlDeleteStatementImpl();
 
     registerNode(statement);
 
-    statement.fromClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    statement.fromClause.addChildren(nodes);
 
     return statement;
   }
 
   @override
-  SqlFunction createFunction(String function, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlFunction createFunction(String function, int maxChildrenLength, nodes) {
     var custom = new SqlFunctionImpl(function, maxChildrenLength);
 
     registerNode(custom);
 
-    custom.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    custom.addChildren(nodes);
 
     return custom;
   }
 
   @override
-  SqlJoin createInnerJoin(fromNode,
-      [onNode0,
-      onNode1,
-      onNode2,
-      onNode3,
-      onNode4,
-      onNode5,
-      onNode6,
-      onNode7,
-      onNode8,
-      onNode9]) {
+  SqlJoin createInnerJoin(fromNode, onNodes) {
     var join = new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN);
 
     registerNode(join);
 
     join
       ..from(fromNode)
-      ..on(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
-          onNode7, onNode8, onNode9);
+      ..on(onNodes);
 
     return join;
   }
@@ -126,51 +109,36 @@ class SqlNodeFactoryImpl implements SqlNodeFactory {
   }
 
   @override
-  SqlJoin createLeftJoin(fromNode,
-      [onNode0,
-      onNode1,
-      onNode2,
-      onNode3,
-      onNode4,
-      onNode5,
-      onNode6,
-      onNode7,
-      onNode8,
-      onNode9]) {
+  SqlJoin createLeftJoin(fromNode, onNodes) {
     var join = new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN);
 
     registerNode(join);
 
     join
       ..from(fromNode)
-      ..on(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5, onNode6,
-          onNode7, onNode8, onNode9);
+      ..on(onNodes);
 
     return join;
   }
 
   @override
-  SqlNode createNode(String type, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlNode createNode(String type, int maxChildrenLength, [nodes]) {
     var custom = new SqlNodeImpl(type, maxChildrenLength);
 
     registerNode(custom);
 
-    custom.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    custom.addChildren(nodes);
 
     return custom;
   }
 
   @override
-  SqlOperator createOperator(String operator, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlOperator createOperator(String operator, int maxChildrenLength, nodes) {
     var custom = new SqlOperatorImpl(operator, maxChildrenLength);
 
     registerNode(custom);
 
-    custom.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    custom.addChildren(nodes);
 
     return custom;
   }
@@ -190,33 +158,29 @@ class SqlNodeFactoryImpl implements SqlNodeFactory {
   }
 
   @override
-  SqlSelectStatement createSelectStatement(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlSelectStatement createSelectStatement(nodes) {
     var statement = new SqlSelectStatementImpl();
 
     registerNode(statement);
 
-    statement.selectClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    statement.selectClause.addChildren(nodes);
 
     return statement;
   }
 
   @override
-  SqlJoins createSqlJoin(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  SqlJoins createSqlJoin(nodes) {
     var join = new SqlJoinsImpl();
 
     registerNode(join);
 
-    join.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    join.addChildren(nodes);
 
     return join;
   }
 
   @override
-  SqlGroup createGroup(String reference, [node]) {
+  SqlGroup createGroup(String reference, node) {
     var group = new SqlGroupImpl(reference);
 
     registerNode(group);
@@ -231,7 +195,7 @@ class SqlNodeFactoryImpl implements SqlNodeFactory {
       [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     var result = new SqlNodeListImpl();
 
-    for (var node in getNodes(
+    for (var node in getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)) {
       if (node is SqlNodeConvertable) {
         node = node.toNode();
@@ -268,11 +232,8 @@ class SqlNodeFactoryImpl implements SqlNodeFactory {
   }
 
   @override
-  SqlNodeList createWrapperNodeList(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    return createTypedWrapperNodeList(null, node0, node1, node2, node3, node4,
-        node5, node6, node7, node8, node9);
-  }
+  SqlNodeList createWrapperNodeList(nodes) =>
+      createTypedWrapperNodeList(null, nodes);
 
   @override
   void registerNode(RegistrableSqlNode node) {

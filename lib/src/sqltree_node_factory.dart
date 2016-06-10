@@ -4,8 +4,6 @@
 import "sqltree_node.dart";
 import "sqltree_statement.dart";
 
-// TODO capire se possibile togliere tutti i varargs e lasciarli solo dentro a sql
-
 class BaseSqlNodeTypes {
   final String RAW = "#";
   final String GROUP = "@";
@@ -43,71 +41,43 @@ class BaseSqlNodeTypes {
 }
 
 abstract class SqlNodeFactory {
-  SqlSelectStatement createSelectStatement(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlSelectStatement createSelectStatement(nodes);
 
   SqlInsertStatement createInsertStatement(node);
 
   SqlUpdateStatement createUpdateStatement(node);
 
-  SqlDeleteStatement createDeleteStatement(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlDeleteStatement createDeleteStatement(nodes);
 
   SqlSelectClause createSelectClause();
 
-  SqlJoins createSqlJoin(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlJoins createSqlJoin(nodes);
 
-  SqlJoin createInnerJoin(fromNode,
-      [onNode0,
-      onNode1,
-      onNode2,
-      onNode3,
-      onNode4,
-      onNode5,
-      onNode6,
-      onNode7,
-      onNode8,
-      onNode9]);
+  SqlJoin createInnerJoin(fromNode, onNodes);
 
-  SqlJoin createLeftJoin(fromNode,
-      [onNode0,
-      onNode1,
-      onNode2,
-      onNode3,
-      onNode4,
-      onNode5,
-      onNode6,
-      onNode7,
-      onNode8,
-      onNode9]);
+  SqlJoin createLeftJoin(fromNode, onNodes);
 
   SqlFunction createCount([node]);
 
-  SqlGroup createGroup(String reference, [node]);
+  SqlGroup createGroup(String reference, node);
 
-  SqlOperator createCustomOperator(String operator, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlOperator createCustomOperator(
+      String operator, int maxChildrenLength, nodes);
 
-  SqlFunction createCustomFunction(String function, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlFunction createCustomFunction(
+      String function, int maxChildrenLength, nodes);
 
-  SqlOperator createOperator(String operator, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlOperator createOperator(String operator, int maxChildrenLength, nodes);
 
-  SqlFunction createFunction(String function, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlFunction createFunction(String function, int maxChildrenLength, nodes);
 
-  SqlNode createNode(String type, int maxChildrenLength,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlNode createNode(String type, int maxChildrenLength, [nodes]);
 
   // TODO trovare un nome diverso per la funzione che normalizza un array di oggetti
 
-  SqlNodeList createWrapperNodeList(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlNodeList createWrapperNodeList(nodes);
 
-  SqlNodeList createTypedWrapperNodeList(String type,
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlNodeList createTypedWrapperNodeList(String type, nodes);
 
   void registerNode(RegistrableSqlNode node);
 }
