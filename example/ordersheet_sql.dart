@@ -59,35 +59,31 @@ void _registerFormatRuleProviders(ExtTypes types) {
 }
 
 sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
-  var custom = new sql.CustomSqlFunction(types.IF, maxChildrenLength: 3);
+  var parent = sql
+      .registerNode(new sql.CustomSqlFunction(types.IF, maxChildrenLength: 3));
 
-  sql.registerNode(custom);
+  parent.addChildren(condition, nodeIf, nodeThen);
 
-  custom.addChildren(condition, nodeIf, nodeThen);
-
-  return custom;
+  return parent;
 }
 
 sql.SqlNode replace(node, from, to) {
-  var custom = new sql.CustomSqlFunction(types.REPLACE, maxChildrenLength: 3);
+  var parent = sql.registerNode(
+      new sql.CustomSqlFunction(types.REPLACE, maxChildrenLength: 3));
 
-  sql.registerNode(custom);
+  parent.addChildren(node, from, to);
 
-  custom.addChildren(node, from, to);
-
-  return custom;
+  return parent;
 }
 
 GroupConcatNode groupConcat(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var custom = new GroupConcatNodeImpl();
+  var parent = sql.registerNode(new GroupConcatNodeImpl());
 
-  sql.registerNode(custom);
-
-  custom.groupConcat(
+  parent.groupConcat(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
 
-  return custom;
+  return parent;
 }
 
 abstract class GroupConcatNode implements sql.SqlNode {
