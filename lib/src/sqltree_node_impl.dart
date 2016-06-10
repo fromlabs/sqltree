@@ -7,6 +7,139 @@ import "sqltree_node.dart";
 import "sqltree_node_manager.dart";
 import "sqltree_util.dart";
 
+class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
+    extends SqlNodeListImpl<E> {
+  SqlNode _parent;
+
+  final List<E> _backedList;
+
+  @override
+  final int maxLength;
+
+  SqlNodeChildrenListImpl(List<E> backedList, this.maxLength)
+      : this._backedList = backedList,
+        super._backedList(backedList);
+
+  @override
+  void set length(int newLength) {
+    _checkChildrenLocked();
+
+    _checkNodesCount(newLength);
+
+    _backedList.length = newLength;
+  }
+
+  @override
+  void add(E value) {
+    _checkChildrenLocked();
+
+    _checkNodesCount(length + 1);
+
+    return _backedList.add(value);
+  }
+
+  @override
+  void addAll(Iterable<E> iterable) {
+    _checkChildrenLocked();
+
+    _checkNodesCount(length + iterable.length);
+
+    return _backedList.addAll(iterable);
+  }
+
+  @override
+  void insert(int index, E element) {
+    _checkChildrenLocked();
+
+    _checkNodesCount(length + 1);
+
+    return _backedList.insert(index, element);
+  }
+
+  @override
+  void insertAll(int index, Iterable<E> iterable) {
+    _checkChildrenLocked();
+
+    _checkNodesCount(length + iterable.length);
+
+    return _backedList.insertAll(index, iterable);
+  }
+
+  @override
+  bool remove(Object value) {
+    _checkChildrenLocked();
+
+    return _backedList.remove(value);
+  }
+
+  @override
+  E removeAt(int index) {
+    _checkChildrenLocked();
+
+    return _backedList.removeAt(index);
+  }
+
+  @override
+  E removeLast() {
+    _checkChildrenLocked();
+
+    return _backedList.removeLast();
+  }
+
+  @override
+  void removeWhere(bool test(E element)) {
+    _checkChildrenLocked();
+
+    return _backedList.removeWhere(test);
+  }
+
+  @override
+  void retainWhere(bool test(E element)) {
+    _checkChildrenLocked();
+
+    return _backedList.retainWhere(test);
+  }
+
+  @override
+  void removeRange(int start, int end) {
+    _checkChildrenLocked();
+
+    return _backedList.removeRange(start, end);
+  }
+
+  @override
+  void replaceRange(int start, int end, Iterable<E> iterable) {
+    _checkChildrenLocked();
+
+    return _backedList.replaceRange(start, end, iterable);
+  }
+
+  @override
+  void clear() {
+    _checkChildrenLocked();
+
+    return _backedList.clear();
+  }
+
+  void _addInternal(SqlNode node) {
+    _checkNodesCount(length + 1);
+
+    _backedList.add(node);
+  }
+
+  void _checkNodesCount(int count) {
+    if (maxLength != null && count > maxLength) {
+      throw new StateError("Children count out of range $count > $maxLength");
+    }
+  }
+
+  void _checkChildrenLocked() {
+    if (_parent is ChildrenLockedSqlNode) {
+      throw new UnsupportedError("Children locked");
+    }
+  }
+}
+
 // TODO verificare altri costruttori e metodi di trasformazione delle liste
 class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
     implements SqlNodeList<T> {
@@ -14,6 +147,11 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
 
   SqlNodeListImpl.from(Iterable elements, {bool growable: true})
       : super(new List.from(elements, growable: growable));
+
+  SqlNodeListImpl._backedList(List<T> backedList) : super(backedList);
+
+  @override
+  int get maxLength => null;
 
   @override
   SqlNode get singleOrNull {
@@ -77,7 +215,7 @@ class SqlNodeImpl extends SqlAbstractNodeImpl {
   @override
   SqlAbstractNodeImpl createSqlNodeClone() => isRawExpression
       ? new SqlNodeImpl.raw(rawExpression)
-      : new SqlNodeImpl(type, maxChildrenLength);
+      : new SqlNodeImpl(type, children.maxLength);
 }
 
 class SqlGroupImpl extends SqlAbstractNodeImpl implements SqlGroup {
@@ -111,7 +249,7 @@ class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
 
   @override
   SqlFunctionImpl createSqlNodeClone() =>
-      new SqlFunctionImpl(type, maxChildrenLength);
+      new SqlFunctionImpl(type, children.maxLength);
 
   @override
   SqlFunctionImpl clone() => super.clone();
@@ -126,31 +264,35 @@ class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
   }
 
   @override
-  bool get isUnary => maxChildrenLength != null && maxChildrenLength == 1;
+  bool get isUnary => children.maxLength != null && children.maxLength == 1;
 
   @override
   SqlOperatorImpl createSqlNodeClone() =>
-      new SqlOperatorImpl(type, maxChildrenLength);
+      new SqlOperatorImpl(type, children.maxLength);
 
   @override
   SqlOperatorImpl clone() => super.clone();
 }
 
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
-  final SqlNodeList _children = new SqlNodeListImpl();
+  final SqlNodeList _children;
 
   SqlNodeManager _nodeManager;
 
   final String _type;
   final String _rawExpression;
-  final int maxChildrenLength;
 
   SqlAbstractNodeImpl.raw(this._rawExpression)
       : this._type = BaseSqlNodeTypes.types.RAW,
-        this.maxChildrenLength = 0;
+        this._children = new SqlNodeChildrenListImpl([], 0) {
+    (_children as SqlNodeChildrenListImpl)._parent = this;
+  }
 
-  SqlAbstractNodeImpl(this._type, this.maxChildrenLength)
-      : this._rawExpression = null {
+  SqlAbstractNodeImpl(this._type, int maxChildrenLength)
+      : this._rawExpression = null,
+        this._children = new SqlNodeChildrenListImpl([], maxChildrenLength) {
+    (_children as SqlNodeChildrenListImpl)._parent = this;
+
     if (type == null) {
       throw new ArgumentError.notNull("type");
     }
@@ -212,7 +354,9 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
       list.add(this);
     }
 
-    list.addAll(_children.getNodeListByReference(reference));
+    if (isComposite) {
+      list.addAll(children.getNodeListByReference(reference));
+    }
 
     return list;
   }
@@ -222,6 +366,15 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   bool get isComposite => !isRawExpression;
+
+  bool get isEmptyComposite =>
+      isComposite && _children.maxLength != null && _children.maxLength == 0;
+
+  bool get isSingleComposite =>
+      isComposite && _children.maxLength != null && _children.maxLength == 1;
+
+  bool get isMultiComposite =>
+      isComposite && (_children.maxLength == null || _children.maxLength > 1);
 
   @override
   String get rawExpression {
@@ -236,29 +389,23 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   SqlNode get child {
     _checkRegistered();
 
-    _checkComposite();
+    _checkSingleComposite();
 
-    _checkNodesCount(1);
-
-    return _children.isEmpty ? null : _children.first;
+    return _children.singleOrNull;
   }
 
   @override
   void set child(singleChild) {
-    _checkChildrenLocked();
-
     _checkRegistered();
 
-    _checkComposite();
+    _checkSingleComposite();
 
-    _checkNodesCount(1);
-
-    var wrapper = _nodeManager.normalize(singleChild).singleOrNull;
+    var normalized = _nodeManager.normalize(singleChild).singleOrNull;
 
     if (_children.isEmpty) {
-      _children.add(wrapper);
+      _children.add(normalized);
     } else {
-      _children[0] = wrapper;
+      _children[0] = normalized;
     }
   }
 
@@ -268,82 +415,34 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
     _checkComposite();
 
-    if (isComposite) {
-      // è una copia (non clone)
-
-      // TODO node.children è una copia, sarebbe bello avere una vista non modificabile più leggera
-
-      return new SqlNodeListImpl.from(_children, growable: false);
-    } else {
-      throw new UnsupportedError("Node is not a composite");
-    }
-  }
-
-  @override
-  SqlNode getChild(int index) {
-    _checkRegistered();
-
-    _checkComposite();
-
-    _checkNodesCount(index + 1);
-
-    return _children[index];
-  }
-
-  @override
-  void setChildren(int index, node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    _checkChildrenLocked();
-
-    _checkRegistered();
-
-    _checkComposite();
-
-    var wrappers = _nodeManager.normalize(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
-
-    _checkNodesCount(index + wrappers.length);
-
-    _children.setAll(index, wrappers);
+    return _children;
   }
 
   @override
   void addChildren(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    _checkChildrenLocked();
-
-    _addInternal(getVargsList(
+    var normalized = _nodeManager.normalize(getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
+
+    children.addAll(normalized);
   }
 
   @override
   void insertChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    _checkChildrenLocked();
-
-    _checkRegistered();
-
-    _checkComposite();
-
-    var wrappers = nodeManager.normalize(getVargsList(
+    var normalized = _nodeManager.normalize(getVargsList(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
-    _checkNodesCount(_children.length + wrappers.length);
-
-    _children.insertAll(index, wrappers);
+    children.insertAll(index, normalized);
   }
 
   @override
-  void clear() {
-    _checkChildrenLocked();
+  void setChildren(int index, node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+    var normalized = _nodeManager.normalize(getVargsList(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
-    _checkRegistered();
-
-    _checkComposite();
-
-    _checkNodesCount(1);
-
-    _children.clear();
+    children.setAll(index, normalized);
   }
 
   @override
@@ -351,23 +450,11 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
     if (isRawExpression) {
       return _rawExpression != null ? "\"$_rawExpression\"" : "";
     } else {
-      return "$type($_children)";
+      return "$type($children)";
     }
   }
 
   SqlNodeManager get nodeManager => _nodeManager;
-
-  void _addInternal(nodes) {
-    _checkRegistered();
-
-    _checkComposite();
-
-    var wrappers = _nodeManager.normalize(nodes);
-
-    _checkNodesCount(_children.length + wrappers.length);
-
-    _children.addAll(wrappers);
-  }
 
   void onNodeRegistered() {}
 
@@ -381,21 +468,17 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   SqlAbstractNodeImpl completeClone(SqlAbstractNodeImpl targetNode) {
     targetNode._nodeManager = _nodeManager;
-    for (var node in _children) {
-      // TODO rivedere perchè deve essere più leggera
-      targetNode._addInternal(node.clone());
+    // TODO rivedere perchè deve essere più leggera
+    for (var node in children) {
+      (targetNode.children as SqlNodeChildrenListImpl)
+          ._addInternal(node.clone());
     }
     return targetNode;
   }
 
   registerAndAddInternal(SqlNode node) {
-    return _addInternal(nodeManager.registerNode(node));
-  }
-
-  void _checkChildrenLocked() {
-    if (this is ChildrenLockedSqlNode) {
-      throw new UnsupportedError("Children locked");
-    }
+    return (_children as SqlNodeChildrenListImpl)
+        ._addInternal(nodeManager.registerNode(node));
   }
 
   void _checkRegistered() {
@@ -404,16 +487,15 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
     }
   }
 
-  void _checkComposite() {
-    if (!isComposite) {
-      throw new UnsupportedError("Node is not a composite");
+  void _checkSingleComposite() {
+    if (!isSingleComposite) {
+      throw new UnsupportedError("Node is not a single composite");
     }
   }
 
-  void _checkNodesCount(int count) {
-    if (maxChildrenLength != null && count > maxChildrenLength) {
-      throw new StateError(
-          "Children count out of range $count > $maxChildrenLength");
+  void _checkComposite() {
+    if (!isComposite) {
+      throw new UnsupportedError("Node is not a composite");
     }
   }
 }

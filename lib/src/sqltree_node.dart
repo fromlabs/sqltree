@@ -4,6 +4,8 @@
 typedef SqlNode NodeWrapper(SqlNode node);
 
 abstract class SqlNodeList<T extends SqlNode> implements List<T> {
+  int get maxLength;
+
   SqlNode get singleOrNull;
 
   SqlNodeList<T> clone();
@@ -52,6 +54,10 @@ abstract class SqlNode {
 
   bool get isComposite;
 
+  bool get isSingleComposite;
+
+  bool get isMultiComposite;
+
   /* SINGLE COMPOSITE NODE */
 
   SqlNode get child;
@@ -60,29 +66,20 @@ abstract class SqlNode {
 
   /* MULTI COMPOSITE NODE */
 
-  // TODO rivedere la gestione del children con una lista che possa essere manipolata
   SqlNodeList get children;
 
-  // TODO togliere: children[index]
-  SqlNode getChild(int index);
-
-  // TODO togliere: children.add
   void addChildren(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  // TODO togliere: children.add
   void setChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  // TODO togliere: children.add
   void insertChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   SqlNode getSingleNodeByReference(String reference);
 
   SqlNodeList getNodeListByReference(String reference);
-
-  void clear();
 }
 
 abstract class SqlGroup implements SqlNode {

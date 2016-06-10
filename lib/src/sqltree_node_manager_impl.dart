@@ -4,7 +4,6 @@
 import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 import "sqltree_node_manager.dart";
-import "sqltree_util.dart";
 
 class SqlNodeManagerImpl implements SqlNodeManager {
   static final Set<String> customNodeTypes = new Set<String>();

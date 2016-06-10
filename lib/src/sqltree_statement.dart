@@ -74,7 +74,8 @@ abstract class SqlSelectStatement implements SqlStatement {
 abstract class SqlInsertStatement implements SqlStatement {
   void insert(node);
 
-  void columns([bool isDistinct]);
+  void columns(
+      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   void values(
       [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);

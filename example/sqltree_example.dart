@@ -3,8 +3,6 @@
 
 import 'package:sqltree/sqltree.dart' as sql;
 
-// TODO problemi con la where
-
 main() {
   var select = sql.select("*")
         ..from(sql.joins("tabella"))

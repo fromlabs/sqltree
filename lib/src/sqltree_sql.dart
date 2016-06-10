@@ -215,7 +215,7 @@ SqlNode tuple(
         node7, node8, node9);
 
 SqlNode parameter([String name]) => name != null
-    ? _unaryOperator(types.NAMED_PARAMETER, name)
+    ? _node(types.NAMED_PARAMETER, 1, name)
     : _node(types.INDEXED_PARAMETER, 0);
 
 SqlNode asc(node) => _node(types.ASC, 1, node);

@@ -19,3 +19,5 @@ export 'src/sqltree_custom.dart';
 export 'src/sqltree_formatter.dart';
 
 export 'src/sqltree_parameter.dart';
+
+export 'src/sqltree_util.dart';

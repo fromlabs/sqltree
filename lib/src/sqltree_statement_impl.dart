@@ -33,42 +33,42 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void clearFrom() {
-    fromClause.clear();
+    fromClause.children.clear();
   }
 
   @override
   void clearGroupBy() {
-    groupByClause.clear();
+    groupByClause.children.clear();
   }
 
   @override
   void clearHaving() {
-    havingClause.clear();
+    havingClause.children.clear();
   }
 
   @override
   void clearLimit() {
-    limitClause.clear();
+    limitClause.child = null;
   }
 
   @override
   void clearOffset() {
-    offsetClause.clear();
+    offsetClause.child = null;
   }
 
   @override
   void clearOrderBy() {
-    orderByClause.clear();
+    orderByClause.children.clear();
   }
 
   @override
   void clearSelect() {
-    selectClause.clear();
+    selectClause.children.clear();
   }
 
   @override
   void clearWhere() {
-    whereClause.clear();
+    whereClause.children.clear();
   }
 
   @override
@@ -84,7 +84,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get fromClause => getChild(1);
+  SqlNode get fromClause => children[1];
 
   @override
   void groupBy(
@@ -94,7 +94,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get groupByClause => getChild(3);
+  SqlNode get groupByClause => children[3];
 
   @override
   void having(
@@ -104,7 +104,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get havingClause => getChild(4);
+  SqlNode get havingClause => children[4];
 
   @override
   bool get isDistinct => selectClause.isDistinct;
@@ -115,7 +115,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get limitClause => getChild(6);
+  SqlNode get limitClause => children[6];
 
   @override
   void offset(node) {
@@ -123,7 +123,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get offsetClause => getChild(7);
+  SqlNode get offsetClause => children[7];
 
   @override
   void orderBy(
@@ -133,7 +133,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get orderByClause => getChild(5);
+  SqlNode get orderByClause => children[5];
 
   @override
   void select(
@@ -143,7 +143,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlSelectClause get selectClause => getChild(0);
+  SqlSelectClause get selectClause => children[0];
 
   @override
   SqlSelectStatement toCountStatement() {
@@ -164,7 +164,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get whereClause => getChild(2);
+  SqlNode get whereClause => children[2];
 
   @override
   SqlSelectStatementImpl createSqlNodeClone() => new SqlSelectStatementImpl();
@@ -191,26 +191,28 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void clearColumns() {
-    columnsClause.clear();
+    columnsClause.children.clear();
   }
 
   @override
   void clearInsert() {
-    insertClause.clear();
+    insertClause.child = null;
   }
 
   @override
   void clearValues() {
-    valuesClause.clear();
+    valuesClause.children.clear();
   }
 
   @override
-  void columns([bool isDistinct]) {
-    columnsClause.clear();
+  void columns(
+      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+    columnsClause.addChildren(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
 
   @override
-  SqlNode get columnsClause => getChild(1);
+  SqlNode get columnsClause => children[1];
 
   @override
   void insert(node) {
@@ -218,7 +220,7 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get insertClause => getChild(0);
+  SqlNode get insertClause => children[0];
 
   @override
   void values(
@@ -228,7 +230,7 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get valuesClause => getChild(2);
+  SqlNode get valuesClause => children[2];
 
   @override
   SqlInsertStatementImpl createSqlNodeClone() => new SqlInsertStatementImpl();
@@ -255,17 +257,17 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void clearSet() {
-    setClause.clear();
+    setClause.children.clear();
   }
 
   @override
   void clearUpdate() {
-    updateClause.clear();
+    updateClause.child = null;
   }
 
   @override
   void clearWhere() {
-    whereClause.clear();
+    whereClause.children.clear();
   }
 
   @override
@@ -276,7 +278,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get setClause => getChild(1);
+  SqlNode get setClause => children[1];
 
   @override
   void update(node) {
@@ -284,7 +286,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get updateClause => getChild(0);
+  SqlNode get updateClause => children[0];
 
   @override
   void where(
@@ -294,7 +296,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get whereClause => getChild(2);
+  SqlNode get whereClause => children[2];
 
   @override
   SqlUpdateStatementImpl createSqlNodeClone() => new SqlUpdateStatementImpl();
@@ -321,17 +323,17 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void clearDelete() {
-    deleteClause.clear();
+    deleteClause.children.clear();
   }
 
   @override
   void clearFrom() {
-    fromClause.clear();
+    fromClause.children.clear();
   }
 
   @override
   void clearWhere() {
-    whereClause.clear();
+    whereClause.children.clear();
   }
 
   @override
@@ -342,7 +344,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get deleteClause => getChild(0);
+  SqlNode get deleteClause => children[0];
 
   @override
   void from(
@@ -352,7 +354,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get fromClause => getChild(1);
+  SqlNode get fromClause => children[1];
 
   @override
   void where(
@@ -362,7 +364,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  SqlNode get whereClause => getChild(2);
+  SqlNode get whereClause => children[2];
 
   @override
   SqlDeleteStatementImpl createSqlNodeClone() => new SqlDeleteStatementImpl();
@@ -473,21 +475,21 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
 
   @override
   void clearFrom() {
-    fromClause.clear();
+    fromClause.child = null;
   }
 
   @override
   void clearOn() {
-    onClause.clear();
+    onClause.children.clear();
   }
 
   @override
   void from(node) {
-    fromClause.addChildren(node);
+    fromClause.children.add(node);
   }
 
   @override
-  SqlNode get fromClause => getChild(0);
+  SqlNode get fromClause => children[0];
 
   @override
   void on(
@@ -497,7 +499,7 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   }
 
   @override
-  SqlNode get onClause => getChild(1);
+  SqlNode get onClause => children[1];
 
   @override
   SqlJoinImpl createSqlNodeClone() => new SqlJoinImpl(type);

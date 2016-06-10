@@ -22,17 +22,17 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   }
 
   void clearGroupConcat() {
-    groupConcatClause.clear();
+    groupConcatClause.children.clear();
   }
 
   @override
   void clearOrderBy() {
-    orderByClause.clear();
+    orderByClause.children.clear();
   }
 
   @override
   void clearSeparator() {
-    separatorClause.clear();
+    separatorClause.child = null;
   }
 
   @override
@@ -48,7 +48,7 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   }
 
   @override
-  GroupConcatClause get groupConcatClause => getChild(0);
+  GroupConcatClause get groupConcatClause => children[0];
 
   @override
   bool get isDistinct => groupConcatClause.isDistinct;
@@ -61,7 +61,7 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   }
 
   @override
-  sql.SqlNode get orderByClause => getChild(1);
+  sql.SqlNode get orderByClause => children[1];
 
   @override
   void separator(node) {
@@ -69,7 +69,7 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   }
 
   @override
-  sql.SqlNode get separatorClause => getChild(2);
+  sql.SqlNode get separatorClause => children[2];
 }
 
 class GroupConcatClauseImpl extends sql.CustomSqlNode

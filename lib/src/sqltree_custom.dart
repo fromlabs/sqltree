@@ -17,7 +17,7 @@ class CustomSqlNode extends SqlNodeImpl {
 
   @override
   CustomSqlNode createSqlNodeClone() =>
-      new CustomSqlNode(type, maxChildrenLength: maxChildrenLength);
+      new CustomSqlNode(type, maxChildrenLength: children.maxLength);
 
   @override
   CustomSqlNode clone() => super.clone();
@@ -29,7 +29,7 @@ class CustomSqlFunction extends SqlFunctionImpl {
 
   @override
   CustomSqlFunction createSqlNodeClone() =>
-      new CustomSqlFunction(type, maxChildrenLength: maxChildrenLength);
+      new CustomSqlFunction(type, maxChildrenLength: children.maxLength);
 
   @override
   CustomSqlFunction clone() => super.clone();
@@ -41,7 +41,7 @@ class CustomSqlOperator extends SqlOperatorImpl {
 
   @override
   CustomSqlOperator createSqlNodeClone() =>
-      new CustomSqlOperator(type, maxChildrenLength: maxChildrenLength);
+      new CustomSqlOperator(type, maxChildrenLength: children.maxLength);
 
   @override
   CustomSqlOperator clone() => super.clone();
