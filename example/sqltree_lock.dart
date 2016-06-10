@@ -5,8 +5,8 @@ import 'package:sqltree/sqltree.dart' as sql;
 
 main() {
   var select = sql.select("*")
-        ..from(sql.joins("tabella"))
-        ..where(sql.equal("a", sql.parameter("par1")));
+    ..from(sql.joins("tabella"))
+    ..where(sql.equal("a", sql.parameter("par1")));
 
   // select.child = "errore 1";
   // print(sql.prettify(sql.format(select)));
@@ -17,11 +17,8 @@ main() {
   print(sql.prettify(sql.format(select)));
 
   // select.children.addAll(sql.text("errore 2"));
-  print(sql.prettify(sql.format(select)));
+  // print(sql.prettify(sql.format(select)));
 
-  select.children.clear();
-
-  print(sql.prettify(sql.format(select)));
-
-
+  // select.children.clear();
+  // print(sql.prettify(sql.format(select)));
 }
