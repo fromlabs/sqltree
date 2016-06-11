@@ -88,9 +88,8 @@ abstract class SqlOperator implements SqlNode {
   bool get isUnary;
 }
 
-// TODO rinominare diversamente qualcosa con public o private o internal...
-abstract class ChildrenLockedSqlNode implements SqlNode {}
+abstract class ChildrenLockingSupport {}
 
-abstract class SqlNodeConvertable {
-  toNode();
+abstract class SqlNodeProvider {
+  createNode();
 }

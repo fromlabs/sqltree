@@ -368,7 +368,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
 }
 
 abstract class SqlAbstractStatementImpl extends SqlAbstractNodeImpl
-    implements SqlStatement, ChildrenLockedSqlNode {
+    implements SqlStatement, ChildrenLockingSupport {
   SqlAbstractStatementImpl(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 }
@@ -445,7 +445,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
 }
 
 class SqlJoinImpl extends SqlAbstractNodeImpl
-    implements SqlJoin, ChildrenLockedSqlNode {
+    implements SqlJoin, ChildrenLockingSupport {
   SqlJoinImpl(String type, bool isFreezed) : super(type, 2, isFreezed);
 
   @override

@@ -74,8 +74,8 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   SqlNodeList normalize(nodes) {
     var result = new SqlNodeListImpl();
 
-    if (nodes is SqlNodeConvertable) {
-      nodes = nodes.toNode();
+    if (nodes is SqlNodeProvider) {
+      nodes = nodes.createNode();
     }
 
     if (nodes is Iterable) {

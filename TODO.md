@@ -1,9 +1,7 @@
 # TODO
 + rivedere gestione riferimenti e enabled introducendo i nodi immutabili (serviranno per le tabelle e colonne)
-
 + backed list
-
-- brutto maxLength su nodelist
++ brutto maxLength su nodelist
 
 - clone e freeze del nodelist
 - clone intelligente se freezed

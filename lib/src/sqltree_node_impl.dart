@@ -123,18 +123,21 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   bool _isEnabled;
 
-  SqlAbstractNodeImpl.raw(this._rawExpression, this.isFreezed)
+  SqlAbstractNodeImpl.raw(this._rawExpression, bool isFreezed)
       : this._type = BaseSqlNodeTypes.types.RAW,
+        this.isFreezed = isFreezed,
         this._isEnabled = true,
-        this._children = new _SqlNodeChildrenListImpl([], 0) {
-    _children._parent = this;
+        this._children = new _SqlNodeChildrenListImpl([], 0, isFreezed) {
+    _children.registerParent(this);
   }
 
-  SqlAbstractNodeImpl(this._type, int maxChildrenLength, this.isFreezed)
+  SqlAbstractNodeImpl(this._type, int maxChildrenLength, bool isFreezed)
       : this._rawExpression = null,
+        this.isFreezed = isFreezed,
         this._isEnabled = true,
-        this._children = new _SqlNodeChildrenListImpl([], maxChildrenLength) {
-    _children._parent = this;
+        this._children =
+            new _SqlNodeChildrenListImpl([], maxChildrenLength, isFreezed) {
+    _children.registerParent(this);
 
     if (type == null) {
       throw new ArgumentError.notNull("type");
@@ -358,16 +361,23 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 }
 
 class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
-  SqlAbstractNodeImpl _parent;
+  final bool isFreezed;
+
+  bool isChildrenLockingEnabled;
 
   final List<SqlNode> _backedList;
 
   @override
   final int maxLength;
 
-  _SqlNodeChildrenListImpl(List<SqlNode> backedList, this.maxLength)
+  _SqlNodeChildrenListImpl(
+      List<SqlNode> backedList, this.maxLength, this.isFreezed)
       : this._backedList = backedList,
         super._backedList(backedList);
+
+  void registerParent(SqlNode parent) {
+    this.isChildrenLockingEnabled = parent is ChildrenLockingSupport;
+  }
 
   @override
   void set length(int newLength) {
@@ -471,7 +481,7 @@ class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
   }
 
   void _addInternal(SqlNode node) {
-    _parent.checkNotFreezed();
+    _checkNotFreezed();
 
     _checkNodesCount(length + 1);
 
@@ -479,13 +489,19 @@ class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
   }
 
   void _checkUpdatable() {
-    _parent.checkNotFreezed();
+    _checkNotFreezed();
 
     _checkChildrenLocked();
   }
 
+  void _checkNotFreezed() {
+    if (isFreezed) {
+      throw new StateError("Node is freezed");
+    }
+  }
+
   void _checkChildrenLocked() {
-    if (_parent is ChildrenLockedSqlNode) {
+    if (isChildrenLockingEnabled) {
       throw new UnsupportedError("Children locked");
     }
   }
