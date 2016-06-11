@@ -83,7 +83,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     } else if (nodes is SqlNode) {
       result.add(nodes);
     } else {
-      result.add(registerNode(new SqlNodeImpl.raw(nodes)));
+      result.add(registerNode(new SqlNodeImpl.raw(nodes, false)));
     }
     return result;
   }

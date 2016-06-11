@@ -7,11 +7,13 @@ import "sqltree_statement.dart";
 import "sqltree_statement_impl.dart";
 import "sqltree_custom.dart";
 import "sqltree_parameter.dart";
+import "sqltree_parameter_impl.dart";
 import "sqltree_node_manager.dart";
 import "sqltree_node_manager_impl.dart";
 import "sqltree_formatter.dart";
 import "sqltree_formatter_impl.dart";
 import "sqltree_prettifier.dart";
+import "sqltree_prettifier_impl.dart";
 import "sqltree_util.dart";
 
 // TODO valutare se rinominare in upper case tutti i metodi
@@ -110,7 +112,7 @@ SqlNamedParameterConversion convert(String sql) => _NODE_CONVERTER.convert(sql);
 
 SqlSelectStatement select(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlSelectStatementImpl());
+  var parent = registerNode(new SqlSelectStatementImpl(false));
 
   parent.selectClause.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -119,7 +121,7 @@ SqlSelectStatement select(
 }
 
 SqlUpdateStatement update([node]) {
-  var parent = registerNode(new SqlUpdateStatementImpl());
+  var parent = registerNode(new SqlUpdateStatementImpl(false));
 
   parent.updateClause.child = node;
 
@@ -127,7 +129,7 @@ SqlUpdateStatement update([node]) {
 }
 
 SqlInsertStatement insert([node]) {
-  var parent = registerNode(new SqlInsertStatementImpl());
+  var parent = registerNode(new SqlInsertStatementImpl(false));
 
   parent.insertClause.child = node;
 
@@ -136,7 +138,7 @@ SqlInsertStatement insert([node]) {
 
 SqlDeleteStatement delete(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlDeleteStatementImpl());
+  var parent = registerNode(new SqlDeleteStatementImpl(false));
 
   parent.fromClause.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -146,7 +148,7 @@ SqlDeleteStatement delete(
 
 SqlJoins joins(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlJoinsImpl());
+  var parent = registerNode(new SqlJoinsImpl(false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -165,7 +167,7 @@ SqlJoin leftJoin(fromNode,
     onNode7,
     onNode8,
     onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN));
+  var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN, false));
 
   parent.fromClause.addChildren(fromNode);
   parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
@@ -185,7 +187,7 @@ SqlJoin join(fromNode,
     onNode7,
     onNode8,
     onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN));
+  var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN, false));
 
   parent.fromClause.addChildren(fromNode);
   parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
@@ -428,7 +430,7 @@ SqlNode function(String function,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(function);
 
-  var parent = registerNode(new CustomSqlFunction(function));
+  var parent = registerNode(new CustomSqlFunction(function, null, false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -440,7 +442,7 @@ SqlNode operator(String operator,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent = registerNode(new CustomSqlOperator(operator));
+  var parent = registerNode(new CustomSqlOperator(operator, null, false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -451,8 +453,7 @@ SqlNode operator(String operator,
 SqlNode unaryOperator(String operator, node) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent =
-      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 1));
+  var parent = registerNode(new CustomSqlOperator(operator, 1, false));
 
   parent.addChildren(node);
 
@@ -462,8 +463,7 @@ SqlNode unaryOperator(String operator, node) {
 SqlNode binaryOperator(String operator, node0, node1) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent =
-      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 2));
+  var parent = registerNode(new CustomSqlOperator(operator, 2, false));
 
   parent.addChildren(node0, node1);
 
@@ -495,7 +495,8 @@ SqlOperator _binaryOperator(String operator, node0, node1) =>
 
 SqlFunction _function(String function, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlOperatorImpl(function, maxChildrenLength));
+  var parent =
+      registerNode(new SqlOperatorImpl(function, maxChildrenLength, false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -505,7 +506,8 @@ SqlFunction _function(String function, int maxChildrenLength,
 
 SqlOperator _operator(String operator, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlOperatorImpl(operator, maxChildrenLength));
+  var parent =
+      registerNode(new SqlOperatorImpl(operator, maxChildrenLength, false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -515,7 +517,7 @@ SqlOperator _operator(String operator, int maxChildrenLength,
 
 SqlNode _node(String type, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlNodeImpl(type, maxChildrenLength));
+  var parent = registerNode(new SqlNodeImpl(type, maxChildrenLength, false));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -527,9 +529,9 @@ SqlNodeManagerImpl _NODE_MANAGER = new SqlNodeManagerImpl();
 
 SqlNodeFormatterImpl _NODE_FORMATTER = new SqlNodeFormatterImpl();
 
-SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifier();
+SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifierImpl();
 
-SqlNamedParameterConverter _NODE_CONVERTER = new SqlNamedParameterConverter();
+SqlNamedParameterConverter _NODE_CONVERTER = new SqlNamedParameterConverterImpl();
 
 final Set<String> _blockNodes = new Set.from([types.BLOCK, types.TUPLE]);
 

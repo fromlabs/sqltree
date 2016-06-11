@@ -8,17 +8,18 @@ import "ordersheet_sql.dart";
 class GroupConcatNodeImpl extends sql.CustomSqlNode
     implements GroupConcatNode, sql.ChildrenLockedSqlNode {
   @override
-  GroupConcatNodeImpl()
-      : super(types.GROUP_CONCAT_STATEMENT, maxChildrenLength: 3);
+  GroupConcatNodeImpl(bool isFreezed)
+      : super(types.GROUP_CONCAT_STATEMENT, 3, isFreezed);
 
   @override
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new GroupConcatClauseImpl());
-    this.registerAndAddInternal(new sql.CustomSqlNode(types.ORDER_BY_CLAUSE));
+    this.registerAndAddInternal(new GroupConcatClauseImpl(isFreezed));
     this.registerAndAddInternal(
-        new sql.CustomSqlNode(types.SEPARATOR_CLAUSE, maxChildrenLength: 1));
+        new sql.CustomSqlNode(types.ORDER_BY_CLAUSE, null, isFreezed));
+    this.registerAndAddInternal(
+        new sql.CustomSqlNode(types.SEPARATOR_CLAUSE, 1, isFreezed));
   }
 
   void clearGroupConcat() {
@@ -70,6 +71,10 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
 
   @override
   sql.SqlNode get separatorClause => children[2];
+
+  @override
+  sql.SqlNode createSqlNodeClone(bool isFreezed) =>
+      new GroupConcatNodeImpl(isFreezed);
 }
 
 class GroupConcatClauseImpl extends sql.CustomSqlNode
@@ -77,23 +82,17 @@ class GroupConcatClauseImpl extends sql.CustomSqlNode
   @override
   bool isDistinct;
 
-  GroupConcatClauseImpl()
+  GroupConcatClauseImpl(bool isFreezed)
       : this.isDistinct = false,
-        super(types.GROUP_CONCAT_CLAUSE);
+        super(types.GROUP_CONCAT_CLAUSE, null, isFreezed);
 
   @override
-  GroupConcatClauseImpl clone() {
-    return super.clone();
-  }
+  sql.SqlNode createSqlNodeClone(bool isFreezed) =>
+      new GroupConcatClauseImpl(isFreezed);
 
   @override
-  GroupConcatClauseImpl createSqlNodeClone() {
-    return new GroupConcatClauseImpl();
-  }
-
-  @override
-  GroupConcatClauseImpl completeClone(GroupConcatClauseImpl targetNode) {
-    GroupConcatClauseImpl node = super.completeClone(targetNode);
+  sql.SqlNode completeClone(GroupConcatClauseImpl targetNode) {
+    GroupConcatClause node = super.completeClone(targetNode);
     node.isDistinct = targetNode.isDistinct;
     return node;
   }

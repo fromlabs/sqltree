@@ -39,4 +39,21 @@ main() {
   print(conversion.positionalParameterNames);
 
   print(sql.prettify(sql.format(select.clone())));
+
+  var cloned = select.clone();
+
+  cloned.getSingleNodeByReference("ref1").disable();
+
+  print(sql.prettify(sql.format(cloned)));
+
+  // select.clone(freeze: true).getSingleNodeByReference("ref1").disable();
+  // select.clone(freeze: true).clone().getSingleNodeByReference("ref1").disable();
+
+  var freezed = select.clone(freeze: true);
+
+  freezed
+      .getSingleNodeByReference("ref3")
+      .addChildren(sql.text("OPEN", "CLOSED"));
+
+  print(sql.prettify(sql.format(freezed)));
 }

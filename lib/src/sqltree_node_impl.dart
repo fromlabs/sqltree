@@ -9,7 +9,7 @@ import "sqltree_util.dart";
 
 class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
     extends SqlNodeListImpl<E> {
-  SqlNode _parent;
+  SqlAbstractNodeImpl _parent;
 
   final List<E> _backedList;
 
@@ -22,7 +22,7 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   void set length(int newLength) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     _checkNodesCount(newLength);
 
@@ -31,7 +31,7 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   void add(E value) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     _checkNodesCount(length + 1);
 
@@ -40,7 +40,7 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   void addAll(Iterable<E> iterable) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     _checkNodesCount(length + iterable.length);
 
@@ -49,7 +49,7 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   void insert(int index, E element) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     _checkNodesCount(length + 1);
 
@@ -58,7 +58,7 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   void insertAll(int index, Iterable<E> iterable) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     _checkNodesCount(length + iterable.length);
 
@@ -67,75 +67,83 @@ class SqlNodeChildrenListImpl<E extends SqlAbstractNodeImpl>
 
   @override
   bool remove(Object value) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.remove(value);
   }
 
   @override
   E removeAt(int index) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.removeAt(index);
   }
 
   @override
   E removeLast() {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.removeLast();
   }
 
   @override
   void removeWhere(bool test(E element)) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.removeWhere(test);
   }
 
   @override
   void retainWhere(bool test(E element)) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.retainWhere(test);
   }
 
   @override
   void removeRange(int start, int end) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.removeRange(start, end);
   }
 
   @override
   void replaceRange(int start, int end, Iterable<E> iterable) {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.replaceRange(start, end, iterable);
   }
 
   @override
   void clear() {
-    _checkChildrenLocked();
+    _checkUpdatable();
 
     return _backedList.clear();
   }
 
   void _addInternal(SqlNode node) {
+    _parent.checkNotFreezed();
+
     _checkNodesCount(length + 1);
 
     _backedList.add(node);
   }
 
-  void _checkNodesCount(int count) {
-    if (maxLength != null && count > maxLength) {
-      throw new StateError("Children count out of range $count > $maxLength");
-    }
+  void _checkUpdatable() {
+    _parent.checkNotFreezed();
+
+    _checkChildrenLocked();
   }
 
   void _checkChildrenLocked() {
     if (_parent is ChildrenLockedSqlNode) {
       throw new UnsupportedError("Children locked");
+    }
+  }
+
+  void _checkNodesCount(int count) {
+    if (maxLength != null && count > maxLength) {
+      throw new StateError("Children count out of range $count > $maxLength");
     }
   }
 }
@@ -197,43 +205,40 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
       new SqlNodeListImpl.from(map(wrapper), growable: false);
 
   @override
-  SqlNodeList<T> clone() {
-    SqlNodeListImpl clone = new SqlNodeListImpl();
+  SqlNodeList<T> clone({freeze: false}) {
+    SqlNodeList clone = new SqlNodeListImpl();
     for (var node in this) {
-      clone.add(node.clone());
+      clone.add(node.clone(freeze: freeze));
     }
     return clone;
   }
 }
 
 class SqlNodeImpl extends SqlAbstractNodeImpl {
-  // TODO verificare named parameters
-  SqlNodeImpl(String type, int maxChildrenLength)
-      : super(type, maxChildrenLength);
+  SqlNodeImpl(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed);
 
-  SqlNodeImpl.raw(expression) : super.raw(expression?.toString());
+  SqlNodeImpl.raw(expression, bool isFreezed)
+      : super.raw(expression?.toString(), isFreezed);
 
   @override
-  SqlAbstractNodeImpl createSqlNodeClone() => isRawExpression
-      ? new SqlNodeImpl.raw(rawExpression)
-      : new SqlNodeImpl(type, children.maxLength);
+  SqlNode createSqlNodeClone(bool isFreezed) => isRawExpression
+      ? new SqlNodeImpl.raw(rawExpression, isFreezed)
+      : new SqlNodeImpl(type, children.maxLength, isFreezed);
 }
 
 class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
-  SqlFunctionImpl(String type, int maxChildrenLength)
-      : super(type, maxChildrenLength);
+  SqlFunctionImpl(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed);
 
   @override
-  SqlFunctionImpl createSqlNodeClone() =>
-      new SqlFunctionImpl(type, children.maxLength);
-
-  @override
-  SqlFunctionImpl clone() => super.clone();
+  SqlNode createSqlNodeClone(bool isFreezed) =>
+      new SqlFunctionImpl(type, children.maxLength, isFreezed);
 }
 
 class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
-  SqlOperatorImpl(String type, int maxChildrenLength)
-      : super(type, maxChildrenLength) {
+  SqlOperatorImpl(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed) {
     if (maxChildrenLength != null && maxChildrenLength == 0) {
       throw new ArgumentError.value(0, "maxChildrenLength");
     }
@@ -243,14 +248,13 @@ class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
   bool get isUnary => children.maxLength != null && children.maxLength == 1;
 
   @override
-  SqlOperatorImpl createSqlNodeClone() =>
-      new SqlOperatorImpl(type, children.maxLength);
-
-  @override
-  SqlOperatorImpl clone() => super.clone();
+  SqlNode createSqlNodeClone(bool isFreezed) =>
+      new SqlOperatorImpl(type, children.maxLength, isFreezed);
 }
 
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
+  final bool isFreezed;
+
   String _reference;
 
   bool _isEnabled;
@@ -262,14 +266,14 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   final String _type;
   final String _rawExpression;
 
-  SqlAbstractNodeImpl.raw(this._rawExpression)
+  SqlAbstractNodeImpl.raw(this._rawExpression, this.isFreezed)
       : this._type = BaseSqlNodeTypes.types.RAW,
         this._isEnabled = true,
         this._children = new SqlNodeChildrenListImpl([], 0) {
     (_children as SqlNodeChildrenListImpl)._parent = this;
   }
 
-  SqlAbstractNodeImpl(this._type, int maxChildrenLength)
+  SqlAbstractNodeImpl(this._type, int maxChildrenLength, this.isFreezed)
       : this._rawExpression = null,
         this._isEnabled = true,
         this._children = new SqlNodeChildrenListImpl([], maxChildrenLength) {
@@ -298,6 +302,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   String get reference => _reference;
 
   void set reference(String reference) {
+    checkNotFreezed();
+
     _reference = reference;
   }
 
@@ -306,6 +312,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   void set isEnabled(bool isEnabled) {
+    checkNotFreezed();
+
     _isEnabled = isEnabled;
   }
 
@@ -444,27 +452,34 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   void onNodeRegistered() {}
 
   @override
-  SqlNode clone() => completeClone(createSqlNodeClone());
+  SqlNode clone({freeze: false}) =>
+      completeClone(createSqlNodeClone(freeze || isFreezed));
 
-  SqlAbstractNodeImpl createSqlNodeClone() {
+  SqlNode createSqlNodeClone(bool isFreezed) {
     throw new UnsupportedError("Clone unsupported on $runtimeType");
   }
 
-  SqlAbstractNodeImpl completeClone(SqlAbstractNodeImpl targetNode) {
+  SqlNode completeClone(SqlAbstractNodeImpl targetNode) {
     SqlNodeChildrenListImpl children = _children;
     SqlNodeChildrenListImpl targetChildren = targetNode._children;
     targetNode._nodeManager = _nodeManager;
     targetNode._reference = _reference;
     targetNode._isEnabled = _isEnabled;
     for (var node in children._backedList) {
-      targetChildren._backedList.add(node.clone());
+      targetChildren._backedList.add(node.clone(freeze: targetNode.isFreezed));
     }
     return targetNode;
   }
 
   registerAndAddInternal(SqlNode node) {
-    return (_children as SqlNodeChildrenListImpl)
-        ._addInternal(nodeManager.registerNode(node));
+    SqlNodeChildrenListImpl children = _children;
+    return children._addInternal(nodeManager.registerNode(node));
+  }
+
+  void checkNotFreezed() {
+    if (isFreezed) {
+      throw new StateError("Node is freezed");
+    }
   }
 
   void _checkRegistered() {

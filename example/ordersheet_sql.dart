@@ -59,8 +59,7 @@ void _registerFormatRuleProviders(ExtTypes types) {
 }
 
 sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
-  var parent = sql
-      .registerNode(new sql.CustomSqlFunction(types.IF, maxChildrenLength: 3));
+  var parent = sql.registerNode(new sql.CustomSqlFunction(types.IF, 3, false));
 
   parent.addChildren(condition, nodeIf, nodeThen);
 
@@ -68,8 +67,8 @@ sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
 }
 
 sql.SqlNode replace(node, from, to) {
-  var parent = sql.registerNode(
-      new sql.CustomSqlFunction(types.REPLACE, maxChildrenLength: 3));
+  var parent =
+      sql.registerNode(new sql.CustomSqlFunction(types.REPLACE, 3, false));
 
   parent.addChildren(node, from, to);
 
@@ -78,7 +77,7 @@ sql.SqlNode replace(node, from, to) {
 
 GroupConcatNode groupConcat(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = sql.registerNode(new GroupConcatNodeImpl());
+  var parent = sql.registerNode(new GroupConcatNodeImpl(false));
 
   parent.groupConcat(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -111,7 +110,7 @@ abstract class GroupConcatNode implements sql.SqlNode {
 
   void clearSeparator();
 
-  GroupConcatNode clone();
+  GroupConcatNode clone({freeze: false});
 }
 
 abstract class GroupConcatClause implements sql.SqlNode {
@@ -119,5 +118,5 @@ abstract class GroupConcatClause implements sql.SqlNode {
 
   void set isDistinct(bool isDistinct);
 
-  GroupConcatClause clone();
+  GroupConcatClause clone({freeze: false});
 }

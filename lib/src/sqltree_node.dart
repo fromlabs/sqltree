@@ -8,7 +8,7 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 
   SqlNode get singleOrNull;
 
-  SqlNodeList<T> clone();
+  SqlNodeList<T> clone({freeze: false});
 
   void setReference(String reference);
 
@@ -28,9 +28,11 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 }
 
 abstract class SqlNode {
+  bool get isFreezed;
+
   String get type;
 
-  SqlNode clone();
+  SqlNode clone({freeze: false});
 
   String reference;
 

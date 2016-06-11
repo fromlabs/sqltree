@@ -12,37 +12,28 @@ class CustomSqlNodeList<T extends SqlNode> extends SqlNodeListImpl<T> {
 }
 
 class CustomSqlNode extends SqlNodeImpl {
-  CustomSqlNode(String type, {int maxChildrenLength})
-      : super(type, maxChildrenLength);
+  CustomSqlNode(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed);
 
   @override
-  CustomSqlNode createSqlNodeClone() =>
-      new CustomSqlNode(type, maxChildrenLength: children.maxLength);
-
-  @override
-  CustomSqlNode clone() => super.clone();
+  SqlNode createSqlNodeClone(bool isFreezed) =>
+      new CustomSqlNode(type, children.maxLength, isFreezed);
 }
 
 class CustomSqlFunction extends SqlFunctionImpl {
-  CustomSqlFunction(String type, {int maxChildrenLength})
-      : super(type, maxChildrenLength);
+  CustomSqlFunction(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed);
 
   @override
-  CustomSqlFunction createSqlNodeClone() =>
-      new CustomSqlFunction(type, maxChildrenLength: children.maxLength);
-
-  @override
-  CustomSqlFunction clone() => super.clone();
+  SqlNode createSqlNodeClone(bool isFreezed) =>
+      new CustomSqlFunction(type, children.maxLength, isFreezed);
 }
 
 class CustomSqlOperator extends SqlOperatorImpl {
-  CustomSqlOperator(String type, {int maxChildrenLength})
-      : super(type, maxChildrenLength);
+  CustomSqlOperator(String type, int maxChildrenLength, bool isFreezed)
+      : super(type, maxChildrenLength, isFreezed);
 
   @override
-  CustomSqlOperator createSqlNodeClone() =>
-      new CustomSqlOperator(type, maxChildrenLength: children.maxLength);
-
-  @override
-  CustomSqlOperator clone() => super.clone();
+  SqlNode createSqlNodeClone(bool isFreezed) =>
+      new CustomSqlOperator(type, children.maxLength, isFreezed);
 }
