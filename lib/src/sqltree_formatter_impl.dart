@@ -184,5 +184,5 @@ class SqlFormattedNodeImpl extends SqlAbstractNodeImpl
   @override
   SqlNode createSqlNodeClone(bool isFreezed) =>
       new SqlFormattedNodeImpl(rule,
-          maxChildrenLength: children.maxLength, isFreezed: isFreezed);
+          maxChildrenLength: maxChildrenLength, isFreezed: isFreezed);
 }

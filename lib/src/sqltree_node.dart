@@ -4,8 +4,6 @@
 typedef SqlNode NodeWrapper(SqlNode node);
 
 abstract class SqlNodeList<T extends SqlNode> implements List<T> {
-  int get maxLength;
-
   SqlNode get singleOrNull;
 
   SqlNodeList<T> clone({freeze: false});

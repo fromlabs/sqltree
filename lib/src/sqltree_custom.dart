@@ -17,7 +17,7 @@ class CustomSqlNode extends SqlNodeImpl {
 
   @override
   SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlNode(type, children.maxLength, isFreezed);
+      new CustomSqlNode(type, maxChildrenLength, isFreezed);
 }
 
 class CustomSqlFunction extends SqlFunctionImpl {
@@ -26,7 +26,7 @@ class CustomSqlFunction extends SqlFunctionImpl {
 
   @override
   SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlFunction(type, children.maxLength, isFreezed);
+      new CustomSqlFunction(type, maxChildrenLength, isFreezed);
 }
 
 class CustomSqlOperator extends SqlOperatorImpl {
@@ -35,5 +35,5 @@ class CustomSqlOperator extends SqlOperatorImpl {
 
   @override
   SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlOperator(type, children.maxLength, isFreezed);
+      new CustomSqlOperator(type, maxChildrenLength, isFreezed);
 }
