@@ -154,34 +154,35 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
   int get maxLength => null;
 
   @override
-  SqlNode get singleOrNull {
-    if (length <= 1) {
-      return isNotEmpty ? first : null;
-    } else {
-      throw new StateError("Not single node");
+  SqlNode get singleOrNull => isNotEmpty ? single : null;
+
+  @override
+  void setReference(String reference) {
+    for (var child in this) {
+      child.reference = reference;
     }
   }
 
   @override
-  void set isEnabled(bool isEnabled) {
+  void setEnabled(bool isEnabled) {
     for (var child in this) {
       child.isEnabled = isEnabled;
     }
   }
 
   @override
-  void set isDisabled(bool isDisabled) {
-    isEnabled = !isDisabled;
+  void setDisabled(bool isDisabled) {
+    setEnabled(!isDisabled);
   }
 
   @override
   void enable() {
-    isEnabled = true;
+    setEnabled(true);
   }
 
   @override
   void disable() {
-    isEnabled = false;
+    setEnabled(false);
   }
 
   SqlNode getSingleNodeByReference(String reference) =>
@@ -218,31 +219,6 @@ class SqlNodeImpl extends SqlAbstractNodeImpl {
       : new SqlNodeImpl(type, children.maxLength);
 }
 
-class SqlGroupImpl extends SqlAbstractNodeImpl implements SqlGroup {
-  @override
-  final String reference;
-
-  @override
-  bool isEnabled;
-
-  SqlGroupImpl(this.reference)
-      : this.isEnabled = true,
-        super(BaseSqlNodeTypes.types.GROUP, 1);
-
-  @override
-  SqlGroupImpl clone() => super.clone();
-
-  @override
-  SqlGroupImpl createSqlNodeClone() => new SqlGroupImpl(reference);
-
-  @override
-  SqlGroupImpl completeClone(SqlGroupImpl targetNode) {
-    SqlGroupImpl node = super.completeClone(targetNode);
-    node.isEnabled = targetNode.isEnabled;
-    return node;
-  }
-}
-
 class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
   SqlFunctionImpl(String type, int maxChildrenLength)
       : super(type, maxChildrenLength);
@@ -275,6 +251,10 @@ class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
 }
 
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
+  String _reference;
+
+  bool _isEnabled;
+
   final SqlNodeList _children;
 
   SqlNodeManager _nodeManager;
@@ -284,12 +264,14 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   SqlAbstractNodeImpl.raw(this._rawExpression)
       : this._type = BaseSqlNodeTypes.types.RAW,
+        this._isEnabled = true,
         this._children = new SqlNodeChildrenListImpl([], 0) {
     (_children as SqlNodeChildrenListImpl)._parent = this;
   }
 
   SqlAbstractNodeImpl(this._type, int maxChildrenLength)
       : this._rawExpression = null,
+        this._isEnabled = true,
         this._children = new SqlNodeChildrenListImpl([], maxChildrenLength) {
     (_children as SqlNodeChildrenListImpl)._parent = this;
 
@@ -313,15 +295,18 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   String get type => _type;
 
   @override
-  String get reference => null;
+  String get reference => _reference;
+
+  void set reference(String reference) {
+    _reference = reference;
+  }
 
   @override
-  bool get isEnabled => true;
+  bool get isEnabled => _isEnabled;
 
   @override
   void set isEnabled(bool isEnabled) {
-    throw new UnsupportedError(
-        "Node enabling not supported: use a group node as a wrapper.");
+    _isEnabled = isEnabled;
   }
 
   @override
@@ -469,6 +454,8 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
     SqlNodeChildrenListImpl children = _children;
     SqlNodeChildrenListImpl targetChildren = targetNode._children;
     targetNode._nodeManager = _nodeManager;
+    targetNode._reference = _reference;
+    targetNode._isEnabled = _isEnabled;
     for (var node in children._backedList) {
       targetChildren._backedList.add(node.clone());
     }

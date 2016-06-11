@@ -10,9 +10,11 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 
   SqlNodeList<T> clone();
 
-  void set isEnabled(bool isEnabled);
+  void setReference(String reference);
 
-  void set isDisabled(bool isDisabled);
+  void setEnabled(bool isEnabled);
+
+  void setDisabled(bool isDisabled);
 
   void enable();
 
@@ -30,11 +32,9 @@ abstract class SqlNode {
 
   SqlNode clone();
 
-  String get reference;
+  String reference;
 
-  bool get isEnabled;
-
-  void set isEnabled(bool isEnabled);
+  bool isEnabled;
 
   bool get isDisabled;
 
@@ -80,14 +80,6 @@ abstract class SqlNode {
   SqlNode getSingleNodeByReference(String reference);
 
   SqlNodeList getNodeListByReference(String reference);
-}
-
-abstract class SqlGroup implements SqlNode {
-  String get reference;
-
-  bool get isEnabled;
-
-  bool get isDisabled;
 }
 
 abstract class SqlFunction implements SqlNode {}

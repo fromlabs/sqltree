@@ -7,10 +7,10 @@ main() {
   var select = sql.select("*")
         ..from(sql.joins("tabella"))
         ..where(sql.equal("a", sql.parameter("par1")))
-        ..where(sql.group("ref1", sql.equal("b", sql.parameter("par2"))))
+        ..where(sql.setReference("ref1", sql.equal("b", sql.parameter("par2"))))
         ..where(sql.qualify("a", "1", "2", "3"))
-        ..where(sql.group("ref2", sql.sqlInTuple("a")))
-        ..where(sql.sqlIn("a", sql.group("ref3", sql.tuple())))
+        ..where(sql.setReference("ref2", sql.sqlInTuple("a")))
+        ..where(sql.sqlIn("a", sql.setReference("ref3", sql.tuple())))
         ..where(sql.sqlInTuple("a"))
       //..where(sql.enabled(true, sql.equal("b", sql.parameter("par2"))))
       //..where(sql.enabledGroup("ref1", true, sql.equal("b", sql.parameter("par2"))))
@@ -23,14 +23,12 @@ main() {
 
   select
       .getSingleNodeByReference("ref2")
-      .child
       .children
       .last
       .addChildren(sql.text("OPEN", "CLOSED"));
 
   select
       .getSingleNodeByReference("ref3")
-      .child
       .addChildren(sql.text("OPEN", "CLOSED"));
 
   print(sql.prettify(sql.format(select)));

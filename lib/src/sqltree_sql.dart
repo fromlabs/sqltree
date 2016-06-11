@@ -303,7 +303,7 @@ SqlNode lower(node) => _function(types.LOWER, 1, node);
 
 /* DECORATORS */
 
-SqlNodeList group(reference,
+SqlNodeList setReference(String reference,
         [node0,
         node1,
         node2,
@@ -314,10 +314,69 @@ SqlNodeList group(reference,
         node7,
         node8,
         node9]) =>
-    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9)
-        .wrap((node) => _NODE_MANAGER.registerNode(new SqlGroupImpl(reference))
-          ..child = node);
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..setReference(reference);
+
+SqlNodeList setEnabled(bool enabled,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..setEnabled(enabled);
+
+SqlNodeList setDisabled(bool disabled,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..setDisabled(disabled);
+
+SqlNodeList enable(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..enable();
+
+SqlNodeList disable(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..disable();
 
 SqlNodeList text(
         [node0,
