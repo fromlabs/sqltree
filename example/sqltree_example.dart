@@ -4,7 +4,6 @@
 import 'package:sqltree/sqltree.dart' as sql;
 
 main() {
-
   sql.normalize("ciao").single.clone();
 
   var select = sql.select("*")
@@ -52,11 +51,19 @@ main() {
   // select.clone(freeze: true).getSingleNodeByReference("ref1").disable();
   // select.clone(freeze: true).clone().getSingleNodeByReference("ref1").disable();
 
-  var freezed = select.clone(freeze: true);
+  var freezed = select.clone(freeze: true).clone(freeze: false);
 
   freezed
       .getSingleNodeByReference("ref3")
       .addChildren(sql.text("OPEN", "CLOSED"));
 
   print(sql.prettify(sql.format(freezed)));
+
+  select = select.clone(freeze: false);
+
+  print(select == select.clone(freeze: false));
+
+  select = select.clone(freeze: true);
+
+  print(select == select.clone(freeze: true));
 }
