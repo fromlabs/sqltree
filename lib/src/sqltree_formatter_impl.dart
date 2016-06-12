@@ -177,12 +177,15 @@ class SqlFormattedNodeImpl extends SqlAbstractNodeImpl
     implements SqlFormattedNode {
   final SqlFormatRule rule;
 
-  SqlFormattedNodeImpl(this.rule,
-      {int maxChildrenLength, bool isFreezed: false})
-      : super(BaseSqlNodeTypes.types.FORMATTED, maxChildrenLength, isFreezed);
+  SqlFormattedNodeImpl(this.rule, {int maxChildrenLength})
+      : super(BaseSqlNodeTypes.types.FORMATTED,
+            maxChildrenLength: maxChildrenLength);
+
+  SqlFormattedNodeImpl.cloneFrom(SqlFormattedNodeImpl targetNode, bool freeze)
+      : this.rule = targetNode.rule,
+        super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool isFreezed) =>
-      new SqlFormattedNodeImpl(rule,
-          maxChildrenLength: maxChildrenLength, isFreezed: isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlFormattedNodeImpl.cloneFrom(this, freeze);
 }

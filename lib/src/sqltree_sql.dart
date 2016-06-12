@@ -430,7 +430,7 @@ SqlNode function(String function,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(function);
 
-  var parent = registerNode(new CustomSqlFunction(function, null, false));
+  var parent = registerNode(new CustomSqlFunction(function));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -442,7 +442,7 @@ SqlNode operator(String operator,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent = registerNode(new CustomSqlOperator(operator, null, false));
+  var parent = registerNode(new CustomSqlOperator(operator));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -453,7 +453,8 @@ SqlNode operator(String operator,
 SqlNode unaryOperator(String operator, node) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent = registerNode(new CustomSqlOperator(operator, 1, false));
+  var parent =
+      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 1));
 
   parent.addChildren(node);
 
@@ -463,7 +464,8 @@ SqlNode unaryOperator(String operator, node) {
 SqlNode binaryOperator(String operator, node0, node1) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent = registerNode(new CustomSqlOperator(operator, 2, false));
+  var parent =
+      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 2));
 
   parent.addChildren(node0, node1);
 
@@ -495,8 +497,8 @@ SqlOperator _binaryOperator(String operator, node0, node1) =>
 
 SqlFunction _function(String function, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent =
-      registerNode(new SqlOperatorImpl(function, maxChildrenLength, false));
+  var parent = registerNode(
+      new SqlOperatorImpl(function, maxChildrenLength: maxChildrenLength));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -506,8 +508,8 @@ SqlFunction _function(String function, int maxChildrenLength,
 
 SqlOperator _operator(String operator, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent =
-      registerNode(new SqlOperatorImpl(operator, maxChildrenLength, false));
+  var parent = registerNode(
+      new SqlOperatorImpl(operator, maxChildrenLength: maxChildrenLength));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -517,7 +519,8 @@ SqlOperator _operator(String operator, int maxChildrenLength,
 
 SqlNode _node(String type, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlNodeImpl(type, maxChildrenLength, false));
+  var parent =
+      registerNode(new SqlNodeImpl(type, maxChildrenLength: maxChildrenLength));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -531,7 +534,8 @@ SqlNodeFormatterImpl _NODE_FORMATTER = new SqlNodeFormatterImpl();
 
 SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifierImpl();
 
-SqlNamedParameterConverter _NODE_CONVERTER = new SqlNamedParameterConverterImpl();
+SqlNamedParameterConverter _NODE_CONVERTER =
+    new SqlNamedParameterConverterImpl();
 
 final Set<String> _blockNodes = new Set.from([types.BLOCK, types.TUPLE]);
 

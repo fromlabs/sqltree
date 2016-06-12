@@ -7,8 +7,8 @@ import "ordersheet_sql.dart";
 
 class GroupConcatNodeImpl extends sql.CustomSqlNode
     implements GroupConcatNode, sql.ChildrenLockingSupport {
-  GroupConcatNodeImpl(bool isFreezed)
-      : super(types.GROUP_CONCAT_STATEMENT, 3, isFreezed);
+  GroupConcatNodeImpl()
+      : super(types.GROUP_CONCAT_STATEMENT, maxChildrenLength: 3);
 
   GroupConcatNodeImpl.cloneFrom(GroupConcatNodeImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
@@ -17,11 +17,9 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new GroupConcatClauseImpl(isFreezed));
-    this.registerAndAddInternal(
-        new sql.CustomSqlNode(types.ORDER_BY_CLAUSE, null, isFreezed));
-    this.registerAndAddInternal(
-        new sql.CustomSqlNode(types.SEPARATOR_CLAUSE, 1, isFreezed));
+    this.registerAndAddInternal(new GroupConcatClauseImpl());
+    this.registerAndAddInternal(new sql.CustomSqlNode(types.ORDER_BY_CLAUSE));
+    this.registerAndAddInternal(new sql.CustomSqlNode(types.SEPARATOR_CLAUSE));
   }
 
   void clearGroupConcat() {
@@ -84,9 +82,9 @@ class GroupConcatClauseImpl extends sql.CustomSqlNode
   @override
   bool isDistinct;
 
-  GroupConcatClauseImpl(bool isFreezed)
+  GroupConcatClauseImpl()
       : this.isDistinct = false,
-        super(types.GROUP_CONCAT_CLAUSE, null, isFreezed);
+        super(types.GROUP_CONCAT_CLAUSE);
 
   GroupConcatClauseImpl.cloneFrom(GroupConcatClauseImpl targetNode, bool freeze)
       : this.isDistinct = targetNode.isDistinct,

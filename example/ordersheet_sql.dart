@@ -59,7 +59,8 @@ void _registerFormatRuleProviders(ExtTypes types) {
 }
 
 sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
-  var parent = sql.registerNode(new sql.CustomSqlFunction(types.IF, 3, false));
+  var parent = sql
+      .registerNode(new sql.CustomSqlFunction(types.IF, maxChildrenLength: 3));
 
   parent.addChildren(condition, nodeIf, nodeThen);
 
@@ -67,8 +68,8 @@ sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
 }
 
 sql.SqlNode replace(node, from, to) {
-  var parent =
-      sql.registerNode(new sql.CustomSqlFunction(types.REPLACE, 3, false));
+  var parent = sql.registerNode(
+      new sql.CustomSqlFunction(types.REPLACE, maxChildrenLength: 3));
 
   parent.addChildren(node, from, to);
 
@@ -77,7 +78,7 @@ sql.SqlNode replace(node, from, to) {
 
 GroupConcatNode groupConcat(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = sql.registerNode(new GroupConcatNodeImpl(false));
+  var parent = sql.registerNode(new GroupConcatNodeImpl());
 
   parent.groupConcat(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);

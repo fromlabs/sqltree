@@ -1,8 +1,7 @@
 # TODO
 
 + clone intelligente se freezed
-
-- volgliamo togliere il freeze da tutti i costruttori (solo con clone)
++ volgliamo togliere il freeze da tutti i costruttori (solo con clone si può freezare)
 
 - rivedere clone del raw e chi utilizza il costruttore
 
