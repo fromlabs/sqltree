@@ -5,35 +5,42 @@ import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 
 class CustomSqlNodeList<T extends SqlNode> extends SqlNodeListImpl<T> {
-  CustomSqlNodeList();
+  CustomSqlNodeList() : super(false);
 
-  CustomSqlNodeList.from(Iterable<T> elements, {bool growable: true})
-      : super.from(elements, growable: growable);
+  // TODO rivedere il clone del custom list
 }
 
 class CustomSqlNode extends SqlNodeImpl {
   CustomSqlNode(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 
+  CustomSqlNode.cloneFrom(CustomSqlNode targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlNode(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) => new SqlNodeImpl.cloneFrom(this, freeze);
 }
 
 class CustomSqlFunction extends SqlFunctionImpl {
   CustomSqlFunction(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 
+  CustomSqlFunction.cloneFrom(CustomSqlFunction targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlFunction(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new CustomSqlFunction.cloneFrom(this, freeze);
 }
 
 class CustomSqlOperator extends SqlOperatorImpl {
   CustomSqlOperator(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 
+  CustomSqlOperator.cloneFrom(CustomSqlOperator targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new CustomSqlOperator(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new CustomSqlOperator.cloneFrom(this, freeze);
 }

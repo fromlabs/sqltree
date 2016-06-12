@@ -4,6 +4,9 @@
 import 'package:sqltree/sqltree.dart' as sql;
 
 main() {
+
+  sql.normalize("ciao").single.clone();
+
   var select = sql.select("*")
         ..from(sql.joins("tabella"))
         ..where(sql.equal("a", sql.parameter("par1")))

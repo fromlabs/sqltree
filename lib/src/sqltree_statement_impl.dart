@@ -11,6 +11,10 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlSelectStatementImpl(bool isFreezed)
       : super(BaseSqlNodeTypes.types.SELECT_STATEMENT, 8, isFreezed);
 
+  SqlSelectStatementImpl.cloneFrom(
+      SqlSelectStatementImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
   void onNodeRegistered() {
     super.onNodeRegistered();
@@ -166,14 +170,18 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlSelectStatementImpl(isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlSelectStatementImpl.cloneFrom(this, freeze);
 }
 
 class SqlInsertStatementImpl extends SqlAbstractStatementImpl
     implements SqlInsertStatement {
   SqlInsertStatementImpl(bool isFreezed)
       : super(BaseSqlNodeTypes.types.INSERT_STATEMENT, 3, isFreezed);
+
+  SqlInsertStatementImpl.cloneFrom(
+      SqlInsertStatementImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void onNodeRegistered() {
@@ -231,14 +239,18 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   SqlNode get valuesClause => children[2];
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlInsertStatementImpl(isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlInsertStatementImpl.cloneFrom(this, freeze);
 }
 
 class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
     implements SqlUpdateStatement {
   SqlUpdateStatementImpl(bool isFreezed)
       : super(BaseSqlNodeTypes.types.UPDATE_STATEMENT, 3, isFreezed);
+
+  SqlUpdateStatementImpl.cloneFrom(
+      SqlUpdateStatementImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void onNodeRegistered() {
@@ -296,14 +308,18 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlUpdateStatementImpl(isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlUpdateStatementImpl.cloneFrom(this, freeze);
 }
 
 class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
     implements SqlDeleteStatement {
   SqlDeleteStatementImpl(bool isFreezed)
       : super(BaseSqlNodeTypes.types.DELETE_STATEMENT, 3, isFreezed);
+
+  SqlDeleteStatementImpl.cloneFrom(
+      SqlDeleteStatementImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void onNodeRegistered() {
@@ -363,14 +379,22 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlDeleteStatementImpl(isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlDeleteStatementImpl.cloneFrom(this, freeze);
 }
 
 abstract class SqlAbstractStatementImpl extends SqlAbstractNodeImpl
     implements SqlStatement, ChildrenLockingSupport {
   SqlAbstractStatementImpl(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
+
+  SqlAbstractStatementImpl.cloneFrom(
+      SqlAbstractStatementImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
+  SqlNode createClone(bool freeze) {
+    throw new UnsupportedError("Clone unsupported on $runtimeType");
+  }
 }
 
 class SqlSelectClauseImpl extends SqlAbstractNodeImpl
@@ -382,21 +406,21 @@ class SqlSelectClauseImpl extends SqlAbstractNodeImpl
       : this.isDistinct = false,
         super(BaseSqlNodeTypes.types.SELECT_CLAUSE, null, isFreezed);
 
-  @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlSelectClauseImpl(isFreezed);
+  SqlSelectClauseImpl.cloneFrom(SqlSelectClauseImpl targetNode, bool freeze)
+      : this.isDistinct = targetNode.isDistinct,
+        super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode completeClone(SqlSelectClauseImpl targetNode) {
-    SqlSelectClause node = super.completeClone(targetNode);
-    node.isDistinct = targetNode.isDistinct;
-    return node;
-  }
+  SqlNode createClone(bool freeze) =>
+      new SqlSelectClauseImpl.cloneFrom(this, freeze);
 }
 
 class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
   SqlJoinsImpl(bool isFreezed)
       : super(BaseSqlNodeTypes.types.JOINS, null, isFreezed);
+
+  SqlJoinsImpl.cloneFrom(SqlJoinsImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void join(fromNode,
@@ -441,12 +465,15 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
   }
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) => new SqlJoinsImpl(isFreezed);
+  SqlNode createClone(bool freeze) => new SqlJoinsImpl.cloneFrom(this, freeze);
 }
 
 class SqlJoinImpl extends SqlAbstractNodeImpl
     implements SqlJoin, ChildrenLockingSupport {
   SqlJoinImpl(String type, bool isFreezed) : super(type, 2, isFreezed);
+
+  SqlJoinImpl.cloneFrom(SqlJoinImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void onNodeRegistered() {
@@ -487,6 +514,5 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   SqlNode get onClause => children[1];
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlJoinImpl(type, isFreezed);
+  SqlNode createClone(bool freeze) => new SqlJoinImpl.cloneFrom(this, freeze);
 }

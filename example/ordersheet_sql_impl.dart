@@ -7,9 +7,11 @@ import "ordersheet_sql.dart";
 
 class GroupConcatNodeImpl extends sql.CustomSqlNode
     implements GroupConcatNode, sql.ChildrenLockingSupport {
-  @override
   GroupConcatNodeImpl(bool isFreezed)
       : super(types.GROUP_CONCAT_STATEMENT, 3, isFreezed);
+
+  GroupConcatNodeImpl.cloneFrom(GroupConcatNodeImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
   void onNodeRegistered() {
@@ -73,8 +75,8 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   sql.SqlNode get separatorClause => children[2];
 
   @override
-  sql.SqlNode createSqlNodeClone(bool isFreezed) =>
-      new GroupConcatNodeImpl(isFreezed);
+  sql.SqlNode createClone(bool freeze) =>
+      new GroupConcatNodeImpl.cloneFrom(this, freeze);
 }
 
 class GroupConcatClauseImpl extends sql.CustomSqlNode
@@ -86,14 +88,11 @@ class GroupConcatClauseImpl extends sql.CustomSqlNode
       : this.isDistinct = false,
         super(types.GROUP_CONCAT_CLAUSE, null, isFreezed);
 
-  @override
-  sql.SqlNode createSqlNodeClone(bool isFreezed) =>
-      new GroupConcatClauseImpl(isFreezed);
+  GroupConcatClauseImpl.cloneFrom(GroupConcatClauseImpl targetNode, bool freeze)
+      : this.isDistinct = targetNode.isDistinct,
+        super.cloneFrom(targetNode, freeze);
 
   @override
-  sql.SqlNode completeClone(GroupConcatClauseImpl targetNode) {
-    GroupConcatClause node = super.completeClone(targetNode);
-    node.isDistinct = targetNode.isDistinct;
-    return node;
-  }
+  sql.SqlNode createClone(bool freeze) =>
+      new GroupConcatClauseImpl.cloneFrom(this, freeze);
 }

@@ -182,7 +182,7 @@ class SqlFormattedNodeImpl extends SqlAbstractNodeImpl
       : super(BaseSqlNodeTypes.types.FORMATTED, maxChildrenLength, isFreezed);
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
+  SqlNode createClone(bool isFreezed) =>
       new SqlFormattedNodeImpl(rule,
           maxChildrenLength: maxChildrenLength, isFreezed: isFreezed);
 }

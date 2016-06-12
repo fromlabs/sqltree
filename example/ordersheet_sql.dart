@@ -110,7 +110,7 @@ abstract class GroupConcatNode implements sql.SqlNode {
 
   void clearSeparator();
 
-  GroupConcatNode clone({freeze: false});
+  GroupConcatNode clone({bool freeze});
 }
 
 abstract class GroupConcatClause implements sql.SqlNode {
@@ -118,5 +118,5 @@ abstract class GroupConcatClause implements sql.SqlNode {
 
   void set isDistinct(bool isDistinct);
 
-  GroupConcatClause clone({freeze: false});
+  GroupConcatClause clone({bool freeze});
 }

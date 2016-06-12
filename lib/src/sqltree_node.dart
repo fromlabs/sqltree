@@ -4,9 +4,11 @@
 typedef SqlNode NodeWrapper(SqlNode node);
 
 abstract class SqlNodeList<T extends SqlNode> implements List<T> {
+  bool get isFreezed;
+
   SqlNode get singleOrNull;
 
-  SqlNodeList<T> clone({freeze: false});
+  SqlNodeList<T> clone({bool freeze});
 
   void setReference(String reference);
 
@@ -30,7 +32,7 @@ abstract class SqlNode {
 
   String get type;
 
-  SqlNode clone({freeze: false});
+  SqlNode clone({bool freeze});
 
   String reference;
 

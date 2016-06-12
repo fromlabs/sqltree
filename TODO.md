@@ -3,15 +3,21 @@
 + backed list
 + brutto maxLength su nodelist
 
++ supporto per unfreeze
 - clone e freeze del nodelist
+
+- riverificare utilizzo del nodeManager (magari non lho appggiamo ma o passiamo su onRegistered)
+- rivedere registerAndInstall
+- verificare se si può mettere ChildrenLockingSupport in SqlJoinsImpl
+
 - clone intelligente se freezed
-- rivedere clone del raw
+- rivedere clone del raw e chi utilizza il costruttore
 
-- check se effettvamento freezed
+- Controllo tipo su register Node
+- Sqltable e sqlcolumn devono avere le stesse caratteristiche dei loro provider perché se recupero i nodi dalla select devo poter fare quello che facevo prima...oppure devo poter tornare al provider che l'ha generato
 
+- rivedere il clone del custom list
 - verificare altri metodi ereditati da custom
-
-- lockedchildren sup
 
 - node proveder al posto di nodeconvertable
 - utilizzare tonde in tabelle e colonne

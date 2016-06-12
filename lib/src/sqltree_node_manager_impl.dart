@@ -72,7 +72,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
 
   @override
   SqlNodeList normalize(nodes) {
-    var result = new SqlNodeListImpl();
+    var result = new SqlNodeListImpl(false);
 
     if (nodes is SqlNodeProvider) {
       nodes = nodes.createNode();
@@ -83,7 +83,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     } else if (nodes is SqlNode) {
       result.add(nodes);
     } else {
-      result.add(registerNode(new SqlNodeImpl.raw(nodes, false)));
+      result.add(registerNode(new SqlNodeImpl.raw(nodes)));
     }
     return result;
   }

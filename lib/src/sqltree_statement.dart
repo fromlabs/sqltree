@@ -4,7 +4,7 @@
 import "sqltree_node.dart";
 
 abstract class SqlStatement implements SqlNode {
-  SqlStatement clone({freeze: false});
+  SqlStatement clone({bool freeze});
 }
 
 abstract class SqlSelectStatement implements SqlStatement {
@@ -68,7 +68,7 @@ abstract class SqlSelectStatement implements SqlStatement {
 
   SqlSelectStatement toCountStatement();
 
-  SqlSelectStatement clone({freeze: false});
+  SqlSelectStatement clone({bool freeze});
 }
 
 abstract class SqlInsertStatement implements SqlStatement {
@@ -92,7 +92,7 @@ abstract class SqlInsertStatement implements SqlStatement {
 
   void clearValues();
 
-  SqlInsertStatement clone({freeze: false});
+  SqlInsertStatement clone({bool freeze});
 }
 
 abstract class SqlUpdateStatement implements SqlStatement {
@@ -116,7 +116,7 @@ abstract class SqlUpdateStatement implements SqlStatement {
 
   void clearWhere();
 
-  SqlUpdateStatement clone({freeze: false});
+  SqlUpdateStatement clone({bool freeze});
 }
 
 abstract class SqlDeleteStatement implements SqlStatement {
@@ -141,7 +141,7 @@ abstract class SqlDeleteStatement implements SqlStatement {
 
   void clearWhere();
 
-  SqlDeleteStatement clone({freeze: false});
+  SqlDeleteStatement clone({bool freeze});
 }
 
 abstract class SqlSelectClause implements SqlNode {
@@ -149,7 +149,7 @@ abstract class SqlSelectClause implements SqlNode {
 
   void set isDistinct(bool isDistinct);
 
-  SqlSelectClause clone({freeze: false});
+  SqlSelectClause clone({bool freeze});
 }
 
 abstract class SqlJoins implements SqlNode {
@@ -177,7 +177,7 @@ abstract class SqlJoins implements SqlNode {
       onNode8,
       onNode9]);
 
-  SqlJoins clone({freeze: false});
+  SqlJoins clone({bool freeze});
 }
 
 abstract class SqlJoin implements SqlNode {
@@ -194,5 +194,5 @@ abstract class SqlJoin implements SqlNode {
 
   void clearOn();
 
-  SqlJoin clone({freeze: false});
+  SqlJoin clone({bool freeze});
 }

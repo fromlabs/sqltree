@@ -8,14 +8,18 @@ import "sqltree_node_manager.dart";
 import "sqltree_util.dart";
 
 // TODO verificare altri costruttori e metodi di trasformazione delle liste
-class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
+
+class SqlNodeListImpl<T extends SqlNode> extends UpdatableList<T>
     implements SqlNodeList<T> {
-  SqlNodeListImpl() : super([]);
+  final bool isFreezed;
 
-  SqlNodeListImpl.from(Iterable elements, {bool growable: true})
-      : super(new List.from(elements, growable: growable));
+  SqlNodeListImpl(this.isFreezed) : super([]);
 
-  SqlNodeListImpl._backedList(List<T> backedList) : super(backedList);
+  SqlNodeListImpl.cloneFrom(SqlNodeListImpl target, bool freeze)
+      : this.isFreezed = freeze,
+        super(target._backedList
+            .map((node) => node.clone(freeze: freeze))
+            .toList());
 
   @override
   SqlNode get singleOrNull => isNotEmpty ? single : null;
@@ -53,20 +57,32 @@ class SqlNodeListImpl<T extends SqlNode> extends DelegatingList<T>
       getNodeListByReference(reference).singleOrNull;
 
   SqlNodeList getNodeListByReference(String reference) =>
-      new SqlNodeListImpl.from(
-          expand((child) => child.getNodeListByReference(reference)),
-          growable: false);
+      new SqlNodeListImpl(false)
+        ..addAll(expand((child) => child.getNodeListByReference(reference)));
 
   SqlNodeList wrap(NodeWrapper wrapper) =>
-      new SqlNodeListImpl.from(map(wrapper), growable: false);
+      new SqlNodeListImpl(false)..addAll(map(wrapper));
 
   @override
-  SqlNodeList<T> clone({freeze: false}) {
-    SqlNodeList clone = new SqlNodeListImpl();
-    for (var node in this) {
-      clone.add(node.clone(freeze: freeze));
+  SqlNodeList<T> clone({bool freeze}) {
+    // TODO rivedere la condizione
+    freeze = freeze ?? isFreezed;
+    return freeze == isFreezed ? createClone(freeze) : this;
+  }
+
+  SqlNodeList<T> createClone(bool freeze) {
+    return new SqlNodeListImpl.cloneFrom(this, freeze);
+  }
+
+  @override
+  void _checkUpdatable() {
+    _checkNotFreezed();
+  }
+
+  void _checkNotFreezed() {
+    if (isFreezed) {
+      throw new StateError("Node is freezed");
     }
-    return clone;
   }
 }
 
@@ -74,22 +90,25 @@ class SqlNodeImpl extends SqlAbstractNodeImpl {
   SqlNodeImpl(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 
-  SqlNodeImpl.raw(expression, bool isFreezed)
-      : super.raw(expression?.toString(), isFreezed);
+  SqlNodeImpl.raw(expression) : super.raw(expression?.toString());
+
+  SqlNodeImpl.cloneFrom(SqlNodeImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) => isRawExpression
-      ? new SqlNodeImpl.raw(rawExpression, isFreezed)
-      : new SqlNodeImpl(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) => new SqlNodeImpl.cloneFrom(this, freeze);
 }
 
 class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
   SqlFunctionImpl(String type, int maxChildrenLength, bool isFreezed)
       : super(type, maxChildrenLength, isFreezed);
 
+  SqlFunctionImpl.cloneFrom(SqlFunctionImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlFunctionImpl(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlFunctionImpl.cloneFrom(this, freeze);
 }
 
 class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
@@ -100,12 +119,15 @@ class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
     }
   }
 
+  SqlOperatorImpl.cloneFrom(SqlOperatorImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
   @override
   bool get isUnary => maxChildrenLength != null && maxChildrenLength == 1;
 
   @override
-  SqlNode createSqlNodeClone(bool isFreezed) =>
-      new SqlOperatorImpl(type, maxChildrenLength, isFreezed);
+  SqlNode createClone(bool freeze) =>
+      new SqlOperatorImpl.cloneFrom(this, freeze);
 }
 
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
@@ -123,26 +145,34 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   bool _isEnabled;
 
-  SqlAbstractNodeImpl.raw(this._rawExpression, bool isFreezed)
-      : this._type = BaseSqlNodeTypes.types.RAW,
-        this.isFreezed = isFreezed,
-        this._isEnabled = true,
-        this._children = new _SqlNodeChildrenListImpl([], 0, isFreezed) {
-    _children.registerParent(this);
-  }
-
   SqlAbstractNodeImpl(this._type, int maxChildrenLength, bool isFreezed)
       : this._rawExpression = null,
         this.isFreezed = isFreezed,
         this._isEnabled = true,
         this._children =
-            new _SqlNodeChildrenListImpl([], maxChildrenLength, isFreezed) {
+            new _SqlNodeChildrenListImpl(maxChildrenLength, isFreezed) {
     _children.registerParent(this);
 
     if (type == null) {
       throw new ArgumentError.notNull("type");
     }
   }
+
+  SqlAbstractNodeImpl.raw(this._rawExpression)
+      : this._type = BaseSqlNodeTypes.types.RAW,
+        this.isFreezed = false,
+        this._isEnabled = true,
+        this._children = null;
+
+  SqlAbstractNodeImpl.cloneFrom(SqlAbstractNodeImpl targetNode, bool freeze)
+      : this.isFreezed = freeze,
+        this._type = targetNode._type,
+        this._rawExpression = targetNode._rawExpression,
+        this._nodeManager = targetNode._nodeManager,
+        this._reference = targetNode._reference,
+        this._isEnabled = targetNode._isEnabled,
+        this._children = targetNode._children?.clone(freeze: freeze);
+  // this._children = targetNode._children?._cloneInternal(freeze: freeze);
 
   @override
   void registerNode(SqlNodeManager nodeManager) {
@@ -203,7 +233,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   @override
   SqlNodeList getNodeListByReference(String reference) {
-    var list = new SqlNodeListImpl();
+    var list = new SqlNodeListImpl(false);
 
     if (this.reference == reference) {
       list.add(this);
@@ -314,22 +344,14 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   void onNodeRegistered() {}
 
   @override
-  SqlNode clone({freeze: false}) =>
-      completeClone(createSqlNodeClone(freeze || isFreezed));
-
-  SqlNode createSqlNodeClone(bool isFreezed) {
-    throw new UnsupportedError("Clone unsupported on $runtimeType");
+  SqlNode clone({bool freeze}) {
+    // TODO rivedere la condizione
+    freeze = freeze ?? isFreezed;
+    return freeze == isFreezed ? createClone(freeze) : this;
   }
 
-  SqlNode completeClone(SqlAbstractNodeImpl targetNode) {
-    targetNode._nodeManager = _nodeManager;
-    targetNode._reference = _reference;
-    targetNode._isEnabled = _isEnabled;
-    for (var node in _children._backedList) {
-      targetNode._children._backedList
-          .add(node.clone(freeze: targetNode.isFreezed));
-    }
-    return targetNode;
+  SqlNode createClone(bool freeze) {
+    throw new UnsupportedError("Clone unsupported on $runtimeType");
   }
 
   registerAndAddInternal(SqlNode node) =>
@@ -361,19 +383,17 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 }
 
 class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
-  final bool isFreezed;
-
   bool isChildrenLockingEnabled;
-
-  final List<SqlNode> _backedList;
 
   @override
   final int maxLength;
 
-  _SqlNodeChildrenListImpl(
-      List<SqlNode> backedList, this.maxLength, this.isFreezed)
-      : this._backedList = backedList,
-        super._backedList(backedList);
+  _SqlNodeChildrenListImpl(this.maxLength, bool isFreezed) : super(isFreezed);
+
+  _SqlNodeChildrenListImpl.cloneFrom(
+      _SqlNodeChildrenListImpl target, bool freeze)
+      : this.maxLength = target.maxLength,
+        super.cloneFrom(target, freeze);
 
   void registerParent(SqlNode parent) {
     this.isChildrenLockingEnabled = parent is ChildrenLockingSupport;
@@ -381,104 +401,42 @@ class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
 
   @override
   void set length(int newLength) {
-    _checkUpdatable();
-
     _checkNodesCount(newLength);
 
-    _backedList.length = newLength;
+    super.length = newLength;
   }
 
   @override
   void add(SqlNode value) {
-    _checkUpdatable();
-
     _checkNodesCount(length + 1);
 
-    return _backedList.add(value);
+    return super.add(value);
   }
 
   @override
   void addAll(Iterable<SqlNode> iterable) {
-    _checkUpdatable();
-
     _checkNodesCount(length + iterable.length);
 
-    return _backedList.addAll(iterable);
+    return super.addAll(iterable);
   }
 
   @override
   void insert(int index, SqlNode element) {
-    _checkUpdatable();
-
     _checkNodesCount(length + 1);
 
-    return _backedList.insert(index, element);
+    return super.insert(index, element);
   }
 
   @override
   void insertAll(int index, Iterable<SqlNode> iterable) {
-    _checkUpdatable();
-
     _checkNodesCount(length + iterable.length);
 
-    return _backedList.insertAll(index, iterable);
+    return super.insertAll(index, iterable);
   }
 
   @override
-  bool remove(Object value) {
-    _checkUpdatable();
-
-    return _backedList.remove(value);
-  }
-
-  @override
-  SqlNode removeAt(int index) {
-    _checkUpdatable();
-
-    return _backedList.removeAt(index);
-  }
-
-  @override
-  SqlNode removeLast() {
-    _checkUpdatable();
-
-    return _backedList.removeLast();
-  }
-
-  @override
-  void removeWhere(bool test(SqlNode element)) {
-    _checkUpdatable();
-
-    return _backedList.removeWhere(test);
-  }
-
-  @override
-  void retainWhere(bool test(SqlNode element)) {
-    _checkUpdatable();
-
-    return _backedList.retainWhere(test);
-  }
-
-  @override
-  void removeRange(int start, int end) {
-    _checkUpdatable();
-
-    return _backedList.removeRange(start, end);
-  }
-
-  @override
-  void replaceRange(int start, int end, Iterable<SqlNode> iterable) {
-    _checkUpdatable();
-
-    return _backedList.replaceRange(start, end, iterable);
-  }
-
-  @override
-  void clear() {
-    _checkUpdatable();
-
-    return _backedList.clear();
-  }
+  _SqlNodeChildrenListImpl createClone(bool freeze) =>
+      new _SqlNodeChildrenListImpl.cloneFrom(this, freeze);
 
   void _addInternal(SqlNode node) {
     _checkNotFreezed();
@@ -489,15 +447,9 @@ class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
   }
 
   void _checkUpdatable() {
-    _checkNotFreezed();
+    super._checkUpdatable();
 
     _checkChildrenLocked();
-  }
-
-  void _checkNotFreezed() {
-    if (isFreezed) {
-      throw new StateError("Node is freezed");
-    }
   }
 
   void _checkChildrenLocked() {
@@ -511,4 +463,105 @@ class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
       throw new StateError("Children count out of range $count > $maxLength");
     }
   }
+}
+
+class UpdatableList<T> extends DelegatingList<T> {
+  final List<T> _backedList;
+
+  UpdatableList(List<T> backedList)
+      : this._backedList = backedList,
+        super(backedList);
+
+  @override
+  void set length(int newLength) {
+    _checkUpdatable();
+
+    _backedList.length = newLength;
+  }
+
+  @override
+  void add(T value) {
+    _checkUpdatable();
+
+    return _backedList.add(value);
+  }
+
+  @override
+  void addAll(Iterable<T> iterable) {
+    _checkUpdatable();
+
+    return _backedList.addAll(iterable);
+  }
+
+  @override
+  void insert(int index, T element) {
+    _checkUpdatable();
+
+    return _backedList.insert(index, element);
+  }
+
+  @override
+  void insertAll(int index, Iterable<T> iterable) {
+    _checkUpdatable();
+
+    return _backedList.insertAll(index, iterable);
+  }
+
+  @override
+  bool remove(Object value) {
+    _checkUpdatable();
+
+    return _backedList.remove(value);
+  }
+
+  @override
+  T removeAt(int index) {
+    _checkUpdatable();
+
+    return _backedList.removeAt(index);
+  }
+
+  @override
+  T removeLast() {
+    _checkUpdatable();
+
+    return _backedList.removeLast();
+  }
+
+  @override
+  void removeWhere(bool test(T element)) {
+    _checkUpdatable();
+
+    return _backedList.removeWhere(test);
+  }
+
+  @override
+  void retainWhere(bool test(T element)) {
+    _checkUpdatable();
+
+    return _backedList.retainWhere(test);
+  }
+
+  @override
+  void removeRange(int start, int end) {
+    _checkUpdatable();
+
+    return _backedList.removeRange(start, end);
+  }
+
+  @override
+  void replaceRange(int start, int end, Iterable<T> iterable) {
+    _checkUpdatable();
+
+    return _backedList.replaceRange(start, end, iterable);
+  }
+
+  @override
+  void clear() {
+    _checkUpdatable();
+
+    return _backedList.clear();
+  }
+
+  void _checkUpdatable() {}
 }
