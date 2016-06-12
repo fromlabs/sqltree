@@ -17,9 +17,9 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new GroupConcatClauseImpl());
-    this.registerAndAddInternal(new sql.CustomSqlNode(types.ORDER_BY_CLAUSE));
-    this.registerAndAddInternal(new sql.CustomSqlNode(types.SEPARATOR_CLAUSE));
+    this.addInternal(new GroupConcatClauseImpl());
+    this.addInternal(new sql.CustomSqlNode(types.ORDER_BY_CLAUSE));
+    this.addInternal(new sql.CustomSqlNode(types.SEPARATOR_CLAUSE));
   }
 
   void clearGroupConcat() {

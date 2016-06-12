@@ -183,6 +183,9 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   }
 
   @override
+  bool get isRegistered => _nodeManager != null;
+
+  @override
   String get type => _type;
 
   int get maxChildrenLength => _children.maxLength;
@@ -347,8 +350,13 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   SqlNode createClone(bool freeze);
 
-  registerAndAddInternal(SqlNode node) =>
-      _children._addInternal(nodeManager.registerNode(node));
+  SqlNode addInternal(SqlNode node) {
+    if (!node.isRegistered) {
+      node = nodeManager.registerNode(node);
+    }
+    _children._addInternal(node);
+    return node;
+  }
 
   void checkNotFreezed() {
     if (isFreezed) {
@@ -357,7 +365,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   }
 
   void _checkRegistered() {
-    if (_nodeManager == null) {
+    if (!isRegistered) {
       throw new StateError("Node not registered");
     }
   }

@@ -8,7 +8,7 @@ import "sqltree_node_manager.dart";
 
 class SqlSelectStatementImpl extends SqlAbstractStatementImpl
     implements SqlSelectStatement {
-  SqlSelectStatementImpl(bool isFreezed)
+  SqlSelectStatementImpl()
       : super(BaseSqlNodeTypes.types.SELECT_STATEMENT, maxChildrenLength: 8);
 
   SqlSelectStatementImpl.cloneFrom(
@@ -19,22 +19,15 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new SqlSelectClauseImpl(isFreezed));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.HAVING_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.LIMIT_CLAUSE,
+    this.addInternal(new SqlSelectClauseImpl());
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.HAVING_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.LIMIT_CLAUSE,
         maxChildrenLength: 1));
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.OFFSET_CLAUSE,
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.OFFSET_CLAUSE,
         maxChildrenLength: 1));
   }
 
@@ -178,7 +171,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
 class SqlInsertStatementImpl extends SqlAbstractStatementImpl
     implements SqlInsertStatement {
-  SqlInsertStatementImpl(bool isFreezed)
+  SqlInsertStatementImpl()
       : super(BaseSqlNodeTypes.types.INSERT_STATEMENT, maxChildrenLength: 3);
 
   SqlInsertStatementImpl.cloneFrom(
@@ -189,13 +182,10 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.INSERT_CLAUSE,
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.INSERT_CLAUSE,
         maxChildrenLength: 1));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.VALUES_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.VALUES_CLAUSE));
   }
 
   @override
@@ -248,7 +238,7 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
 
 class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
     implements SqlUpdateStatement {
-  SqlUpdateStatementImpl(bool isFreezed)
+  SqlUpdateStatementImpl()
       : super(BaseSqlNodeTypes.types.UPDATE_STATEMENT, maxChildrenLength: 3);
 
   SqlUpdateStatementImpl.cloneFrom(
@@ -259,13 +249,10 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.UPDATE_CLAUSE,
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.UPDATE_CLAUSE,
         maxChildrenLength: 1));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.SET_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.SET_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
   }
 
   @override
@@ -318,7 +305,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
 
 class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
     implements SqlDeleteStatement {
-  SqlDeleteStatementImpl(bool isFreezed)
+  SqlDeleteStatementImpl()
       : super(BaseSqlNodeTypes.types.DELETE_STATEMENT, maxChildrenLength: 3);
 
   SqlDeleteStatementImpl.cloneFrom(
@@ -329,13 +316,10 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.DELETE_CLAUSE,
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.DELETE_CLAUSE,
         maxChildrenLength: 1));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
   }
 
   @override
@@ -407,7 +391,7 @@ class SqlSelectClauseImpl extends SqlAbstractNodeImpl
   @override
   bool isDistinct;
 
-  SqlSelectClauseImpl(bool isFreezed)
+  SqlSelectClauseImpl()
       : this.isDistinct = false,
         super(BaseSqlNodeTypes.types.SELECT_CLAUSE);
 
@@ -421,7 +405,7 @@ class SqlSelectClauseImpl extends SqlAbstractNodeImpl
 }
 
 class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
-  SqlJoinsImpl(bool isFreezed) : super(BaseSqlNodeTypes.types.JOINS);
+  SqlJoinsImpl() : super(BaseSqlNodeTypes.types.JOINS);
 
   SqlJoinsImpl.cloneFrom(SqlJoinsImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
@@ -438,15 +422,13 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = nodeManager.registerNode(
-        new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN, isFreezed));
+    var join = addChildren(nodeManager
+        .registerNode(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN)));
 
-    join.addInternal(fromNode);
+    join.addChildren(fromNode);
 
-    join.addInternal(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5,
+    join.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5,
         onNode6, onNode7, onNode8, onNode9);
-
-    registerAndAddInternal(join);
   }
 
   @override
@@ -461,11 +443,13 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    return registerAndAddInternal(
-        new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN, isFreezed))
-      ..addChildren(fromNode)
-      ..addChildren(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5,
-          onNode6, onNode7, onNode8, onNode9);
+    var join = addChildren(nodeManager
+        .registerNode(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN)));
+
+    join.addChildren(fromNode);
+
+    join.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4, onNode5,
+        onNode6, onNode7, onNode8, onNode9);
   }
 
   @override
@@ -474,7 +458,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
 
 class SqlJoinImpl extends SqlAbstractNodeImpl
     implements SqlJoin, ChildrenLockingSupport {
-  SqlJoinImpl(String type, bool isFreezed) : super(type, maxChildrenLength: 2);
+  SqlJoinImpl(String type) : super(type, maxChildrenLength: 2);
 
   SqlJoinImpl.cloneFrom(SqlJoinImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
@@ -483,11 +467,9 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.registerAndAddInternal(new SqlNodeImpl(
-        BaseSqlNodeTypes.types.JOIN_FROM,
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_FROM,
         maxChildrenLength: 1));
-    this.registerAndAddInternal(
-        new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_ON));
+    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_ON));
   }
 
   @override

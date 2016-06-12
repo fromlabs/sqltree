@@ -112,7 +112,7 @@ SqlNamedParameterConversion convert(String sql) => _NODE_CONVERTER.convert(sql);
 
 SqlSelectStatement select(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlSelectStatementImpl(false));
+  var parent = registerNode(new SqlSelectStatementImpl());
 
   parent.selectClause.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -121,7 +121,7 @@ SqlSelectStatement select(
 }
 
 SqlUpdateStatement update([node]) {
-  var parent = registerNode(new SqlUpdateStatementImpl(false));
+  var parent = registerNode(new SqlUpdateStatementImpl());
 
   parent.updateClause.child = node;
 
@@ -129,7 +129,7 @@ SqlUpdateStatement update([node]) {
 }
 
 SqlInsertStatement insert([node]) {
-  var parent = registerNode(new SqlInsertStatementImpl(false));
+  var parent = registerNode(new SqlInsertStatementImpl());
 
   parent.insertClause.child = node;
 
@@ -138,7 +138,7 @@ SqlInsertStatement insert([node]) {
 
 SqlDeleteStatement delete(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlDeleteStatementImpl(false));
+  var parent = registerNode(new SqlDeleteStatementImpl());
 
   parent.fromClause.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -148,7 +148,7 @@ SqlDeleteStatement delete(
 
 SqlJoins joins(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = registerNode(new SqlJoinsImpl(false));
+  var parent = registerNode(new SqlJoinsImpl());
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -167,7 +167,7 @@ SqlJoin leftJoin(fromNode,
     onNode7,
     onNode8,
     onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN, false));
+  var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN));
 
   parent.fromClause.addChildren(fromNode);
   parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
@@ -187,7 +187,7 @@ SqlJoin join(fromNode,
     onNode7,
     onNode8,
     onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN, false));
+  var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN));
 
   parent.fromClause.addChildren(fromNode);
   parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
