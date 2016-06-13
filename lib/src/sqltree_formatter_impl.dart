@@ -13,20 +13,9 @@ import "sqltree_util.dart";
 class SqlNodeFormatterImpl implements SqlNodeFormatter {
   static const String _EMPTY = "";
 
-  final List<SqlNodeFormatter> _formatters = [];
-
-  final List<SqlFormatRuleProvider> _ruleProviders = [];
-
-  static final SqlFormatRule _joinsRule = new SqlFormatRule(separator: " ");
-
-  static final SqlFormatRule _columnsRule =
-      new SqlFormatRule(prefix: "(", separator: ", ", postfix: ")");
-
-  static final SqlFormatRule _emptyRule = new SqlFormatRule();
-
-  static final SqlFormatRule _onRule =
-      new SqlFormatRule(prefix: "ON ", separator: " AND ");
-
+  final List<SqlNodeFormatterFunction> _formatters = [];
+/*
+*/
   static final Set<String> _clauseNodes = new Set.from([
     BaseSqlNodeTypes.types.INSERT_CLAUSE,
     BaseSqlNodeTypes.types.VALUES_CLAUSE,
@@ -46,6 +35,10 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
   static final Set<String> _emptyNodes = new Set.from(
       [BaseSqlNodeTypes.types.JOIN_FROM, BaseSqlNodeTypes.types.GROUP]);
 
+  void registerNodeFormatter(SqlNodeFormatterFunction formatter) {
+    _formatters.add(formatter);
+  }
+
   @override
   String format(SqlNode node) {
     if (node == null || node.isDisabled) {
@@ -53,136 +46,103 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
     } else if (node.isComposite) {
       String formatted;
 
-      for (SqlNodeFormatter formatter in _formatters) {
-        formatted = formatter.format(node);
+      List<String> formattedChildren = _getFormattedChildren(node);
+
+      formatted = _supportedFormat(node, formattedChildren);
+      if (formatted != null) {
+        return formatted;
+      }
+
+      for (SqlNodeFormatterFunction formatter in _formatters) {
+        formatted = formatter(node, formattedChildren);
         if (formatted != null) {
           return formatted;
         }
       }
 
-      return _defaultFormat(node);
+      return _defaultFormat(node, formattedChildren);
     } else {
       return node.rawExpression;
     }
-  }
-
-  void registerNodeFormatter(SqlNodeFormatter formatter) {
-    _formatters.add(formatter);
-  }
-
-  void registerFormatRuleProvider(SqlFormatRuleProvider provider) {
-    _ruleProviders.add(provider);
-  }
-
-  String _defaultFormat(SqlNode node) {
-    List<String> formattedChildren = _getFormattedChildren(node);
-
-    SqlFormatRule rule = _getSupportedRule(node);
-
-    if (rule == null) {
-      for (SqlFormatRuleProvider provider in _ruleProviders) {
-        rule = provider(node);
-        if (rule != null) {
-          break;
-        }
-      }
-    }
-
-    if (rule == null) {
-      rule = _getDefaultRule(node);
-    }
-
-    if (formattedChildren.isNotEmpty || rule.isFormatEmptyChildrenEnabled) {
-      StringBuffer buffer = new StringBuffer();
-
-      if (isNotEmptyString(rule.prefix)) {
-        buffer.write(rule.prefix);
-      }
-
-      buffer.write(formattedChildren.join(rule.separator ?? _EMPTY));
-
-      if (isNotEmptyString(rule.postfix)) {
-        buffer.write(rule.postfix);
-      }
-
-      return buffer.toString();
-    } else {
-      return _EMPTY;
-    }
-  }
-
-  SqlFormatRule _getSupportedRule(SqlNode node) {
-    if (node is SqlStatement) {
-      return new SqlFormatRule(separator: " ");
-    } else if (node is SqlSelectClause) {
-      return new SqlFormatRule(
-          prefix: "${node.type} ${node.isDistinct ? "DISTINCT " : ""}",
-          separator: ", ");
-    } else if (node is SqlFormattedNode) {
-      return node.rule;
-    } else if (node is SqlFunction) {
-      return new SqlFormatRule(
-          prefix: "${node.type}(",
-          separator: ", ",
-          postfix: ")",
-          isFormatEmptyChildrenEnabled: true);
-    } else if (node is SqlOperator) {
-      if (node.isUnary) {
-        return new SqlFormatRule(prefix: "${node.type} ", separator: ", ");
-      } else {
-        return new SqlFormatRule(separator: " ${node.type} ");
-      }
-    } else if (node is SqlJoins) {
-      return _joinsRule;
-    } else if (node is SqlJoin) {
-      return new SqlFormatRule(prefix: "${node.type} ", separator: " ");
-    } else if (_clauseNodes.contains(node.type)) {
-      return new SqlFormatRule(prefix: "${node.type} ", separator: ", ");
-    } else if (BaseSqlNodeTypes.types.DELETE_CLAUSE == node.type) {
-      return new SqlFormatRule(
-          prefix: "${node.type} ",
-          separator: ", ",
-          isFormatEmptyChildrenEnabled: true);
-    } else if (_whereNodes.contains(node.type)) {
-      return new SqlFormatRule(prefix: "${node.type} ", separator: " AND ");
-    } else if (BaseSqlNodeTypes.types.COLUMNS_CLAUSE == node.type) {
-      return _columnsRule;
-    } else if (_emptyNodes.contains(node.type)) {
-      return _emptyRule;
-    } else if (BaseSqlNodeTypes.types.JOIN_ON == node.type) {
-      return _onRule;
-    }
-
-    return null;
-  }
-
-  SqlFormatRule _getDefaultRule(SqlNode node) {
-    print(
-        "WARNING: undefined rule for node of type ${node.type} [${node.runtimeType}]");
-
-    return new SqlFormatRule(
-        prefix: "${node.type}(",
-        separator: ", ",
-        postfix: ")",
-        isFormatEmptyChildrenEnabled: true);
   }
 
   List<String> _getFormattedChildren(SqlNode node) => node.children
       .map((childNode) => this.format(childNode))
       .where((formatted) => isNotEmptyString(formatted))
       .toList(growable: false);
+
+  String _supportedFormat(SqlNode node, List<String> formattedChildren) {
+    if (node is SqlStatement) {
+      return formatByRule(formattedChildren, separator: " ");
+    } else if (node is SqlSelectClause) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type} ${node.isDistinct ? "DISTINCT " : ""}",
+          separator: ", ");
+    } else if (node is SqlFormattedNode) {
+      return node.formatter(node, formattedChildren);
+    } else if (node is SqlFunction) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type}(",
+          separator: ", ",
+          postfix: ")",
+          isFormatEmptyChildrenEnabled: true);
+    } else if (node is SqlOperator) {
+      if (node.isUnary) {
+        return formatByRule(formattedChildren,
+            prefix: "${node.type} ", separator: ", ");
+      } else {
+        return formatByRule(formattedChildren, separator: " ${node.type} ");
+      }
+    } else if (node is SqlJoins) {
+      return formatByRule(formattedChildren, separator: " ");
+    } else if (node is SqlJoin) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type} ", separator: " ");
+    } else if (_clauseNodes.contains(node.type)) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type} ", separator: ", ");
+    } else if (BaseSqlNodeTypes.types.DELETE_CLAUSE == node.type) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type} ",
+          separator: ", ",
+          isFormatEmptyChildrenEnabled: true);
+    } else if (_whereNodes.contains(node.type)) {
+      return formatByRule(formattedChildren,
+          prefix: "${node.type} ", separator: " AND ");
+    } else if (BaseSqlNodeTypes.types.COLUMNS_CLAUSE == node.type) {
+      return formatByRule(formattedChildren,
+          prefix: "(", separator: ", ", postfix: ")");
+    } else if (_emptyNodes.contains(node.type)) {
+      return formatByRule(formattedChildren);
+    } else if (BaseSqlNodeTypes.types.JOIN_ON == node.type) {
+      return formatByRule(formattedChildren, prefix: "ON ", separator: " AND ");
+    }
+
+    return null;
+  }
+
+  String _defaultFormat(SqlNode node, List<String> formattedChildren) {
+    print(
+        "WARNING: undefined rule for node of type ${node.type} [${node.runtimeType}]");
+
+    return formatByRule(formattedChildren,
+        prefix: "${node.type}(",
+        separator: ", ",
+        postfix: ")",
+        isFormatEmptyChildrenEnabled: true);
+  }
 }
 
 class SqlFormattedNodeImpl extends SqlAbstractNodeImpl
     implements SqlFormattedNode {
-  final SqlFormatRule rule;
+  final SqlNodeFormatterFunction formatter;
 
-  SqlFormattedNodeImpl(this.rule, {int maxChildrenLength})
+  SqlFormattedNodeImpl(this.formatter, {int maxChildrenLength})
       : super(BaseSqlNodeTypes.types.FORMATTED,
             maxChildrenLength: maxChildrenLength);
 
   SqlFormattedNodeImpl.cloneFrom(SqlFormattedNodeImpl targetNode, bool freeze)
-      : this.rule = targetNode.rule,
+      : this.formatter = targetNode.formatter,
         super.cloneFrom(targetNode, freeze);
 
   @override

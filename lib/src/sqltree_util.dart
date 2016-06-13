@@ -13,3 +13,29 @@ List getVargsList(
 bool isEmptyString(String string) => string?.isEmpty ?? true;
 
 bool isNotEmptyString(String string) => !isEmptyString(string);
+
+String formatByRule(List<String> formattedChildren,
+    {String prefix,
+    String separator,
+    String postfix,
+    bool isFormatEmptyChildrenEnabled: false}) {
+  if (formattedChildren.isNotEmpty || isFormatEmptyChildrenEnabled) {
+    StringBuffer buffer = new StringBuffer();
+
+    if (isNotEmptyString(prefix)) {
+      buffer.write(prefix);
+    }
+
+    if (formattedChildren != null) {
+      buffer.write(formattedChildren.join(separator ?? ""));
+    }
+
+    if (isNotEmptyString(postfix)) {
+      buffer.write(postfix);
+    }
+
+    return buffer.toString();
+  } else {
+    return "";
+  }
+}

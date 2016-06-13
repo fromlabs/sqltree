@@ -35,26 +35,22 @@ class ExtTypes {
 
 void _initialize(ExtTypes types) {
   _registerFormatters(types);
-
-  _registerFormatRuleProviders(types);
 }
 
 void _registerFormatters(ExtTypes types) {
-  // è solo un esempio di utilizzo che in realtà non fa niente
-  sql.registerNodeFormatter(new sql.SqlNodeFormatterFunctionWrapper((node) {}));
-}
-
-void _registerFormatRuleProviders(ExtTypes types) {
-  sql.registerFormatRuleProvider((node) {
+  sql.registerNodeFormatter((node, formattedChildren) {
     if (types.GROUP_CONCAT_STATEMENT == node.type) {
-      return new sql.SqlFormatRule(
+      return sql.formatByRule(formattedChildren,
           prefix: "${node.type}(", separator: " ", postfix: ")");
     } else if (node is GroupConcatClause) {
-      return new sql.SqlFormatRule(
+      return sql.formatByRule(formattedChildren,
           prefix: node.isDistinct ? "DISTINCT " : null, separator: ", ");
     } else if (types.SEPARATOR_CLAUSE == node.type) {
-      return new sql.SqlFormatRule(prefix: "${node.type} ", separator: " ");
+      return sql.formatByRule(formattedChildren,
+          prefix: "${node.type} ", separator: " ");
     }
+
+    return null;
   });
 }
 

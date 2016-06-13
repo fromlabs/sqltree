@@ -91,12 +91,8 @@ void registerNodeType(String type) {
 
 registerNode(SqlNode node) => _NODE_MANAGER.registerNode(node);
 
-void registerNodeFormatter(SqlNodeFormatter formatter) {
+void registerNodeFormatter(SqlNodeFormatterFunction formatter) {
   _NODE_FORMATTER.registerNodeFormatter(formatter);
-}
-
-void registerFormatRuleProvider(SqlFormatRuleProvider provider) {
-  _NODE_FORMATTER.registerFormatRuleProvider(provider);
 }
 
 /* UTILS */
@@ -485,7 +481,7 @@ SqlFormattedNode formatted(String prefix, String separator, String postfix,
     bool formatEmptyChildrenEnabled, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   var parent = registerNode(new SqlFormattedNodeImpl(
-      new SqlFormatRule(
+      (node, formattedChildren) => formatByRule(formattedChildren,
           prefix: prefix,
           separator: separator,
           postfix: postfix,
@@ -556,32 +552,28 @@ final Set<String> _prefixNodes =
 
 void _initialize(SqlNodeTypes types) {
   _registerFormatters();
-
-  _registerFormatRuleProviders();
 }
 
 void _registerFormatters() {
-  // è solo un esempio di utilizzo che in realtà non fa niente
-  registerNodeFormatter(new SqlNodeFormatterFunctionWrapper((node) {}));
-}
-
-void _registerFormatRuleProviders() {
-  registerFormatRuleProvider((node) {
+  registerNodeFormatter((node, formattedChildren) {
     if (types.NAMED_PARAMETER == node.type) {
-      return new SqlFormatRule(prefix: r"${", postfix: "}");
+      return formatByRule(formattedChildren, prefix: r"${", postfix: "}");
     } else if (types.TEXT == node.type) {
       // TODO attenzione agli escape nel TEXT
-      return new SqlFormatRule(
+      return formatByRule(formattedChildren,
           prefix: "'", postfix: "'", isFormatEmptyChildrenEnabled: true);
     } else if (_blockNodes.contains(node.type)) {
-      return new SqlFormatRule(prefix: "(", separator: ", ", postfix: ")");
+      return formatByRule(formattedChildren,
+          prefix: "(", separator: ", ", postfix: ")");
     } else if (types.QUALIFIER == node.type) {
-      return new SqlFormatRule(separator: node.type);
+      return formatByRule(formattedChildren, separator: node.type);
     } else if (_postNodes.contains(node.type)) {
-      return new SqlFormatRule(postfix: " ${node.type}");
+      return formatByRule(formattedChildren, postfix: " ${node.type}");
     } else if (_prefixNodes.contains(node.type)) {
-      return new SqlFormatRule(
+      return formatByRule(formattedChildren,
           prefix: node.type, isFormatEmptyChildrenEnabled: true);
     }
+
+    return null;
   });
 }
