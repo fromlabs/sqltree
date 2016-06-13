@@ -9,15 +9,25 @@ import "sqltree_util.dart";
 
 // TODO verificare altri costruttori e metodi di trasformazione delle liste
 
-class SqlNodeListImpl<T extends SqlNode> extends UpdatableList<T>
-    implements SqlNodeList<T> {
+class SqlNodeListImpl<T extends SqlNode> extends SqlAbstractNodeListImpl<T> {
+  SqlNodeListImpl();
+
+  SqlNodeListImpl.cloneFrom(SqlNodeListImpl target, bool freeze)
+      : super.cloneFrom(target, freeze);
+
+  SqlNodeList<T> createClone(bool freeze) =>
+      new SqlNodeListImpl.cloneFrom(this, freeze);
+}
+
+abstract class SqlAbstractNodeListImpl<T extends SqlNode>
+    extends UpdatableList<T> implements SqlNodeList<T> {
   final bool isFreezed;
 
-  SqlNodeListImpl()
+  SqlAbstractNodeListImpl()
       : this.isFreezed = false,
         super([]);
 
-  SqlNodeListImpl.cloneFrom(SqlNodeListImpl target, bool freeze)
+  SqlAbstractNodeListImpl.cloneFrom(SqlAbstractNodeListImpl target, bool freeze)
       : this.isFreezed = freeze,
         super(target._backedList
             .map((node) => node.clone(freeze: freeze))
@@ -68,14 +78,12 @@ class SqlNodeListImpl<T extends SqlNode> extends UpdatableList<T>
   SqlNodeList<T> clone({bool freeze}) => (freeze != null && !freeze) ||
       !isFreezed ? createClone(freeze ?? isFreezed) : this;
 
-  SqlNodeList<T> createClone(bool freeze) {
-    return new SqlNodeListImpl.cloneFrom(this, freeze);
-  }
-
   @override
   void _checkUpdatable() {
     _checkNotFreezed();
   }
+
+  SqlNodeList<T> createClone(bool freeze);
 
   void _checkNotFreezed() {
     if (isFreezed) {
@@ -97,7 +105,7 @@ class SqlNodeImpl extends SqlAbstractNodeImpl {
   SqlNode createClone(bool freeze) => new SqlNodeImpl.cloneFrom(this, freeze);
 }
 
-class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
+class SqlFunctionImpl extends SqlAbstractFunctionImpl {
   SqlFunctionImpl(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
 
@@ -109,23 +117,43 @@ class SqlFunctionImpl extends SqlAbstractNodeImpl implements SqlFunction {
       new SqlFunctionImpl.cloneFrom(this, freeze);
 }
 
-class SqlOperatorImpl extends SqlAbstractNodeImpl implements SqlOperator {
+class SqlOperatorImpl extends SqlAbstractOperatorImpl implements SqlOperator {
   SqlOperatorImpl(String type, {int maxChildrenLength})
+      : super(type, maxChildrenLength: maxChildrenLength);
+
+  SqlOperatorImpl.cloneFrom(SqlOperatorImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+
+  @override
+  SqlNode createClone(bool freeze) =>
+      new SqlOperatorImpl.cloneFrom(this, freeze);
+}
+
+abstract class SqlAbstractFunctionImpl extends SqlAbstractNodeImpl
+    implements SqlFunction {
+  SqlAbstractFunctionImpl(String type, {int maxChildrenLength})
+      : super(type, maxChildrenLength: maxChildrenLength);
+
+  SqlAbstractFunctionImpl.cloneFrom(
+      SqlAbstractFunctionImpl targetNode, bool freeze)
+      : super.cloneFrom(targetNode, freeze);
+}
+
+abstract class SqlAbstractOperatorImpl extends SqlAbstractNodeImpl
+    implements SqlOperator {
+  SqlAbstractOperatorImpl(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength) {
     if (maxChildrenLength != null && maxChildrenLength == 0) {
       throw new ArgumentError.value(0, "maxChildrenLength");
     }
   }
 
-  SqlOperatorImpl.cloneFrom(SqlOperatorImpl targetNode, bool freeze)
+  SqlAbstractOperatorImpl.cloneFrom(
+      SqlAbstractOperatorImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 
   @override
   bool get isUnary => maxChildrenLength != null && maxChildrenLength == 1;
-
-  @override
-  SqlNode createClone(bool freeze) =>
-      new SqlOperatorImpl.cloneFrom(this, freeze);
 }
 
 abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
@@ -383,7 +411,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   }
 }
 
-class _SqlNodeChildrenListImpl extends SqlNodeListImpl {
+class _SqlNodeChildrenListImpl extends SqlAbstractNodeListImpl {
   @override
   final int maxLength;
 

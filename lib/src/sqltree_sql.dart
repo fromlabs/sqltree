@@ -5,7 +5,6 @@ import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 import "sqltree_statement.dart";
 import "sqltree_statement_impl.dart";
-import "sqltree_custom.dart";
 import "sqltree_parameter.dart";
 import "sqltree_parameter_impl.dart";
 import "sqltree_node_manager.dart";
@@ -426,11 +425,11 @@ SqlNodeList normalize(
 
 /* CUSTOMS */
 
-SqlNode function(String function,
+SqlFunction function(String function,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(function);
 
-  var parent = registerNode(new CustomSqlFunction(function));
+  var parent = registerNode(new SqlFunctionImpl(function));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -438,11 +437,11 @@ SqlNode function(String function,
   return parent;
 }
 
-SqlNode operator(String operator,
+SqlOperator operator(String operator,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
-  var parent = registerNode(new CustomSqlOperator(operator));
+  var parent = registerNode(new SqlOperatorImpl(operator));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -450,22 +449,22 @@ SqlNode operator(String operator,
   return parent;
 }
 
-SqlNode unaryOperator(String operator, node) {
+SqlOperator unaryOperator(String operator, node) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
   var parent =
-      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 1));
+      registerNode(new SqlOperatorImpl(operator, maxChildrenLength: 1));
 
   parent.addChildren(node);
 
   return parent;
 }
 
-SqlNode binaryOperator(String operator, node0, node1) {
+SqlOperator binaryOperator(String operator, node0, node1) {
   _NODE_MANAGER.registerCustomNodeType(operator);
 
   var parent =
-      registerNode(new CustomSqlOperator(operator, maxChildrenLength: 2));
+      registerNode(new SqlOperatorImpl(operator, maxChildrenLength: 2));
 
   parent.addChildren(node0, node1);
 

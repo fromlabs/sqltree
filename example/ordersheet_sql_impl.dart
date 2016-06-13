@@ -5,7 +5,7 @@ import 'package:sqltree/sqltree.dart' as sql;
 
 import "ordersheet_sql.dart";
 
-class GroupConcatNodeImpl extends sql.CustomSqlNode
+class GroupConcatNodeImpl extends sql.CustomSqlNodeBase
     implements GroupConcatNode, sql.ChildrenLockingSupport {
   GroupConcatNodeImpl()
       : super(types.GROUP_CONCAT_STATEMENT, maxChildrenLength: 3);
@@ -77,7 +77,7 @@ class GroupConcatNodeImpl extends sql.CustomSqlNode
       new GroupConcatNodeImpl.cloneFrom(this, freeze);
 }
 
-class GroupConcatClauseImpl extends sql.CustomSqlNode
+class GroupConcatClauseImpl extends sql.CustomSqlNodeBase
     implements GroupConcatClause {
   @override
   bool isDistinct;

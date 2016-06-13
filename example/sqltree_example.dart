@@ -66,4 +66,6 @@ main() {
   select = select.clone(freeze: true);
 
   print(select == select.clone(freeze: true));
+
+  var node = sql.function("prova");
 }

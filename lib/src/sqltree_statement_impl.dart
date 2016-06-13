@@ -422,8 +422,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addChildren(nodeManager
-        .registerNode(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN)));
+    var join = addInternal(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN));
 
     join.addChildren(fromNode);
 
@@ -443,8 +442,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addChildren(nodeManager
-        .registerNode(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN)));
+    var join = addInternal(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN));
 
     join.addChildren(fromNode);
 
