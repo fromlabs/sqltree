@@ -20,6 +20,8 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 
   void disable();
 
+  bool containsReference(String reference);
+
   SqlNode getSingleNodeByReference(String reference);
 
   SqlNodeList getNodeListByReference(String reference);
@@ -80,6 +82,8 @@ abstract class SqlNode {
 
   void insertChildren(int index, node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+
+  bool containsReference(String reference);
 
   SqlNode getSingleNodeByReference(String reference);
 

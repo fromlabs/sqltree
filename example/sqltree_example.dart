@@ -4,7 +4,7 @@
 import 'package:sqltree/sqltree.dart' as sql;
 
 main() {
-  sql.normalize("ciao").single.clone();
+  sql.node("ciao").clone();
 
   var select = sql.select("*")
         ..from(sql.joins("tabella"))
@@ -66,6 +66,4 @@ main() {
   select = select.clone(freeze: true);
 
   print(select == select.clone(freeze: true));
-
-  var node = sql.function("prova");
 }

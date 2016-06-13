@@ -5,6 +5,7 @@ import "package:collection/collection.dart";
 
 import "sqltree_node.dart";
 import "sqltree_node_manager.dart";
+import "sqltree_node_manager_impl.dart";
 import "sqltree_util.dart";
 
 // TODO verificare altri costruttori e metodi di trasformazione delle liste
@@ -64,6 +65,10 @@ abstract class SqlAbstractNodeListImpl<T extends SqlNode>
   void disable() {
     setEnabled(false);
   }
+
+  @override
+  bool containsReference(String reference) =>
+      getNodeListByReference(reference).isNotEmpty;
 
   SqlNode getSingleNodeByReference(String reference) =>
       getNodeListByReference(reference).singleOrNull;
@@ -156,7 +161,7 @@ abstract class SqlAbstractOperatorImpl extends SqlAbstractNodeImpl
   bool get isUnary => maxChildrenLength != null && maxChildrenLength == 1;
 }
 
-abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
+abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   final bool isFreezed;
 
   final String _type;
@@ -254,6 +259,10 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
   void disable() {
     isEnabled = false;
   }
+
+  @override
+  bool containsReference(String reference) =>
+      getNodeListByReference(reference).isNotEmpty;
 
   @override
   SqlNode getSingleNodeByReference(String reference) =>
@@ -378,7 +387,7 @@ abstract class SqlAbstractNodeImpl implements RegistrableSqlNode {
 
   SqlNode createClone(bool freeze);
 
-  SqlNode addInternal(SqlNode node) {
+  SqlNode addInternalNode(SqlNode node) {
     if (!node.isRegistered) {
       node = nodeManager.registerNode(node);
     }

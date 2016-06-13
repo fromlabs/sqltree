@@ -425,6 +425,18 @@ SqlNodeList normalize(
 
 /* CUSTOMS */
 
+SqlNode node(String type,
+    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  _NODE_MANAGER.registerCustomNodeType(type);
+
+  var parent = registerNode(new SqlNodeImpl(type));
+
+  parent.addChildren(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+
+  return parent;
+}
+
 SqlFunction function(String function,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   _NODE_MANAGER.registerCustomNodeType(function);

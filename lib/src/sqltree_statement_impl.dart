@@ -19,15 +19,15 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.addInternal(new SqlSelectClauseImpl());
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.HAVING_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.LIMIT_CLAUSE,
+    this.addInternalNode(new SqlSelectClauseImpl());
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.HAVING_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.LIMIT_CLAUSE,
         maxChildrenLength: 1));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.OFFSET_CLAUSE,
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.OFFSET_CLAUSE,
         maxChildrenLength: 1));
   }
 
@@ -182,10 +182,10 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.INSERT_CLAUSE,
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.INSERT_CLAUSE,
         maxChildrenLength: 1));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.VALUES_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.VALUES_CLAUSE));
   }
 
   @override
@@ -249,10 +249,10 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.UPDATE_CLAUSE,
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.UPDATE_CLAUSE,
         maxChildrenLength: 1));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.SET_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.SET_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
   }
 
   @override
@@ -316,10 +316,10 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.DELETE_CLAUSE,
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.DELETE_CLAUSE,
         maxChildrenLength: 1));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
   }
 
   @override
@@ -422,7 +422,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addInternal(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN));
+    var join = addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN));
 
     join.addChildren(fromNode);
 
@@ -442,7 +442,7 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addInternal(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN));
+    var join = addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN));
 
     join.addChildren(fromNode);
 
@@ -465,9 +465,9 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   void onNodeRegistered() {
     super.onNodeRegistered();
 
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_FROM,
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_FROM,
         maxChildrenLength: 1));
-    this.addInternal(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_ON));
+    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.JOIN_ON));
   }
 
   @override

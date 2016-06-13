@@ -40,11 +40,7 @@ class BaseSqlNodeTypes {
 }
 
 abstract class SqlNodeManager {
-  registerNode(RegistrableSqlNode node);
+  registerNode(SqlNode node);
 
   SqlNodeList normalize(nodes);
-}
-
-abstract class RegistrableSqlNode implements SqlNode {
-  void registerNode(SqlNodeManager nodeManager);
 }

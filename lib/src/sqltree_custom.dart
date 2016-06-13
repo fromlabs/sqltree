@@ -10,6 +10,7 @@ class CustomSqlNodeList<T extends SqlNode> extends CustomSqlNodeListBase<T> {
   CustomSqlNodeList.cloneFrom(CustomSqlNodeList<T> target, bool freeze)
       : super.cloneFrom(target, freeze);
 
+  @override
   CustomSqlNodeList<T> createClone(bool freeze) =>
       new CustomSqlNodeList.cloneFrom(this, freeze);
 }
@@ -21,6 +22,7 @@ class CustomSqlNode extends CustomSqlNodeBase {
   CustomSqlNode.cloneFrom(CustomSqlNode targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 
+  @override
   CustomSqlNode createClone(bool freeze) =>
       new CustomSqlNode.cloneFrom(this, freeze);
 }
@@ -32,6 +34,7 @@ class CustomSqlFunction extends CustomSqlFunctionBase {
   CustomSqlFunction.cloneFrom(CustomSqlFunction targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 
+  @override
   CustomSqlFunction createClone(bool freeze) =>
       new CustomSqlFunction.cloneFrom(this, freeze);
 }
@@ -43,6 +46,7 @@ class CustomSqlOperator extends CustomSqlOperatorBase {
   CustomSqlOperator.cloneFrom(CustomSqlOperator targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 
+  @override
   CustomSqlOperator createClone(bool freeze) =>
       new CustomSqlOperator.cloneFrom(this, freeze);
 }

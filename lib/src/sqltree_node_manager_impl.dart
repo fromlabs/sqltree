@@ -44,14 +44,18 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   }
 
   @override
-  registerNode(RegistrableSqlNode node) {
-    if (!nodeTypes.contains(node.type)) {
-      throw new StateError("Node type not registered: ${node.type}");
+  registerNode(SqlNode node) {
+    if (node is RegistrableSqlNode) {
+      if (!nodeTypes.contains(node.type)) {
+        throw new StateError("Node type not registered: ${node.type}");
+      }
+
+      (node as RegistrableSqlNode).registerNode(this);
+
+      return node;
+    } else {
+      throw new ArgumentError("Node not registrable: ${node.type}");
     }
-
-    node.registerNode(this);
-
-    return node;
   }
 
   void registerNodeType(String type) {
@@ -74,7 +78,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   SqlNodeList normalize(nodes) {
     var result = new SqlNodeListImpl();
 
-    if (nodes is SqlNodeProvider) {
+    while (nodes is SqlNodeProvider) {
       nodes = nodes.createNode();
     }
 
@@ -87,4 +91,8 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     }
     return result;
   }
+}
+
+abstract class RegistrableSqlNode {
+  void registerNode(SqlNodeManager nodeManager);
 }
