@@ -8,25 +8,25 @@ abstract class SqlStatement implements SqlNode {
 }
 
 abstract class SqlSelectStatement implements SqlStatement {
-  void select(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void select(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   void distinct([bool isDistinct = true]);
 
-  void from(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void from(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void groupBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void groupBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void having(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void having(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void orderBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void orderBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   void offset(node);
 
@@ -74,11 +74,11 @@ abstract class SqlSelectStatement implements SqlStatement {
 abstract class SqlInsertStatement implements SqlStatement {
   void insert(node);
 
-  void columns(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void columns(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void values(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void values(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   SqlNode get insertClause;
 
@@ -98,11 +98,11 @@ abstract class SqlInsertStatement implements SqlStatement {
 abstract class SqlUpdateStatement implements SqlStatement {
   void update(node);
 
-  void set(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void set(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   SqlNode get updateClause;
 
@@ -120,14 +120,13 @@ abstract class SqlUpdateStatement implements SqlStatement {
 }
 
 abstract class SqlDeleteStatement implements SqlStatement {
-  void delete(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void delete(node);
 
-  void from(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void from(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   SqlNode get deleteClause;
 
@@ -183,8 +182,8 @@ abstract class SqlJoins implements SqlNode {
 abstract class SqlJoin implements SqlNode {
   void from(node);
 
-  void on(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void on(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   SqlNode get fromClause;
 

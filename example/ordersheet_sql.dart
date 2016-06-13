@@ -89,11 +89,11 @@ GroupConcatNode groupConcat(
 abstract class GroupConcatNode implements sql.SqlNode {
   void distinct([bool isDistinct = true]);
 
-  void groupConcat(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void groupConcat(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
-  void orderBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  void orderBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   void separator(node);
 

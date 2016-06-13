@@ -135,12 +135,10 @@ SqlInsertStatement insert([node]) {
   return parent;
 }
 
-SqlDeleteStatement delete(
-    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+SqlDeleteStatement delete([node]) {
   var parent = registerNode(new SqlDeleteStatementImpl());
 
-  parent.fromClause.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.deleteClause.child = node;
 
   return parent;
 }

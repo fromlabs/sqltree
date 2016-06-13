@@ -22,9 +22,11 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
     this.addInternalNode(new SqlSelectClauseImpl());
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.FROM_CLAUSE));
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.WHERE_CLAUSE));
-    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
+    this.addInternalNode(
+        new SqlNodeImpl(BaseSqlNodeTypes.types.GROUP_BY_CLAUSE));
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.HAVING_CLAUSE));
-    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
+    this.addInternalNode(
+        new SqlNodeImpl(BaseSqlNodeTypes.types.ORDER_BY_CLAUSE));
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.LIMIT_CLAUSE,
         maxChildrenLength: 1));
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.OFFSET_CLAUSE,
@@ -77,8 +79,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  void from(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void from(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     fromClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -87,8 +89,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get fromClause => children[1];
 
   @override
-  void groupBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void groupBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     groupByClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -97,8 +99,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get groupByClause => children[3];
 
   @override
-  void having(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void having(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     havingClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -126,8 +128,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get offsetClause => children[7];
 
   @override
-  void orderBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void orderBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     orderByClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -136,8 +138,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get orderByClause => children[5];
 
   @override
-  void select(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void select(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     selectClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -155,8 +157,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
         new SqlNodeImpl(BaseSqlNodeTypes.types.COUNT, maxChildrenLength: 1)));
 
   @override
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     whereClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -184,7 +186,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
 
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.INSERT_CLAUSE,
         maxChildrenLength: 1));
-    this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
+    this.addInternalNode(
+        new SqlNodeImpl(BaseSqlNodeTypes.types.COLUMNS_CLAUSE));
     this.addInternalNode(new SqlNodeImpl(BaseSqlNodeTypes.types.VALUES_CLAUSE));
   }
 
@@ -204,8 +207,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  void columns(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void columns(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     columnsClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -214,7 +217,7 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   SqlNode get columnsClause => children[1];
 
   @override
-  void insert(node) {
+  void insert([node]) {
     insertClause.addChildren(node);
   }
 
@@ -222,8 +225,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   SqlNode get insertClause => children[0];
 
   @override
-  void values(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void values(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     valuesClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -271,8 +274,8 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  void set(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void set(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     setClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -281,7 +284,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   SqlNode get setClause => children[1];
 
   @override
-  void update(node) {
+  void update([node]) {
     updateClause.addChildren(node);
   }
 
@@ -289,8 +292,8 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   SqlNode get updateClause => children[0];
 
   @override
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     whereClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -338,18 +341,16 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
-  void delete(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    deleteClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  void delete(node) {
+    deleteClause.addChildren(node);
   }
 
   @override
   SqlNode get deleteClause => children[0];
 
   @override
-  void from(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void from(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     fromClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -358,8 +359,8 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   SqlNode get fromClause => children[1];
 
   @override
-  void where(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void where(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     whereClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -422,7 +423,8 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN));
+    var join =
+        addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.INNER_JOIN));
 
     join.addChildren(fromNode);
 
@@ -442,7 +444,8 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
       onNode7,
       onNode8,
       onNode9]) {
-    var join = addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN));
+    var join =
+        addInternalNode(new SqlJoinImpl(BaseSqlNodeTypes.types.LEFT_JOIN));
 
     join.addChildren(fromNode);
 
@@ -489,8 +492,8 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   SqlNode get fromClause => children[0];
 
   @override
-  void on(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void on(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     onClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }

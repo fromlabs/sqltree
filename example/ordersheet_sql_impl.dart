@@ -42,8 +42,8 @@ class GroupConcatNodeImpl extends sql.CustomSqlNodeBase
   }
 
   @override
-  void groupConcat(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void groupConcat(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     groupConcatClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }
@@ -55,8 +55,8 @@ class GroupConcatNodeImpl extends sql.CustomSqlNodeBase
   bool get isDistinct => groupConcatClause.isDistinct;
 
   @override
-  void orderBy(
-      [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+  void orderBy(node0,
+      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
     orderByClause.addChildren(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
   }

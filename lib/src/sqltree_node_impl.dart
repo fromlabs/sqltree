@@ -227,6 +227,8 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   String get reference => _reference;
 
   void set reference(String reference) {
+    _checkRegistered();
+
     checkNotFreezed();
 
     _reference = reference;
@@ -237,6 +239,8 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
 
   @override
   void set isEnabled(bool isEnabled) {
+    _checkRegistered();
+
     checkNotFreezed();
 
     _isEnabled = isEnabled;
@@ -372,7 +376,7 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
     if (isRawExpression) {
       return _rawExpression != null ? "\"$_rawExpression\"" : "";
     } else {
-      return "$type($children)";
+      return "$type($_children)";
     }
   }
 
@@ -478,6 +482,8 @@ class _SqlNodeChildrenListImpl extends SqlAbstractNodeListImpl {
       new _SqlNodeChildrenListImpl.cloneFrom(this, freeze);
 
   void _addInternal(SqlNode node) {
+    // we assume that the node is already registered
+
     _checkNotFreezed();
 
     _checkNodesCount(length + 1);
