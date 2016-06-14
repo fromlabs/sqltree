@@ -3,7 +3,7 @@
 
 import 'package:sqltree/sqltree.dart' as sql;
 
-import "ordersheet_sql_impl.dart";
+import "custom_sql_impl.dart";
 
 final ExtTypes types = new ExtTypes();
 
@@ -13,12 +13,13 @@ class ExtTypes {
   final String GROUP_CONCAT_STATEMENT = "GROUP_CONCAT";
   final String GROUP_CONCAT_CLAUSE = "GROUP_CONCAT_CLAUSE";
   final String SEPARATOR_CLAUSE = "SEPARATOR";
-  // sfruttiamo un tipo esistente
+  // use an existent type
   final String ORDER_BY_CLAUSE = sql.types.ORDER_BY_CLAUSE;
 
   ExtTypes() {
     _registerTypes(this);
 
+    // TODO use a callback
     _initialize(this);
   }
 
@@ -28,7 +29,7 @@ class ExtTypes {
     sql.registerNodeType(types.GROUP_CONCAT_STATEMENT);
     sql.registerNodeType(types.GROUP_CONCAT_CLAUSE);
     sql.registerNodeType(types.SEPARATOR_CLAUSE);
-    // già registrato
+    // already registered
     // sql.registerNodeType(types.ORDER_BY_CLAUSE);
   }
 }

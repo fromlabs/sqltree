@@ -8,14 +8,11 @@ import "sqltree_node_impl.dart";
 import "sqltree_statement.dart";
 import "sqltree_util.dart";
 
-// TODO studiare un motore di regole più snello e veloce che crei meno oggetti
-
 class SqlNodeFormatterImpl implements SqlNodeFormatter {
   static const String _EMPTY = "";
 
   final List<SqlNodeFormatterFunction> _formatters = [];
-/*
-*/
+
   static final Set<String> _clauseNodes = new Set.from([
     BaseSqlNodeTypes.types.INSERT_CLAUSE,
     BaseSqlNodeTypes.types.VALUES_CLAUSE,

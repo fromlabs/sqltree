@@ -1,8 +1,3 @@
-// Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
-// is governed by a BSD-style license that can be found in the LICENSE file.
-
-import "package:string_tokenizer/string_tokenizer.dart";
-
 import "sqltree_prettifier.dart";
 
 class SqlPrettifierImpl implements SqlPrettifier {
@@ -76,6 +71,8 @@ class _SqlGrammar {
 }
 
 class _FormatProcess {
+  static final Pattern _PATTERN =
+      new RegExp("""[()+*/=<>'`"[\\], \n\r\f\t-]""");
   static final _SqlGrammar _grammar = new _SqlGrammar();
 
   static final String _WHITESPACE = " \n\r\f\t";
@@ -99,35 +96,35 @@ class _FormatProcess {
   int indent = 1;
 
   StringBuffer result = new StringBuffer();
-  StringTokenizer tokens;
+  Iterator<String> tokens;
   String lastToken;
   String token;
   String lcToken;
 
   _FormatProcess(String sql) {
-    tokens = new StringTokenizer(sql, "()+*/-=<>'`\"[]," + _WHITESPACE, true);
+    tokens = tokenize(sql, _PATTERN).iterator;
   }
 
   String perform() {
     result.write(initial);
 
-    while (tokens.hasMoreTokens()) {
-      token = tokens.nextToken();
+    while (tokens.moveNext()) {
+      token = tokens.current;
       lcToken = token.toLowerCase();
 
       if ("'" == token) {
         String t;
-        do {
-          t = tokens.nextToken();
+        // cannot handle single quotes
+        while ("'" != t && tokens.moveNext()) {
+          t = tokens.current;
           token += t;
-        } while (
-            "'" != t && tokens.hasMoreTokens()); // cannot handle single quotes
+        }
       } else if ("\"" == token) {
         String t;
-        do {
-          t = tokens.nextToken();
+        while ("\"" != t && tokens.moveNext()) {
+          t = tokens.current;
           token += t;
-        } while ("\"" != t);
+        }
       }
 
       if (afterByOrSetOrFromOrSelect && "," == token) {
@@ -336,5 +333,33 @@ class _FormatProcess {
       result.write(indentString);
     }
     beginLine = true;
+  }
+
+  Iterable<String> tokenize(String query, Pattern pattern) sync* {
+    var matches = pattern.allMatches(query);
+
+    var start = 0;
+    var end;
+    var token;
+    for (var match in matches) {
+      end = match.start;
+      token = query.substring(start, end);
+      if (token.isNotEmpty) {
+        yield token;
+        start = end;
+      }
+
+      end = start + 1;
+      token = query.substring(start, end);
+      if (token.isNotEmpty) {
+        yield token;
+        start = end;
+      }
+    }
+    token = query.substring(start);
+    if (token.isNotEmpty) {
+      yield token;
+      start = end;
+    }
   }
 }

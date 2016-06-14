@@ -15,8 +15,6 @@ import "sqltree_prettifier.dart";
 import "sqltree_prettifier_impl.dart";
 import "sqltree_util.dart";
 
-// TODO valutare se rinominare in upper case tutti i metodi
-
 final SqlNodeTypes types = new SqlNodeTypes();
 
 class SqlNodeTypes extends BaseSqlNodeTypes {
@@ -49,7 +47,7 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   SqlNodeTypes() {
     _registerTypes(this);
 
-    // TODO valutare una callback per l'inizializzazione
+    // TODO use a callback
     _initialize(this);
   }
 

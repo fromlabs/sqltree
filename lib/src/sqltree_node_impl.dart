@@ -8,8 +8,6 @@ import "sqltree_node_manager.dart";
 import "sqltree_node_manager_impl.dart";
 import "sqltree_util.dart";
 
-// TODO verificare altri costruttori e metodi di trasformazione delle liste
-
 class SqlNodeListImpl<T extends SqlNode> extends SqlAbstractNodeListImpl<T> {
   SqlNodeListImpl();
 

@@ -1,15 +1,14 @@
 name: sqltree
-description: A starting point for Dart libraries or applications.
+description: A library for building sql queries through a tree representation.
 version: 0.0.1
-#author: Roberto Tassi <email@example.com>
-#homepage: https://www.example.com
+author: Roberto Tassi <roberto.tassi@fromlabs.org>
+homepage: https://github.com/fromlabs/sqltree
 
 environment:
   sdk: '>=1.0.0 <2.0.0'
 
 dependencies:
   collection: "^1.8.0"
-  string_tokenizer: "^0.0.1"
 
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
