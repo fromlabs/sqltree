@@ -501,7 +501,7 @@ SqlOperator _binaryOperator(String operator, node0, node1) =>
 SqlFunction _function(String function, int maxChildrenLength,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   var parent = registerNode(
-      new SqlOperatorImpl(function, maxChildrenLength: maxChildrenLength));
+      new SqlFunctionImpl(function, maxChildrenLength: maxChildrenLength));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
