@@ -14,8 +14,8 @@ main() {
         ..where(sql.setReference("ref2", sql.sqlInTuple("a")))
         ..where(sql.sqlIn("a", sql.setReference("ref3", sql.tuple())))
         ..where(sql.sqlInTuple("a"))
-      //..where(sql.enabled(true, sql.equal("b", sql.parameter("par2"))))
-      //..where(sql.enabledGroup("ref1", true, sql.equal("b", sql.parameter("par2"))))
+        ..limit(10)
+        ..offset(200)
       ;
 
   select.whereClause.children.last.children.last
@@ -66,4 +66,8 @@ main() {
   select = select.clone(freeze: true);
 
   print(select == select.clone(freeze: true));
+
+  print(sql.prettify(sql.format(sql.text(r"ci'\'ao").single)));
+
+  print(sql.prettify(sql.format(sql.select(sql.function("coalesce", "ID", "REF_ID")))));
 }

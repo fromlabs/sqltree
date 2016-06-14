@@ -225,7 +225,7 @@ SqlNode not(node) => _unaryOperator(types.NOT, node);
 
 SqlNode count([node]) => _function(types.COUNT, 1, node);
 
-SqlNode as(node, String alias) => _binaryOperator(types.AS, node, alias);
+SqlNode as(node, String alias) => _node(types.AS, 2, node, alias);
 
 SqlNode equal(node0, node1) => _binaryOperator(types.EQUAL, node0, node1);
 
@@ -556,12 +556,22 @@ void _initialize(SqlNodeTypes types) {
 
 void _registerFormatters() {
   registerNodeFormatter((node, formattedChildren) {
-    if (types.NAMED_PARAMETER == node.type) {
+    if (types.AS == node.type) {
+      if (formattedChildren.length == 2 &&
+          formattedChildren[0] == formattedChildren[1]) {
+        return formattedChildren[0];
+      } else {
+        return formatByRule(formattedChildren, separator: " AS ");
+      }
+    } else if (types.NAMED_PARAMETER == node.type) {
       return formatByRule(formattedChildren, prefix: r"${", postfix: "}");
     } else if (types.TEXT == node.type) {
-      // TODO attenzione agli escape nel TEXT
-      return formatByRule(formattedChildren,
-          prefix: "'", postfix: "'", isFormatEmptyChildrenEnabled: true);
+      return formatByRule(
+          formattedChildren.map((formatted) =>
+              formatted.replaceAll("'", "''").replaceAll(r"\", r"\\")),
+          prefix: "'",
+          postfix: "'",
+          isFormatEmptyChildrenEnabled: true);
     } else if (_blockNodes.contains(node.type)) {
       return formatByRule(formattedChildren,
           prefix: "(", separator: ", ", postfix: ")");

@@ -98,5 +98,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
 }
 
 abstract class RegistrableSqlNode {
+  bool get isRegistered;
+
   void registerNode(SqlNodeManager nodeManager);
 }

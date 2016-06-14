@@ -392,9 +392,11 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   SqlNode createClone(bool freeze);
 
   SqlNode addInternalNode(SqlNode node) {
-    if (!node.isRegistered) {
+    if (node is RegistrableSqlNode &&
+        !(node as RegistrableSqlNode).isRegistered) {
       node = nodeManager.registerNode(node);
     }
+
     _children._addInternal(node);
     return node;
   }

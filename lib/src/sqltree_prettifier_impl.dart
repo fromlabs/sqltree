@@ -28,6 +28,8 @@ class _SqlGrammar {
     _BEGIN_CLAUSES.add("outer");
     _BEGIN_CLAUSES.add("group");
     _BEGIN_CLAUSES.add("order");
+    _BEGIN_CLAUSES.add("limit");
+    _BEGIN_CLAUSES.add("offset");
 
     _END_CLAUSES.add("where");
     _END_CLAUSES.add("set");
@@ -77,8 +79,10 @@ class _FormatProcess {
   static final _SqlGrammar _grammar = new _SqlGrammar();
 
   static final String _WHITESPACE = " \n\r\f\t";
-  static final String indentString = "    ";
-  static final String initial = "\n    ";
+  // static final String indentString = "    ";
+  static final String indentString = "  ";
+  // static final String initial = "\n    ";
+  static final String initial = "";
 
   bool beginLine = true;
   bool afterBeginBeforeEnd = false;

@@ -14,7 +14,7 @@ bool isEmptyString(String string) => string?.isEmpty ?? true;
 
 bool isNotEmptyString(String string) => !isEmptyString(string);
 
-String formatByRule(List<String> formattedChildren,
+String formatByRule(Iterable<String> formattedChildren,
     {String prefix,
     String separator,
     String postfix,

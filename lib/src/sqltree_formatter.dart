@@ -4,7 +4,7 @@
 import "sqltree_node.dart";
 
 typedef String SqlNodeFormatterFunction(
-    SqlNode node, List<String> formattedChildren);
+    SqlNode node, Iterable<String> formattedChildren);
 
 abstract class SqlNodeFormatter {
   String format(SqlNode node);

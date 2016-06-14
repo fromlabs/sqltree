@@ -30,8 +30,6 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 }
 
 abstract class SqlNode {
-  bool get isRegistered;
-
   bool get isFreezed;
 
   String get type;
