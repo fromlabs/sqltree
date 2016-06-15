@@ -7,6 +7,8 @@ import "sqltree_node_impl.dart";
 class CustomSqlNodeList<T extends SqlNode> extends CustomSqlNodeListBase<T> {
   CustomSqlNodeList();
 
+  CustomSqlNodeList.from(Iterable<T> nodes) : super.from(nodes);
+
   CustomSqlNodeList.cloneFrom(CustomSqlNodeList<T> target, bool freeze)
       : super.cloneFrom(target, freeze);
 
@@ -54,6 +56,8 @@ class CustomSqlOperator extends CustomSqlOperatorBase {
 abstract class CustomSqlNodeListBase<T extends SqlNode>
     extends SqlAbstractNodeListImpl<T> {
   CustomSqlNodeListBase();
+
+  CustomSqlNodeListBase.from(Iterable<T> nodes) : super.from(nodes);
 
   CustomSqlNodeListBase.cloneFrom(CustomSqlNodeListBase target, bool freeze)
       : super.cloneFrom(target, freeze);

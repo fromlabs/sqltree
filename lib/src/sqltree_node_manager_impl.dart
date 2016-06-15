@@ -75,9 +75,7 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   }
 
   @override
-  SqlNodeList normalize(nodes) {
-    var result = new SqlNodeListImpl();
-
+  Iterable<SqlNode> normalize(nodes) sync* {
     if (nodes != null) {
       var previous;
       while (nodes != previous && nodes is SqlNodeProvider) {
@@ -85,15 +83,13 @@ class SqlNodeManagerImpl implements SqlNodeManager {
         nodes = nodes.createNode();
       }
       if (nodes is Iterable) {
-        result.addAll(nodes.expand((child) => normalize(child)));
+        yield* nodes.expand(normalize);
       } else if (nodes is SqlNode) {
-        result.add(nodes);
+        yield nodes;
       } else {
-        result.add(registerNode(new SqlNodeImpl.raw(nodes)));
+        yield registerNode(new SqlNodeImpl.raw(nodes));
       }
     }
-
-    return result;
   }
 }
 

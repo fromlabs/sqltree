@@ -296,82 +296,7 @@ SqlNode lower(node) => _function(types.LOWER, 1, node);
 
 /* DECORATORS */
 
-SqlNodeList setReference(String reference,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
-      ..setReference(reference);
-
-SqlNodeList setEnabled(bool enabled,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
-      ..setEnabled(enabled);
-
-SqlNodeList setDisabled(bool disabled,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
-      ..setDisabled(disabled);
-
-SqlNodeList enable(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
-      ..enable();
-
-SqlNodeList disable(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
-      ..disable();
-
-SqlNodeList text(
+Iterable<SqlNode> setReference(String reference,
         [node0,
         node1,
         node2,
@@ -384,9 +309,69 @@ SqlNodeList text(
         node9]) =>
     normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
             node9)
-        .wrap((node) => _node(types.TEXT, 1, node));
+        .map((node) => node..reference = reference);
 
-SqlNodeList qualify(String qualifier,
+Iterable<SqlNode> setEnabled(bool isEnabled,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..map((node) => node..isEnabled = isEnabled);
+
+Iterable<SqlNode> setDisabled(bool isDisabled,
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..map((node) => node..isDisabled = isDisabled);
+
+Iterable<SqlNode> enable(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..map((node) => node..enable());
+
+Iterable<SqlNode> disable(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+      ..map((node) => node..disable());
+
+Iterable<SqlNode> text(
         [node0,
         node1,
         node2,
@@ -399,9 +384,9 @@ SqlNodeList qualify(String qualifier,
         node9]) =>
     normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
             node9)
-        .wrap((node) => _node(types.QUALIFIER, 2, qualifier, node));
+        .map((node) => _node(types.TEXT, 1, node));
 
-SqlNodeList normalize(
+Iterable<SqlNode> qualify(String qualifier,
         [node0,
         node1,
         node2,
@@ -412,8 +397,24 @@ SqlNodeList normalize(
         node7,
         node8,
         node9]) =>
-    _NODE_MANAGER.normalize(getVargsList(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
+    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
+            node9)
+        .map((node) => _node(types.QUALIFIER, 2, qualifier, node));
+
+Iterable<SqlNode> normalize(
+        [node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9]) =>
+    getVargsIterable(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
+        .expand(_NODE_MANAGER.normalize);
 
 /* CUSTOMS */
 

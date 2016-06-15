@@ -1,12 +1,8 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-typedef SqlNode NodeWrapper(SqlNode node);
-
 abstract class SqlNodeList<T extends SqlNode> implements List<T> {
   bool get isFreezed;
-
-  SqlNode get singleOrNull;
 
   SqlNodeList<T> clone({bool freeze});
 
@@ -22,11 +18,11 @@ abstract class SqlNodeList<T extends SqlNode> implements List<T> {
 
   bool containsReference(String reference);
 
+  Iterable<SqlNode> whereReference(String reference);
+
   SqlNode getSingleNodeByReference(String reference);
 
   SqlNodeList getNodeListByReference(String reference);
-
-  SqlNodeList wrap(NodeWrapper wrapper);
 }
 
 abstract class SqlNode {
@@ -82,6 +78,8 @@ abstract class SqlNode {
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
   bool containsReference(String reference);
+
+  Iterable<SqlNode> whereReference(String reference);
 
   SqlNode getSingleNodeByReference(String reference);
 
