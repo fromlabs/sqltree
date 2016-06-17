@@ -75,7 +75,10 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   }
 
   @override
-  Iterable<SqlNode> normalize(nodes) sync* {
+  SqlNodeIterable<SqlNode> normalize(nodes) =>
+      new DelegatingSqlNodeIterable(_normalizeInternal(nodes));
+
+  Iterable<SqlNode> _normalizeInternal(nodes) sync* {
     if (nodes != null) {
       var previous;
       while (nodes != previous && nodes is SqlNodeProvider) {

@@ -42,5 +42,5 @@ class BaseSqlNodeTypes {
 abstract class SqlNodeManager {
   registerNode(SqlNode node);
 
-  Iterable<SqlNode> normalize(nodes);
+  SqlNodeIterable<SqlNode> normalize(nodes);
 }

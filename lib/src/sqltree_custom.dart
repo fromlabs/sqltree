@@ -1,9 +1,9 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 
+/*
 class CustomSqlNodeList<T extends SqlNode> extends CustomSqlNodeListBase<T> {
   CustomSqlNodeList();
 
@@ -15,8 +15,20 @@ class CustomSqlNodeList<T extends SqlNode> extends CustomSqlNodeListBase<T> {
   @override
   CustomSqlNodeList<T> createClone(bool freeze) =>
       new CustomSqlNodeList.cloneFrom(this, freeze);
-}
 
+  @override
+  bool isAlreadyWrappedIterable(Iterable<T> base) =>
+      base is DelegatingSqlNodeIterable<T>;
+
+  @override
+  bool isAlreadyWrappedList(Iterable<T> base) => base is CustomSqlNodeList<T>;
+
+  SqlNodeIterable<T> createIterable(Iterable<T> base) =>
+      new DelegatingSqlNodeIterable(base);
+
+  SqlNodeList<T> createList(List<T> base) => new CustomSqlNodeList(base);
+}
+*/
 class CustomSqlNode extends CustomSqlNodeBase {
   CustomSqlNode(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
@@ -53,16 +65,17 @@ class CustomSqlOperator extends CustomSqlOperatorBase {
       new CustomSqlOperator.cloneFrom(this, freeze);
 }
 
+/*
 abstract class CustomSqlNodeListBase<T extends SqlNode>
-    extends SqlAbstractNodeListImpl<T> {
-  CustomSqlNodeListBase();
+    extends DelegatingSqlNodeListBase<T> {
+  CustomSqlNodeListBase() : super([]);
 
   CustomSqlNodeListBase.from(Iterable<T> nodes) : super.from(nodes);
 
   CustomSqlNodeListBase.cloneFrom(CustomSqlNodeListBase target, bool freeze)
       : super.cloneFrom(target, freeze);
 }
-
+*/
 abstract class CustomSqlNodeBase extends SqlAbstractNodeImpl {
   CustomSqlNodeBase(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);

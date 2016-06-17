@@ -296,7 +296,7 @@ SqlNode lower(node) => _function(types.LOWER, 1, node);
 
 /* DECORATORS */
 
-Iterable<SqlNode> setReference(String reference,
+SqlNodeIterable<SqlNode> setReference(String reference,
         [node0,
         node1,
         node2,
@@ -311,7 +311,7 @@ Iterable<SqlNode> setReference(String reference,
             node9)
         .map((node) => node..reference = reference);
 
-Iterable<SqlNode> setEnabled(bool isEnabled,
+SqlNodeIterable<SqlNode> setEnabled(bool isEnabled,
         [node0,
         node1,
         node2,
@@ -326,7 +326,7 @@ Iterable<SqlNode> setEnabled(bool isEnabled,
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..isEnabled = isEnabled);
 
-Iterable<SqlNode> setDisabled(bool isDisabled,
+SqlNodeIterable<SqlNode> setDisabled(bool isDisabled,
         [node0,
         node1,
         node2,
@@ -341,7 +341,7 @@ Iterable<SqlNode> setDisabled(bool isDisabled,
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..isDisabled = isDisabled);
 
-Iterable<SqlNode> enable(
+SqlNodeIterable<SqlNode> enable(
         [node0,
         node1,
         node2,
@@ -356,7 +356,7 @@ Iterable<SqlNode> enable(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..enable());
 
-Iterable<SqlNode> disable(
+SqlNodeIterable<SqlNode> disable(
         [node0,
         node1,
         node2,
@@ -371,7 +371,7 @@ Iterable<SqlNode> disable(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..disable());
 
-Iterable<SqlNode> text(
+SqlNodeIterable<SqlNode> text(
         [node0,
         node1,
         node2,
@@ -386,7 +386,7 @@ Iterable<SqlNode> text(
             node9)
         .map((node) => _node(types.TEXT, 1, node));
 
-Iterable<SqlNode> qualify(String qualifier,
+SqlNodeIterable<SqlNode> qualify(String qualifier,
         [node0,
         node1,
         node2,
@@ -401,7 +401,7 @@ Iterable<SqlNode> qualify(String qualifier,
             node9)
         .map((node) => _node(types.QUALIFIER, 2, qualifier, node));
 
-Iterable<SqlNode> normalize(
+SqlNodeIterable<SqlNode> normalize(
         [node0,
         node1,
         node2,
@@ -412,7 +412,7 @@ Iterable<SqlNode> normalize(
         node7,
         node8,
         node9]) =>
-    getVargsIterable(node0, node1, node2, node3, node4, node5, node6, node7,
+    getNodesFromVargs(node0, node1, node2, node3, node4, node5, node6, node7,
             node8, node9)
         .expand(_NODE_MANAGER.normalize);
 

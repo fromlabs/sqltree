@@ -40,7 +40,7 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
   String format(SqlNode node) {
     if (node == null || node.isDisabled) {
       return _EMPTY;
-    } else if (node.isComposite) {
+    } else if (node.isCompositeNode) {
       String formatted;
 
       List<String> formattedChildren = _getFormattedChildren(node);
