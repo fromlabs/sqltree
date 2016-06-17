@@ -1,14 +1,9 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import "sqltree_node_impl.dart";
-
 // TODO queste classi devono essere facilmente estendibili per SqlColumnList, SQCOlumnSet, SqlColumnIterable
 
 abstract class SqlNodeIterable<E extends SqlNode> implements Iterable<E> {
-  factory SqlNodeIterable(Iterable<E> base) =>
-      new DelegatingSqlNodeIterable(base);
-
   void setReference(String reference);
 
   void setEnabled(bool isEnabled);

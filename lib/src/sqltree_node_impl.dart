@@ -418,7 +418,7 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
 
   void _checkNodesCount(int count) {
     if (maxLength != null && count > maxLength) {
-      throw new StateError("Children count out of range $count > $maxLength");
+      throw new UnsupportedError("Children count out of range $count > $maxLength");
     }
   }
 
@@ -440,9 +440,11 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
 
   @override
   void addAll(Iterable<SqlNode> iterable) {
-    _checkNodesCount(length + iterable.length);
+    var list = iterable.toList(growable: false);
 
-    return super.addAll(iterable);
+    _checkNodesCount(length + list.length);
+
+    return super.addAll(list);
   }
 
   @override
@@ -454,9 +456,11 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
 
   @override
   void insertAll(int index, Iterable<SqlNode> iterable) {
-    _checkNodesCount(length + iterable.length);
+    var list = iterable.toList(growable: false);
 
-    return super.insertAll(index, iterable);
+    _checkNodesCount(length + list.length);
+
+    return super.insertAll(index, list);
   }
 }
 

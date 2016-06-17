@@ -6,6 +6,16 @@ import 'package:test/test.dart';
 import "package:sqltree/sqltree.dart" as sql;
 
 void main() {
+  group('children locking tests', () {
+    test('Test 1', () {
+      expect(
+          () => sql.select("a", "b").addChildren("c"), throwsUnsupportedError);
+      expect(() => sql.select("a", "b").children.addAll(sql.normalize("c")),
+          throwsUnsupportedError);
+      expect(() => sql.select("a", "b").children.removeLast(),
+          throwsUnsupportedError);
+    });
+  });
   group('clone and freeze tests', () {
     test('Test 1', () {
       var select = sql.select("a", "b");
@@ -46,9 +56,11 @@ void main() {
       expect(sql.normalize("").single.rawExpression, "");
       expect(sql.normalize("", "").length, 2);
       expect(sql.normalize("", "").firstOrNull.rawExpression, "");
-      expect(() => sql.normalize("", "").singleOrNull.rawExpression, throwsStateError);
+      expect(() => sql.normalize("", "").singleOrNull.rawExpression,
+          throwsStateError);
       expect(sql.normalize("", "").first.rawExpression, "");
-      expect(() => sql.normalize("", "").single.rawExpression, throwsStateError);
+      expect(
+          () => sql.normalize("", "").single.rawExpression, throwsStateError);
     });
   });
 }

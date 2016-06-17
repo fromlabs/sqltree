@@ -1,34 +1,51 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 
-/*
-class CustomSqlNodeList<T extends SqlNode> extends CustomSqlNodeListBase<T> {
-  CustomSqlNodeList();
+abstract class CustomSqlNodeIterableBase<E extends SqlNode>
+    extends DelegatingSqlNodeIterableBase<E> {
+  const CustomSqlNodeIterableBase(Iterable<E> base) : super(base);
+}
 
-  CustomSqlNodeList.from(Iterable<T> nodes) : super.from(nodes);
+abstract class CustomSqlNodeListBase<E extends SqlNode>
+    extends DelegatingSqlNodeListBase<E> {
+  const CustomSqlNodeListBase(List<E> base) : super(base);
 
-  CustomSqlNodeList.cloneFrom(CustomSqlNodeList<T> target, bool freeze)
+  CustomSqlNodeListBase.cloneFrom(CustomSqlNodeListBase target, bool freeze)
+      : super.cloneFrom(target, freeze);
+}
+
+class CustomSqlNodeList<E extends SqlNode>
+    extends DelegatingSqlNodeListBase<E> {
+  CustomSqlNodeList() : super([]);
+
+  CustomSqlNodeList.from(Iterable<E> nodes, {bool growable: true})
+      : super(nodes.toList(growable: growable));
+
+  CustomSqlNodeList.cloneFrom(CustomSqlNodeList target, bool freeze)
       : super.cloneFrom(target, freeze);
 
   @override
-  CustomSqlNodeList<T> createClone(bool freeze) =>
-      new CustomSqlNodeList.cloneFrom(this, freeze);
+  bool isAlreadyWrappedIterable(Iterable<E> base) =>
+      base is DelegatingSqlNodeIterable;
 
   @override
-  bool isAlreadyWrappedIterable(Iterable<T> base) =>
-      base is DelegatingSqlNodeIterable<T>;
+  bool isAlreadyWrappedList(Iterable<E> base) => base is DelegatingSqlNodeList;
 
   @override
-  bool isAlreadyWrappedList(Iterable<T> base) => base is CustomSqlNodeList<T>;
-
-  SqlNodeIterable<T> createIterable(Iterable<T> base) =>
+  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
       new DelegatingSqlNodeIterable(base);
 
-  SqlNodeList<T> createList(List<T> base) => new CustomSqlNodeList(base);
+  @override
+  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList(base);
+
+  @override
+  CustomSqlNodeList createClone(bool freeze) =>
+      new CustomSqlNodeList.cloneFrom(this, freeze);
 }
-*/
+
 class CustomSqlNode extends CustomSqlNodeBase {
   CustomSqlNode(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
@@ -65,17 +82,6 @@ class CustomSqlOperator extends CustomSqlOperatorBase {
       new CustomSqlOperator.cloneFrom(this, freeze);
 }
 
-/*
-abstract class CustomSqlNodeListBase<T extends SqlNode>
-    extends DelegatingSqlNodeListBase<T> {
-  CustomSqlNodeListBase() : super([]);
-
-  CustomSqlNodeListBase.from(Iterable<T> nodes) : super.from(nodes);
-
-  CustomSqlNodeListBase.cloneFrom(CustomSqlNodeListBase target, bool freeze)
-      : super.cloneFrom(target, freeze);
-}
-*/
 abstract class CustomSqlNodeBase extends SqlAbstractNodeImpl {
   CustomSqlNodeBase(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
