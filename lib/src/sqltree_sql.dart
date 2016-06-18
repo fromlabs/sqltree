@@ -26,6 +26,7 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   final String LIKE = "LIKE";
   final String UPPER = "UPPER";
   final String LOWER = "LOWER";
+  final String COALESCE = "COALESCE";
   final String NOT = "NOT";
   final String EQUAL = "=";
   final String NOT_EQUAL = "<>";
@@ -222,6 +223,8 @@ SqlNode isNotNull(node) => _node(types.IS_NOT_NULL, 1, node);
 SqlNode not(node) => _unaryOperator(types.NOT, node);
 
 SqlNode count([node]) => _function(types.COUNT, 1, node);
+
+SqlNode coalesce(node0, node1) => _function(types.COALESCE, node0, node1);
 
 SqlNode as(node, String alias) => _node(types.AS, 2, node, alias);
 
