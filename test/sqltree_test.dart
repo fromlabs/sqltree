@@ -10,12 +10,13 @@ void main() {
     test('Test 1', () {
       expect(
           () => sql.select("a", "b").addChildren("c"), throwsUnsupportedError);
-      expect(() => sql.select("a", "b").children.addAll(sql.normalize("c")),
+      expect(() => sql.select("a", "b").children.addAll(sql.node("c")),
           throwsUnsupportedError);
       expect(() => sql.select("a", "b").children.removeLast(),
           throwsUnsupportedError);
     });
   });
+
   group('clone and freeze tests', () {
     test('Test 1', () {
       var select = sql.select("a", "b");
@@ -42,25 +43,44 @@ void main() {
     });
 
     test('Test 2', () {
-      expect(sql.normalize().length, 0);
-      expect(sql.normalize().firstOrNull, null);
-      expect(sql.normalize().singleOrNull, null);
-      expect(() => sql.normalize().first, throwsStateError);
-      expect(() => sql.normalize().single, throwsStateError);
-      expect(sql.normalize(null).length, 0);
-      expect(sql.normalize(null, null).length, 0);
-      expect(sql.normalize("").length, 1);
-      expect(sql.normalize("").firstOrNull.rawExpression, "");
-      expect(sql.normalize("").singleOrNull.rawExpression, "");
-      expect(sql.normalize("").first.rawExpression, "");
-      expect(sql.normalize("").single.rawExpression, "");
-      expect(sql.normalize("", "").length, 2);
-      expect(sql.normalize("", "").firstOrNull.rawExpression, "");
-      expect(() => sql.normalize("", "").singleOrNull.rawExpression,
-          throwsStateError);
-      expect(sql.normalize("", "").first.rawExpression, "");
+      expect(sql.node().length, 0);
+      expect(sql.node().firstOrNull, null);
+      expect(sql.node().singleOrNull, null);
+      expect(() => sql.node().first, throwsStateError);
+      expect(() => sql.node().single, throwsStateError);
+      expect(sql.node(null).length, 0);
+      expect(sql.node(null, null).length, 0);
+      expect(sql.node("").length, 1);
+      expect(sql.node("").firstOrNull.rawExpression, "");
+      expect(sql.node("").singleOrNull.rawExpression, "");
+      expect(sql.node("").first.rawExpression, "");
+      expect(sql.node("").single.rawExpression, "");
+      expect(sql.node("", "").length, 2);
+      expect(sql.node("", "").firstOrNull.rawExpression, "");
       expect(
-          () => sql.normalize("", "").single.rawExpression, throwsStateError);
+          () => sql.node("", "").singleOrNull.rawExpression, throwsStateError);
+      expect(sql.node("", "").first.rawExpression, "");
+      expect(() => sql.node("", "").single.rawExpression, throwsStateError);
+    });
+  });
+
+  group('registration', () {
+    test('Test 1', () {
+      sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
+      expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
+          throwsStateError);
+      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
+      print(sql.text("a"));
+    });
+  });
+
+  group('normalize', () {
+    test('Test 1', () {
+      sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
+      expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
+          throwsStateError);
+      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
+      print(sql.text("a"));
     });
   });
 }

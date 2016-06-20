@@ -3,6 +3,8 @@
 
 import "sqltree_node.dart";
 
+typedef void SqlNodeCheck(SqlNode node);
+
 class BaseSqlNodeTypes {
   final String RAW = "#";
   final String GROUP = "@";

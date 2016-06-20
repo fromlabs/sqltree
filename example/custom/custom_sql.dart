@@ -13,8 +13,7 @@ class ExtTypes {
   final String GROUP_CONCAT_STATEMENT = "GROUP_CONCAT";
   final String GROUP_CONCAT_CLAUSE = "GROUP_CONCAT_CLAUSE";
   final String SEPARATOR_CLAUSE = "SEPARATOR";
-  // use an existent type
-  final String ORDER_BY_CLAUSE = sql.types.ORDER_BY_CLAUSE;
+  final String GROUP_CONCAT_ORDER_BY_CLAUSE = "GROUP_CONCAT_ORDER_BY_CLAUSE";
 
   ExtTypes() {
     _registerTypes(this);
@@ -24,13 +23,17 @@ class ExtTypes {
   }
 
   void _registerTypes(ExtTypes types) {
-    sql.registerNodeType(types.IF);
-    sql.registerNodeType(types.REPLACE);
-    sql.registerNodeType(types.GROUP_CONCAT_STATEMENT);
-    sql.registerNodeType(types.GROUP_CONCAT_CLAUSE);
-    sql.registerNodeType(types.SEPARATOR_CLAUSE);
-    // already registered
-    // sql.registerNodeType(types.ORDER_BY_CLAUSE);
+    sql.registerNodeType(types.IF, (node) => node is sql.ExtensionSqlFunction);
+    sql.registerNodeType(
+        types.REPLACE, (node) => node is sql.ExtensionSqlFunction);
+    sql.registerNodeType(types.GROUP_CONCAT_STATEMENT,
+        (node) => node is GroupConcatStatementImpl);
+    sql.registerNodeType(
+        types.GROUP_CONCAT_CLAUSE, (node) => node is GroupConcatClauseImpl);
+    sql.registerNodeType(
+        types.SEPARATOR_CLAUSE, (node) => node is sql.ExtensionSqlNode);
+    sql.registerNodeType(types.GROUP_CONCAT_ORDER_BY_CLAUSE,
+        (node) => node is sql.ExtensionSqlNode);
   }
 }
 
@@ -43,6 +46,9 @@ void _registerFormatters(ExtTypes types) {
     if (types.GROUP_CONCAT_STATEMENT == node.type) {
       return sql.formatByRule(formattedChildren,
           prefix: "${node.type}(", separator: " ", postfix: ")");
+    } else if (types.GROUP_CONCAT_ORDER_BY_CLAUSE == node.type) {
+      return sql.formatByRule(formattedChildren,
+          prefix: "ORDER BY ", separator: ", ");
     } else if (node is GroupConcatClause) {
       return sql.formatByRule(formattedChildren,
           prefix: node.isDistinct ? "DISTINCT " : null, separator: ", ");
@@ -56,8 +62,8 @@ void _registerFormatters(ExtTypes types) {
 }
 
 sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
-  var parent = sql
-      .registerNode(new sql.CustomSqlFunction(types.IF, maxChildrenLength: 3));
+  var parent = sql.registerNode(
+      new sql.ExtensionSqlFunction(types.IF, maxChildrenLength: 3));
 
   parent.addChildren(condition, nodeIf, nodeThen);
 
@@ -66,16 +72,16 @@ sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
 
 sql.SqlNode replace(node, from, to) {
   var parent = sql.registerNode(
-      new sql.CustomSqlFunction(types.REPLACE, maxChildrenLength: 3));
+      new sql.ExtensionSqlFunction(types.REPLACE, maxChildrenLength: 3));
 
   parent.addChildren(node, from, to);
 
   return parent;
 }
 
-GroupConcatNode groupConcat(
+GroupConcatStatement groupConcat(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  var parent = sql.registerNode(new GroupConcatNodeImpl());
+  var parent = sql.registerNode(new GroupConcatStatementImpl());
 
   parent.groupConcat(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -83,7 +89,7 @@ GroupConcatNode groupConcat(
   return parent;
 }
 
-abstract class GroupConcatNode implements sql.SqlNode {
+abstract class GroupConcatStatement implements sql.SqlNode {
   void distinct([bool isDistinct = true]);
 
   void groupConcat(node0,
@@ -108,7 +114,7 @@ abstract class GroupConcatNode implements sql.SqlNode {
 
   void clearSeparator();
 
-  GroupConcatNode clone({bool freeze});
+  GroupConcatStatement clone({bool freeze});
 }
 
 abstract class GroupConcatClause implements sql.SqlNode {

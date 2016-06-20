@@ -4,7 +4,7 @@
 import 'package:sqltree/sqltree.dart' as sql;
 
 main() {
-  var nodes3 = sql.normalize("USERS");
+  var nodes3 = sql.node("USERS");
 
   var node3 = nodes3.single;
   node3.reference = "USERS";
@@ -14,7 +14,7 @@ main() {
   var nodes2 = sql.setReference("USERS", "USERS");
   print(nodes2.first.reference);
 
-  var nodes = sql.normalize(sql.setReference("USERS", "USERS"));
+  var nodes = sql.node(sql.setReference("USERS", "USERS"));
 
   print(nodes);
   print(nodes.first.reference);
@@ -39,7 +39,7 @@ main() {
 
   select2.whereReference("USERS").single.disable();
 
-  sql.node("ciao").clone();
+  sql.custom("ciao").clone();
 
   var select = sql.select("*")
     ..from(sql.joins("tabella"))

@@ -5,6 +5,7 @@ import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
 import "sqltree_statement.dart";
 import "sqltree_statement_impl.dart";
+import "sqltree_custom_impl.dart";
 import "sqltree_parameter.dart";
 import "sqltree_parameter_impl.dart";
 import "sqltree_node_manager.dart";
@@ -58,25 +59,25 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
     registerNodeType(types.TUPLE);
     registerNodeType(types.INDEXED_PARAMETER);
     registerNodeType(types.NAMED_PARAMETER);
-    registerNodeType(types.COUNT);
-    registerNodeType(types.LIKE);
-    registerNodeType(types.UPPER);
-    registerNodeType(types.LOWER);
-    registerNodeType(types.NOT);
-    registerNodeType(types.EQUAL);
-    registerNodeType(types.NOT_EQUAL);
-    registerNodeType(types.GREATER);
-    registerNodeType(types.GREATER_OR_EQUAL);
-    registerNodeType(types.LESS);
-    registerNodeType(types.LESS_OR_EQUAL);
-    registerNodeType(types.AND);
-    registerNodeType(types.OR);
+    registerNodeType(types.COUNT, (node) => node is SqlFunctionImpl);
+    registerNodeType(types.LIKE, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.UPPER, (node) => node is SqlFunctionImpl);
+    registerNodeType(types.LOWER, (node) => node is SqlFunctionImpl);
+    registerNodeType(types.NOT, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.EQUAL, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.NOT_EQUAL, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.GREATER, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.GREATER_OR_EQUAL, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.LESS, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.LESS_OR_EQUAL, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.AND, (node) => node is SqlOperatorImpl);
+    registerNodeType(types.OR, (node) => node is SqlOperatorImpl);
     registerNodeType(types.ASC);
     registerNodeType(types.DESC);
     registerNodeType(types.IS_NULL);
     registerNodeType(types.IS_NOT_NULL);
     registerNodeType(types.NULL);
-    registerNodeType(types.IN);
+    registerNodeType(types.IN, (node) => node is SqlOperatorImpl);
     registerNodeType(types.AS);
     registerNodeType(types.QUALIFIER);
   }
@@ -84,8 +85,8 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
 
 /* CONFIGURATION */
 
-void registerNodeType(String type) {
-  _NODE_MANAGER.registerNodeType(type);
+void registerNodeType(String type, [void checkNode(SqlNode node)]) {
+  _NODE_MANAGER.registerNodeType(type, checkNode);
 }
 
 registerNode(SqlNode node) => _NODE_MANAGER.registerNode(node);
@@ -310,8 +311,7 @@ SqlNodeIterable<SqlNode> setReference(String reference,
         node7,
         node8,
         node9]) =>
-    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .map((node) => node..reference = reference);
 
 SqlNodeIterable<SqlNode> setEnabled(bool isEnabled,
@@ -325,8 +325,7 @@ SqlNodeIterable<SqlNode> setEnabled(bool isEnabled,
         node7,
         node8,
         node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..isEnabled = isEnabled);
 
 SqlNodeIterable<SqlNode> setDisabled(bool isDisabled,
@@ -340,8 +339,7 @@ SqlNodeIterable<SqlNode> setDisabled(bool isDisabled,
         node7,
         node8,
         node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..isDisabled = isDisabled);
 
 SqlNodeIterable<SqlNode> enable(
@@ -355,8 +353,7 @@ SqlNodeIterable<SqlNode> enable(
         node7,
         node8,
         node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..enable());
 
 SqlNodeIterable<SqlNode> disable(
@@ -370,8 +367,7 @@ SqlNodeIterable<SqlNode> disable(
         node7,
         node8,
         node9]) =>
-    normalize(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
       ..map((node) => node..disable());
 
 SqlNodeIterable<SqlNode> text(
@@ -385,8 +381,7 @@ SqlNodeIterable<SqlNode> text(
         node7,
         node8,
         node9]) =>
-    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .map((node) => _node(types.TEXT, 1, node));
 
 SqlNodeIterable<SqlNode> qualify(String qualifier,
@@ -400,11 +395,10 @@ SqlNodeIterable<SqlNode> qualify(String qualifier,
         node7,
         node8,
         node9]) =>
-    normalize(node0, node1, node2, node3, node4, node5, node6, node7, node8,
-            node9)
+    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .map((node) => _node(types.QUALIFIER, 2, qualifier, node));
 
-SqlNodeIterable<SqlNode> normalize(
+SqlNodeIterable<SqlNode> node(
         [node0,
         node1,
         node2,
@@ -421,11 +415,12 @@ SqlNodeIterable<SqlNode> normalize(
 
 /* CUSTOMS */
 
-SqlNode node(String type,
+SqlNode custom(String type,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  _NODE_MANAGER.registerCustomNodeType(type);
+  _NODE_MANAGER.registerCustomNodeType(
+      type, (node) => node is SqlCustomNodeImpl);
 
-  var parent = registerNode(new SqlNodeImpl(type));
+  var parent = registerNode(new SqlCustomNodeImpl(type));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -435,9 +430,10 @@ SqlNode node(String type,
 
 SqlFunction function(String function,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  _NODE_MANAGER.registerCustomNodeType(function);
+  _NODE_MANAGER.registerCustomNodeType(
+      function, (node) => node is SqlCustomFunctionImpl);
 
-  var parent = registerNode(new SqlFunctionImpl(function));
+  var parent = registerNode(new SqlCustomFunctionImpl(function));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -447,9 +443,10 @@ SqlFunction function(String function,
 
 SqlOperator operator(String operator,
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-  _NODE_MANAGER.registerCustomNodeType(operator);
+  _NODE_MANAGER.registerCustomNodeType(
+      operator, (node) => node is SqlCustomOperatorImpl);
 
-  var parent = registerNode(new SqlOperatorImpl(operator));
+  var parent = registerNode(new SqlCustomOperatorImpl(operator));
 
   parent.addChildren(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
@@ -458,10 +455,11 @@ SqlOperator operator(String operator,
 }
 
 SqlOperator unaryOperator(String operator, node) {
-  _NODE_MANAGER.registerCustomNodeType(operator);
+  _NODE_MANAGER.registerCustomNodeType(
+      operator, (node) => node is SqlCustomOperatorImpl);
 
   var parent =
-      registerNode(new SqlOperatorImpl(operator, maxChildrenLength: 1));
+      registerNode(new SqlCustomOperatorImpl(operator, maxChildrenLength: 1));
 
   parent.addChildren(node);
 
@@ -469,10 +467,11 @@ SqlOperator unaryOperator(String operator, node) {
 }
 
 SqlOperator binaryOperator(String operator, node0, node1) {
-  _NODE_MANAGER.registerCustomNodeType(operator);
+  _NODE_MANAGER.registerCustomNodeType(
+      operator, (node) => node is SqlCustomOperatorImpl);
 
   var parent =
-      registerNode(new SqlOperatorImpl(operator, maxChildrenLength: 2));
+      registerNode(new SqlCustomOperatorImpl(operator, maxChildrenLength: 2));
 
   parent.addChildren(node0, node1);
 

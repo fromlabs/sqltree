@@ -3,6 +3,16 @@
 
 // TODO queste classi devono essere facilmente estendibili per SqlColumnList, SQCOlumnSet, SqlColumnIterable
 
+abstract class Clonable {
+  Clonable clone();
+}
+
+abstract class Freezable implements Clonable {
+  bool get isFreezed;
+
+  Freezable clone({bool freeze});
+}
+
 abstract class SqlNodeIterable<E extends SqlNode> implements Iterable<E> {
   void setReference(String reference);
 
@@ -46,9 +56,8 @@ abstract class SqlNodeIterable<E extends SqlNode> implements Iterable<E> {
 }
 
 abstract class SqlNodeList<E extends SqlNode>
-    implements SqlNodeIterable<E>, List<E> {
-  bool get isFreezed;
-
+    implements SqlNodeIterable<E>, List<E>, Freezable {
+  @override
   SqlNodeList<E> clone({bool freeze});
 
   /* FROM LIST */
@@ -60,11 +69,10 @@ abstract class SqlNodeList<E extends SqlNode>
   SqlNodeList<E> sublist(int start, [int end]);
 }
 
-abstract class SqlNode {
-  bool get isFreezed;
-
+abstract class SqlNode implements Freezable {
   String get type;
 
+  @override
   SqlNode clone({bool freeze});
 
   String reference;

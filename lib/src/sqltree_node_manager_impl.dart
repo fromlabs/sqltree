@@ -3,25 +3,32 @@
 
 import "sqltree_node.dart";
 import "sqltree_node_impl.dart";
+import "sqltree_statement_impl.dart";
 import "sqltree_node_manager.dart";
+import "sqltree_formatter_impl.dart";
 
 class SqlNodeManagerImpl implements SqlNodeManager {
   static final Set<String> customNodeTypes = new Set<String>();
 
   final Set<String> nodeTypes = new Set<String>();
+  final Map<String, SqlNodeCheck> nodeChecks = new Map<String, SqlNodeCheck>();
 
   SqlNodeManagerImpl() {
     _registerTypes();
   }
 
   void _registerTypes() {
-    registerNodeType(BaseSqlNodeTypes.types.RAW);
-    registerNodeType(BaseSqlNodeTypes.types.GROUP);
-    registerNodeType(BaseSqlNodeTypes.types.SELECT_STATEMENT);
-    registerNodeType(BaseSqlNodeTypes.types.UPDATE_STATEMENT);
-    registerNodeType(BaseSqlNodeTypes.types.DELETE_STATEMENT);
-    registerNodeType(BaseSqlNodeTypes.types.INSERT_STATEMENT);
-    registerNodeType(BaseSqlNodeTypes.types.SELECT_CLAUSE);
+    registerNodeType(BaseSqlNodeTypes.types.RAW, (node) => node.isRawNode);
+    registerNodeType(BaseSqlNodeTypes.types.SELECT_STATEMENT,
+        (node) => node is SqlSelectStatementImpl);
+    registerNodeType(BaseSqlNodeTypes.types.UPDATE_STATEMENT,
+        (node) => node is SqlUpdateStatementImpl);
+    registerNodeType(BaseSqlNodeTypes.types.DELETE_STATEMENT,
+        (node) => node is SqlDeleteStatementImpl);
+    registerNodeType(BaseSqlNodeTypes.types.INSERT_STATEMENT,
+        (node) => node is SqlInsertStatementImpl);
+    registerNodeType(BaseSqlNodeTypes.types.SELECT_CLAUSE,
+        (node) => node is SqlSelectClauseImpl);
     registerNodeType(BaseSqlNodeTypes.types.UPDATE_CLAUSE);
     registerNodeType(BaseSqlNodeTypes.types.INSERT_CLAUSE);
     registerNodeType(BaseSqlNodeTypes.types.DELETE_CLAUSE);
@@ -35,12 +42,16 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     registerNodeType(BaseSqlNodeTypes.types.LIMIT_CLAUSE);
     registerNodeType(BaseSqlNodeTypes.types.OFFSET_CLAUSE);
     registerNodeType(BaseSqlNodeTypes.types.SET_CLAUSE);
-    registerNodeType(BaseSqlNodeTypes.types.JOINS);
-    registerNodeType(BaseSqlNodeTypes.types.INNER_JOIN);
-    registerNodeType(BaseSqlNodeTypes.types.LEFT_JOIN);
+    registerNodeType(
+        BaseSqlNodeTypes.types.JOINS, (node) => node is SqlJoinsImpl);
+    registerNodeType(
+        BaseSqlNodeTypes.types.INNER_JOIN, (node) => node is SqlJoinImpl);
+    registerNodeType(
+        BaseSqlNodeTypes.types.LEFT_JOIN, (node) => node is SqlJoinImpl);
     registerNodeType(BaseSqlNodeTypes.types.JOIN_FROM);
     registerNodeType(BaseSqlNodeTypes.types.JOIN_ON);
-    registerNodeType(BaseSqlNodeTypes.types.FORMATTED);
+    registerNodeType(BaseSqlNodeTypes.types.FORMATTED,
+        (node) => node is SqlFormattedNodeImpl);
   }
 
   @override
@@ -48,6 +59,11 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     if (node is RegistrableSqlNode) {
       if (!nodeTypes.contains(node.type)) {
         throw new StateError("Node type not registered: ${node.type}");
+      }
+
+      var typeTest = nodeChecks[node.type] ?? (node) => node is SqlNodeImpl;
+      if (!typeTest(node)) {
+        throw new StateError("Node not valid");
       }
 
       (node as RegistrableSqlNode).registerNode(this);
@@ -58,17 +74,18 @@ class SqlNodeManagerImpl implements SqlNodeManager {
     }
   }
 
-  void registerNodeType(String type) {
+  void registerNodeType(String type, [SqlNodeCheck typeTest]) {
     if (!nodeTypes.contains(type)) {
       nodeTypes.add(type);
+      nodeChecks[type] = typeTest;
     } else {
       throw new StateError("Node type already registered: $type");
     }
   }
 
-  void registerCustomNodeType(String type) {
+  void registerCustomNodeType(String type, [SqlNodeCheck typeTest]) {
     if (!customNodeTypes.contains(type)) {
-      registerNodeType(type);
+      registerNodeType(type, typeTest);
 
       customNodeTypes.add(type);
     }

@@ -30,7 +30,7 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
       [BaseSqlNodeTypes.types.WHERE_CLAUSE, BaseSqlNodeTypes.types.JOIN_ON]);
 
   static final Set<String> _emptyNodes = new Set.from(
-      [BaseSqlNodeTypes.types.JOIN_FROM, BaseSqlNodeTypes.types.GROUP]);
+      [BaseSqlNodeTypes.types.JOIN_FROM]);
 
   void registerNodeFormatter(SqlNodeFormatterFunction formatter) {
     _formatters.add(formatter);
