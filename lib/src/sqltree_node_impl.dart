@@ -358,7 +358,8 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   }
 }
 
-class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
+class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
+    with DelegatingSqlNodeIterableMixin<SqlNode> {
   @override
   final int maxLength;
 
@@ -375,20 +376,6 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
   void registerParent(SqlNode parent) {
     this.isChildrenLockingEnabled = parent is ChildrenLockingSupport;
   }
-
-  @override
-  bool isAlreadyWrappedIterable(Iterable<SqlNode> base) =>
-      base is DelegatingSqlNodeIterable<SqlNode>;
-
-  @override
-  bool isAlreadyWrappedList(Iterable<SqlNode> base) =>
-      base is DelegatingSqlNodeList<SqlNode>;
-
-  SqlNodeIterable<SqlNode> createIterable(Iterable<SqlNode> base) =>
-      new DelegatingSqlNodeIterable(base);
-
-  SqlNodeList<SqlNode> createList(List<SqlNode> base) =>
-      new DelegatingSqlNodeList(base);
 
   @override
   _SqlNodeChildrenListImpl createClone(bool freeze) =>
@@ -470,10 +457,8 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase {
 
 // TODO a cosa serve il getter statico typed sui DelegatingBase?
 
-class DelegatingSqlNodeIterable<E extends SqlNode>
-    extends DelegatingSqlNodeIterableBase<E> {
-  const DelegatingSqlNodeIterable(Iterable<E> base) : super(base);
-
+abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
+    implements DelegatingSqlNodeIterableBase<E> {
   @override
   bool isAlreadyWrappedIterable(Iterable<E> base) =>
       base is DelegatingSqlNodeIterable<E>;
@@ -488,25 +473,19 @@ class DelegatingSqlNodeIterable<E extends SqlNode>
   SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList(base);
 }
 
+class DelegatingSqlNodeIterable<E extends SqlNode>
+    extends DelegatingSqlNodeIterableBase<E>
+    with DelegatingSqlNodeIterableMixin<E> {
+  DelegatingSqlNodeIterable(Iterable<E> base) : super(base);
+}
+
 class DelegatingSqlNodeList<E extends SqlNode>
-    extends DelegatingSqlNodeListBase<E> {
-  const DelegatingSqlNodeList(List<E> base) : super(base);
+    extends DelegatingSqlNodeListBase<E>
+    with DelegatingSqlNodeIterableMixin<E> {
+  DelegatingSqlNodeList(List<E> base) : super(base);
 
   DelegatingSqlNodeList.cloneFrom(DelegatingSqlNodeList target, bool freeze)
       : super.cloneFrom(target, freeze);
-
-  @override
-  bool isAlreadyWrappedIterable(Iterable<E> base) =>
-      base is DelegatingSqlNodeIterable<E>;
-
-  @override
-  bool isAlreadyWrappedList(Iterable<E> base) =>
-      base is DelegatingSqlNodeList<E>;
-
-  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
-      new DelegatingSqlNodeIterable(base);
-
-  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList(base);
 
   @override
   DelegatingSqlNodeList createClone(bool freeze) =>

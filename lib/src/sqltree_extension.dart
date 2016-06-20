@@ -13,12 +13,14 @@ abstract class ExtensionSqlNodeListBase<E extends SqlNode>
     extends DelegatingSqlNodeListBase<E> {
   const ExtensionSqlNodeListBase(List<E> base) : super(base);
 
-  ExtensionSqlNodeListBase.cloneFrom(ExtensionSqlNodeListBase target, bool freeze)
+  ExtensionSqlNodeListBase.cloneFrom(
+      ExtensionSqlNodeListBase target, bool freeze)
       : super.cloneFrom(target, freeze);
 }
 
 class ExtensionSqlNodeList<E extends SqlNode>
-    extends DelegatingSqlNodeListBase<E> {
+    extends DelegatingSqlNodeListBase<E>
+    with DelegatingSqlNodeIterableMixin<E> {
   ExtensionSqlNodeList() : super([]);
 
   ExtensionSqlNodeList.from(Iterable<E> nodes, {bool growable: true})
@@ -26,20 +28,6 @@ class ExtensionSqlNodeList<E extends SqlNode>
 
   ExtensionSqlNodeList.cloneFrom(ExtensionSqlNodeList target, bool freeze)
       : super.cloneFrom(target, freeze);
-
-  @override
-  bool isAlreadyWrappedIterable(Iterable<E> base) =>
-      base is DelegatingSqlNodeIterable;
-
-  @override
-  bool isAlreadyWrappedList(Iterable<E> base) => base is DelegatingSqlNodeList;
-
-  @override
-  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
-      new DelegatingSqlNodeIterable(base);
-
-  @override
-  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList(base);
 
   @override
   ExtensionSqlNodeList createClone(bool freeze) =>
@@ -94,7 +82,8 @@ abstract class ExtensionSqlFunctionBase extends SqlAbstractFunctionImpl {
   ExtensionSqlFunctionBase(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
 
-  ExtensionSqlFunctionBase.cloneFrom(ExtensionSqlFunctionBase targetNode, bool freeze)
+  ExtensionSqlFunctionBase.cloneFrom(
+      ExtensionSqlFunctionBase targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 }
 
@@ -102,6 +91,7 @@ abstract class ExtensionSqlOperatorBase extends SqlAbstractOperatorImpl {
   ExtensionSqlOperatorBase(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
 
-  ExtensionSqlOperatorBase.cloneFrom(ExtensionSqlOperatorBase targetNode, bool freeze)
+  ExtensionSqlOperatorBase.cloneFrom(
+      ExtensionSqlOperatorBase targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 }
