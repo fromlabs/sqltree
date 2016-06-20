@@ -38,9 +38,9 @@ abstract class SqlNodeIterable<E extends SqlNode> implements Iterable<E> {
 
   /* FROM ITERABLE */
 
-  SqlNodeIterable<E> expand(Iterable f(E element));
+  SqlNodeIterable<E> expandNodes(Iterable<E> f(E element));
 
-  SqlNodeIterable<E> map(f(E element));
+  SqlNodeIterable<E> mapNodes(E f(E element));
 
   SqlNodeIterable<E> skip(int n);
 

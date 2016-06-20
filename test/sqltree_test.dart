@@ -6,6 +6,19 @@ import 'package:test/test.dart';
 import "package:sqltree/sqltree.dart" as sql;
 
 void main() {
+
+  group('base', () {
+    test('Test 1', () {
+      sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
+      expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
+          throwsStateError);
+      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
+    });
+    test('Test 2', () {
+      expect(sql.setReference("CIAO", sql.equal("a", "b")).single.reference, "CIAO");
+    });
+  });
+
   group('children locking tests', () {
     test('Test 1', () {
       expect(
@@ -61,26 +74,6 @@ void main() {
           () => sql.node("", "").singleOrNull.rawExpression, throwsStateError);
       expect(sql.node("", "").first.rawExpression, "");
       expect(() => sql.node("", "").single.rawExpression, throwsStateError);
-    });
-  });
-
-  group('registration', () {
-    test('Test 1', () {
-      sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
-      expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
-          throwsStateError);
-      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
-      print(sql.text("a"));
-    });
-  });
-
-  group('normalize', () {
-    test('Test 1', () {
-      sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
-      expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
-          throwsStateError);
-      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
-      print(sql.text("a"));
     });
   });
 }

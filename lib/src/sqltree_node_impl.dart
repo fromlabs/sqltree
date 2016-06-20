@@ -503,13 +503,21 @@ abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
   DelegatingSqlNodeIterableBase(Iterable<E> base)
       : this._base = base,
         super(base);
+}
+
+abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
+    implements SqlNodeIterable<E> {
+  bool isAlreadyWrappedIterable(Iterable<E> base);
+
+  bool isAlreadyWrappedList(Iterable<E> base);
+
+  SqlNodeIterable<E> createIterable(Iterable<E> base);
+
+  SqlNodeList<E> createList(List<E> base);
 
   @override
-  SqlNodeIterable<E> expand(Iterable f(E element)) =>
-      _wrapIterable(super.expand(f));
-
-  @override
-  SqlNodeIterable<E> map(f(E element)) => _wrapIterable(super.map(f));
+  SqlNodeIterable<E> where(bool test(E element)) =>
+      _wrapIterable(super.where(test));
 
   @override
   SqlNodeIterable<E> skip(int n) => _wrapIterable(super.skip(n));
@@ -530,21 +538,6 @@ abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
       _wrapList(super.toList(growable: growable));
 
   @override
-  SqlNodeIterable<E> where(bool test(E element)) =>
-      _wrapIterable(super.where(test));
-}
-
-abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
-    implements SqlNodeIterable<E> {
-  bool isAlreadyWrappedIterable(Iterable<E> base);
-
-  bool isAlreadyWrappedList(Iterable<E> base);
-
-  SqlNodeIterable<E> createIterable(Iterable<E> base);
-
-  SqlNodeList<E> createList(List<E> base);
-
-  @override
   E get firstOrNull => isNotEmpty ? first : null;
 
   @override
@@ -559,7 +552,14 @@ abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
       whereDeep((node) => node.reference == reference);
 
   SqlNodeIterable<E> whereDeep(bool test(E element)) =>
-      expand((node) => node.whereDeep(test));
+      expandNodes((node) => node.whereDeep(test));
+
+  @override
+  SqlNodeIterable<E> expandNodes(Iterable<E> f(E element)) =>
+      _wrapIterable(expand(f));
+
+  @override
+  SqlNodeIterable<E> mapNodes(E f(E element)) => _wrapIterable(map(f));
 
   @override
   void disable() {
