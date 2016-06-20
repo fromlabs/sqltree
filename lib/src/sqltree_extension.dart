@@ -6,12 +6,12 @@ import "sqltree_node_impl.dart";
 
 abstract class ExtensionSqlNodeIterableBase<E extends SqlNode>
     extends DelegatingSqlNodeIterableBase<E> {
-  const ExtensionSqlNodeIterableBase(Iterable<E> base) : super(base);
+  ExtensionSqlNodeIterableBase(Iterable<E> base) : super(base);
 }
 
 abstract class ExtensionSqlNodeListBase<E extends SqlNode>
     extends DelegatingSqlNodeListBase<E> {
-  const ExtensionSqlNodeListBase(List<E> base) : super(base);
+  ExtensionSqlNodeListBase(List<E> base) : super(base);
 
   ExtensionSqlNodeListBase.cloneFrom(
       ExtensionSqlNodeListBase target, bool freeze)
@@ -20,7 +20,7 @@ abstract class ExtensionSqlNodeListBase<E extends SqlNode>
 
 class ExtensionSqlNodeList<E extends SqlNode>
     extends DelegatingSqlNodeListBase<E>
-    with DelegatingSqlNodeIterableMixin<E> {
+    with DelegatingSqlNodeCollectionMixin<E> {
   ExtensionSqlNodeList() : super([]);
 
   ExtensionSqlNodeList.from(Iterable<E> nodes, {bool growable: true})

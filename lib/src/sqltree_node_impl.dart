@@ -3,6 +3,8 @@
 
 import "dart:math" as math;
 
+import "package:collection/collection.dart";
+
 import "sqltree_node.dart";
 import "sqltree_node_manager.dart";
 import "sqltree_node_manager_impl.dart";
@@ -359,7 +361,7 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
 }
 
 class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
-    with DelegatingSqlNodeIterableMixin<SqlNode> {
+    with DelegatingSqlNodeCollectionMixin<SqlNode> {
   @override
   final int maxLength;
 
@@ -395,7 +397,7 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
 
     _checkNodesCount(length + 1);
 
-    _listBase.add(node);
+    _base.add(node);
   }
 
   void _checkChildrenLocked() {
@@ -457,7 +459,7 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
 
 // TODO a cosa serve il getter statico typed sui DelegatingBase?
 
-abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
+abstract class DelegatingSqlNodeCollectionMixin<E extends SqlNode>
     implements DelegatingSqlNodeIterableBase<E> {
   @override
   bool isAlreadyWrappedIterable(Iterable<E> base) =>
@@ -475,13 +477,13 @@ abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
 
 class DelegatingSqlNodeIterable<E extends SqlNode>
     extends DelegatingSqlNodeIterableBase<E>
-    with DelegatingSqlNodeIterableMixin<E> {
+    with DelegatingSqlNodeCollectionMixin<E> {
   DelegatingSqlNodeIterable(Iterable<E> base) : super(base);
 }
 
 class DelegatingSqlNodeList<E extends SqlNode>
     extends DelegatingSqlNodeListBase<E>
-    with DelegatingSqlNodeIterableMixin<E> {
+    with DelegatingSqlNodeCollectionMixin<E> {
   DelegatingSqlNodeList(List<E> base) : super(base);
 
   DelegatingSqlNodeList.cloneFrom(DelegatingSqlNodeList target, bool freeze)
@@ -493,11 +495,47 @@ class DelegatingSqlNodeList<E extends SqlNode>
 }
 
 abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
+    extends DelegatingIterable<E>
+    with DelegatingSqlNodeIterableMixin<E>
     implements SqlNodeIterable<E> {
   final Iterable<E> _base;
 
-  const DelegatingSqlNodeIterableBase(this._base);
+  DelegatingSqlNodeIterableBase(Iterable<E> base)
+      : this._base = base,
+        super(base);
 
+  @override
+  SqlNodeIterable<E> expand(Iterable f(E element)) =>
+      _wrapIterable(super.expand(f));
+
+  @override
+  SqlNodeIterable<E> map(f(E element)) => _wrapIterable(super.map(f));
+
+  @override
+  SqlNodeIterable<E> skip(int n) => _wrapIterable(super.skip(n));
+
+  @override
+  SqlNodeIterable<E> skipWhile(bool test(E value)) =>
+      _wrapIterable(super.skipWhile(test));
+
+  @override
+  SqlNodeIterable<E> take(int n) => _wrapIterable(super.take(n));
+
+  @override
+  SqlNodeIterable<E> takeWhile(bool test(E value)) =>
+      _wrapIterable(super.takeWhile(test));
+
+  @override
+  SqlNodeList<E> toList({bool growable: true}) =>
+      _wrapList(super.toList(growable: growable));
+
+  @override
+  SqlNodeIterable<E> where(bool test(E element)) =>
+      _wrapIterable(super.where(test));
+}
+
+abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
+    implements SqlNodeIterable<E> {
   bool isAlreadyWrappedIterable(Iterable<E> base);
 
   bool isAlreadyWrappedList(Iterable<E> base);
@@ -552,97 +590,6 @@ abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
     }
   }
 
-  @override
-  bool any(bool test(E element)) => _base.any(test);
-
-  @override
-  bool contains(Object element) => _base.contains(element);
-
-  @override
-  E elementAt(int index) => _base.elementAt(index);
-
-  @override
-  bool every(bool test(E element)) => _base.every(test);
-
-  @override
-  SqlNodeIterable<E> expand(Iterable f(E element)) =>
-      _wrapIterable(_base.expand(f));
-
-  @override
-  E get first => _base.first;
-
-  @override
-  E firstWhere(bool test(E element), {E orElse()}) =>
-      _base.firstWhere(test, orElse: orElse);
-
-  @override
-  dynamic fold(initialValue, dynamic combine(previousValue, E element)) =>
-      _base.fold(initialValue, combine);
-
-  @override
-  void forEach(void f(E element)) => _base.forEach(f);
-
-  @override
-  bool get isEmpty => _base.isEmpty;
-
-  @override
-  bool get isNotEmpty => _base.isNotEmpty;
-
-  @override
-  Iterator<E> get iterator => _base.iterator;
-
-  String join([String separator = ""]) => _base.join(separator);
-
-  @override
-  E get last => _base.last;
-
-  @override
-  E lastWhere(bool test(E element), {E orElse()}) =>
-      _base.lastWhere(test, orElse: orElse);
-
-  @override
-  int get length => _base.length;
-
-  @override
-  SqlNodeIterable<E> map(f(E element)) => _wrapIterable(_base.map(f));
-
-  @override
-  E reduce(E combine(E value, E element)) => _base.reduce(combine);
-
-  @override
-  E get single => _base.single;
-
-  @override
-  E singleWhere(bool test(E element)) => _base.singleWhere(test);
-
-  @override
-  SqlNodeIterable<E> skip(int n) => _wrapIterable(_base.skip(n));
-
-  @override
-  SqlNodeIterable<E> skipWhile(bool test(E value)) =>
-      _wrapIterable(_base.skipWhile(test));
-
-  @override
-  SqlNodeIterable<E> take(int n) => _wrapIterable(_base.take(n));
-
-  @override
-  SqlNodeIterable<E> takeWhile(bool test(E value)) =>
-      _wrapIterable(_base.takeWhile(test));
-
-  @override
-  SqlNodeList<E> toList({bool growable: true}) =>
-      _wrapList(_base.toList(growable: growable));
-
-  @override
-  Set<E> toSet() => _base.toSet();
-
-  @override
-  SqlNodeIterable<E> where(bool test(E element)) =>
-      _wrapIterable(_base.where(test));
-
-  @override
-  String toString() => _base.toString();
-
   SqlNodeIterable<E> _wrapIterable(Iterable<E> base) =>
       isAlreadyWrappedIterable(base) ? base : createIterable(base);
 
@@ -650,12 +597,22 @@ abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
       isAlreadyWrappedList(base) ? base : createList(base);
 }
 
+abstract class DelegatingListBase<E> extends DelegatingList<E> {
+  final List<E> _base;
+
+  DelegatingListBase(List<E> base)
+      : this._base = base,
+        super(base);
+}
+
 abstract class DelegatingSqlNodeListBase<E extends SqlNode>
-    extends DelegatingSqlNodeIterableBase<E> implements SqlNodeList<E> {
+    extends DelegatingListBase<E>
+    with DelegatingSqlNodeIterableMixin<E>
+    implements SqlNodeList<E> {
   @override
   final bool isFreezed;
 
-  const DelegatingSqlNodeListBase(List<E> base)
+  DelegatingSqlNodeListBase(List<E> base)
       : this.isFreezed = false,
         super(base);
 
@@ -663,8 +620,6 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
       DelegatingSqlNodeListBase target, bool freeze)
       : this.isFreezed = freeze,
         super(target._base.map((node) => node.clone(freeze: freeze)).toList());
-
-  List<E> get _listBase => _base;
 
   @override
   SqlNodeList<E> clone({bool freeze}) => (freeze != null && !freeze) ||
@@ -683,159 +638,146 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   }
 
   @override
-  E operator [](int index) => _listBase[index];
-
-  @override
   void operator []=(int index, E value) {
     _checkUpdatable();
 
-    _listBase[index] = value;
+    super[index] = value;
   }
 
   @override
   void add(E value) {
     _checkUpdatable();
 
-    _listBase.add(value);
+    super.add(value);
   }
 
   @override
   void addAll(Iterable<E> iterable) {
     _checkUpdatable();
 
-    _listBase.addAll(iterable);
+    super.addAll(iterable);
   }
-
-  @override
-  Map<int, E> asMap() => _listBase.asMap();
 
   @override
   void clear() {
     _checkUpdatable();
 
-    _listBase.clear();
+    super.clear();
   }
 
   @override
   void fillRange(int start, int end, [E fillValue]) {
     _checkUpdatable();
 
-    _listBase.fillRange(start, end, fillValue);
+    super.fillRange(start, end, fillValue);
   }
 
   @override
   SqlNodeIterable<E> getRange(int start, int end) =>
-      _wrapIterable(_listBase.getRange(start, end));
-
-  @override
-  int indexOf(E element, [int start = 0]) => _listBase.indexOf(element, start);
+      _wrapIterable(super.getRange(start, end));
 
   @override
   void insert(int index, E element) {
     _checkUpdatable();
 
-    _listBase.insert(index, element);
+    super.insert(index, element);
   }
 
   @override
   void insertAll(int index, Iterable<E> iterable) {
     _checkUpdatable();
 
-    _listBase.insertAll(index, iterable);
+    super.insertAll(index, iterable);
   }
-
-  @override
-  int lastIndexOf(E element, [int start]) =>
-      _listBase.lastIndexOf(element, start);
 
   @override
   void set length(int newLength) {
     _checkUpdatable();
 
-    _listBase.length = newLength;
+    super.length = newLength;
   }
 
   @override
   bool remove(Object value) {
     _checkUpdatable();
 
-    return _listBase.remove(value);
+    return super.remove(value);
   }
 
   @override
   E removeAt(int index) {
     _checkUpdatable();
 
-    return _listBase.removeAt(index);
+    return super.removeAt(index);
   }
 
   @override
   E removeLast() {
     _checkUpdatable();
 
-    return _listBase.removeLast();
+    return super.removeLast();
   }
 
   @override
   void removeRange(int start, int end) {
     _checkUpdatable();
 
-    _listBase.removeRange(start, end);
+    super.removeRange(start, end);
   }
 
   @override
   void removeWhere(bool test(E element)) {
     _checkUpdatable();
 
-    _listBase.removeWhere(test);
+    super.removeWhere(test);
   }
 
   @override
   void replaceRange(int start, int end, Iterable<E> iterable) {
     _checkUpdatable();
 
-    _listBase.replaceRange(start, end, iterable);
+    super.replaceRange(start, end, iterable);
   }
 
   @override
   void retainWhere(bool test(E element)) {
     _checkUpdatable();
 
-    _listBase.retainWhere(test);
+    super.retainWhere(test);
   }
 
   @override
-  SqlNodeIterable<E> get reversed => _wrapIterable(_listBase.reversed);
+  SqlNodeIterable<E> get reversed => _wrapIterable(super.reversed);
 
   @override
   void setAll(int index, Iterable<E> iterable) {
     _checkUpdatable();
 
-    _listBase.setAll(index, iterable);
+    super.setAll(index, iterable);
   }
 
   @override
   void setRange(int start, int end, Iterable<E> iterable, [int skipCount = 0]) {
     _checkUpdatable();
 
-    _listBase.setRange(start, end, iterable, skipCount);
+    super.setRange(start, end, iterable, skipCount);
   }
 
   @override
   void shuffle([math.Random random]) {
     _checkUpdatable();
 
-    _listBase.shuffle(random);
+    super.shuffle(random);
   }
 
   @override
   void sort([int compare(E a, E b)]) {
     _checkUpdatable();
 
-    _listBase.sort(compare);
+    super.sort(compare);
   }
 
   @override
   SqlNodeList<E> sublist(int start, [int end]) =>
-      _wrapList(_listBase.sublist(start, end));
+      _wrapList(super.sublist(start, end));
 }
