@@ -92,8 +92,22 @@ class SqlNodeManagerImpl implements SqlNodeManager {
   }
 
   @override
-  SqlNodeIterable<SqlNode> normalize(nodes) =>
-      new DelegatingSqlNodeIterable(_normalizeInternal(nodes));
+  SqlNodeIterable<SqlNode> normalize(node0,
+          [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
+      new DelegatingSqlNodeIterable([
+        node0,
+        node1,
+        node2,
+        node3,
+        node4,
+        node5,
+        node6,
+        node7,
+        node8,
+        node9
+      ]
+          .where((node) => node != null)
+          .expand((nodes) => _normalizeInternal(nodes)));
 
   Iterable<SqlNode> _normalizeInternal(nodes) sync* {
     if (nodes != null) {

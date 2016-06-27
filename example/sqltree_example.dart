@@ -52,8 +52,8 @@ main() {
     ..limit(10)
     ..offset(200);
 
-  select.whereClause.children.last.children.last
-      .addChildren(sql.text("OPEN", "CLOSED"));
+  select.whereClause.children.last.children.last.children
+      .addAll(sql.text("OPEN", "CLOSED"));
 
   select.whereReference("ref1").single.disable();
 
@@ -62,9 +62,14 @@ main() {
       .single
       .children
       .last
-      .addChildren(sql.text("OPEN", "CLOSED"));
+      .children
+      .addAll(sql.text("OPEN", "CLOSED"));
 
-  select.whereReference("ref3").single.addChildren(sql.text("OPEN", "CLOSED"));
+  select
+      .whereReference("ref3")
+      .single
+      .children
+      .addAll(sql.text("OPEN", "CLOSED"));
 
   print(sql.prettify(sql.format(select)));
 
@@ -86,7 +91,11 @@ main() {
 
   var freezed = select.clone(freeze: true).clone(freeze: false);
 
-  freezed.whereReference("ref3").single.addChildren(sql.text("OPEN", "CLOSED"));
+  freezed
+      .whereReference("ref3")
+      .single
+      .children
+      .addAll(sql.text("OPEN", "CLOSED"));
 
   print(sql.prettify(sql.format(freezed)));
 

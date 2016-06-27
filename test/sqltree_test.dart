@@ -12,7 +12,7 @@ void main() {
       sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
       expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
           throwsStateError);
-      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).addChildren("a");
+      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).children.addAll(sql.node("a"));
     });
     test('Test 2', () {
       expect(sql.setReference("CIAO", sql.equal("a", "b")).single.reference, "CIAO");
@@ -22,7 +22,7 @@ void main() {
   group('children locking tests', () {
     test('Test 1', () {
       expect(
-          () => sql.select("a", "b").addChildren("c"), throwsUnsupportedError);
+          () => sql.select("a", "b").children.addAll(sql.node("c")), throwsUnsupportedError);
       expect(() => sql.select("a", "b").children.addAll(sql.node("c")),
           throwsUnsupportedError);
       expect(() => sql.select("a", "b").children.removeLast(),
@@ -34,24 +34,24 @@ void main() {
     test('Test 1', () {
       var select = sql.select("a", "b");
       expect(select.isFreezed, false);
-      select.selectClause.addChildren("c");
+      select.selectClause.children.addAll(sql.node("c"));
       expect(select.selectClause.children.length, 3);
       select = select.clone();
       expect(select.isFreezed, false);
-      select.selectClause.addChildren("d");
+      select.selectClause.children.addAll(sql.node("d"));
       expect(select.selectClause.children.length, 4);
       select = select.clone(freeze: true);
       expect(select.isFreezed, true);
-      expect(() => select.selectClause.addChildren("e"),
+      expect(() => select.selectClause.children.addAll(sql.node("e")),
           throwsA(new isInstanceOf<StateError>()));
       expect(select.selectClause.children.length, 4);
       select = select.clone();
       expect(select.isFreezed, true);
-      expect(() => select.selectClause.addChildren("e"), throwsStateError);
+      expect(() => select.selectClause.children.addAll(sql.node("e")), throwsStateError);
       expect(select.selectClause.children.length, 4);
       select = select.clone(freeze: false);
       expect(select.isFreezed, false);
-      select.selectClause.addChildren("e");
+      select.selectClause.children.addAll(sql.node("e"));
       expect(select.selectClause.children.length, 5);
     });
 

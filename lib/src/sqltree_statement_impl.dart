@@ -81,8 +81,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void from(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    fromClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    fromClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -91,8 +91,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void groupBy(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    groupByClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    groupByClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -101,8 +101,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void having(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    havingClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    havingClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -113,7 +113,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void limit(node) {
-    limitClause.addChildren(node);
+    limitClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -121,7 +121,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void offset(node) {
-    offsetClause.addChildren(node);
+    offsetClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -130,8 +130,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void orderBy(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    orderByClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    orderByClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -140,8 +140,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void select(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    selectClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    selectClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -160,8 +160,8 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   @override
   void where(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    whereClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    whereClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -210,8 +210,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   @override
   void columns(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    columnsClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    columnsClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -219,7 +219,7 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void insert([node]) {
-    insertClause.addChildren(node);
+    insertClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -228,8 +228,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   @override
   void values(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    valuesClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    valuesClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -277,8 +277,8 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   @override
   void set(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    setClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    setClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -286,7 +286,7 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void update([node]) {
-    updateClause.addChildren(node);
+    updateClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -295,8 +295,8 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   @override
   void where(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    whereClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    whereClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -343,7 +343,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void delete(node) {
-    deleteClause.addChildren(node);
+    deleteClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -352,8 +352,8 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   @override
   void from(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    fromClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    fromClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -362,8 +362,8 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   @override
   void where(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    whereClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    whereClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -382,24 +382,29 @@ abstract class SqlAbstractStatementImpl extends SqlAbstractNodeImpl
   SqlAbstractStatementImpl.cloneFrom(
       SqlAbstractStatementImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
-
-  SqlNode createClone(bool freeze) {
-    throw new UnsupportedError("Clone unsupported on $runtimeType");
-  }
 }
 
 class SqlSelectClauseImpl extends SqlAbstractNodeImpl
     implements SqlSelectClause {
-  @override
-  bool isDistinct;
+  bool _isDistinct;
 
   SqlSelectClauseImpl()
-      : this.isDistinct = false,
+      : this._isDistinct = false,
         super(BaseSqlNodeTypes.types.SELECT_CLAUSE);
 
   SqlSelectClauseImpl.cloneFrom(SqlSelectClauseImpl targetNode, bool freeze)
-      : this.isDistinct = targetNode.isDistinct,
+      : this._isDistinct = targetNode.isDistinct,
         super.cloneFrom(targetNode, freeze);
+
+  @override
+  bool get isDistinct => _isDistinct;
+
+  @override
+  void set isDistinct(bool isDistinct) {
+    checkNotFreezed();
+
+    _isDistinct = isDistinct;
+  }
 
   @override
   SqlNode createClone(bool freeze) =>
@@ -495,8 +500,8 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   @override
   void on(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    onClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    onClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override

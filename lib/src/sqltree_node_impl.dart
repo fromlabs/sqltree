@@ -9,21 +9,6 @@ import "sqltree_node.dart";
 import "sqltree_node_manager.dart";
 import "sqltree_node_manager_impl.dart";
 
-SqlNodeIterable<SqlNode> getNodesFromVargs(
-        [arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]) =>
-    new DelegatingSqlNodeIterable([
-      arg0,
-      arg1,
-      arg2,
-      arg3,
-      arg4,
-      arg5,
-      arg6,
-      arg7,
-      arg8,
-      arg9
-    ].where((arg) => arg != null));
-
 class SqlNodeImpl extends SqlAbstractNodeImpl {
   SqlNodeImpl(String type, {int maxChildrenLength})
       : super(type, maxChildrenLength: maxChildrenLength);
@@ -278,34 +263,6 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
     _checkComposite();
 
     return _children;
-  }
-
-  @override
-  void addChildren(node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    children.addAll(getNodesFromVargs(node0, node1, node2, node3, node4, node5,
-            node6, node7, node8, node9)
-        .expand(_nodeManager.normalize));
-  }
-
-  @override
-  void insertChildren(int index, node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    children.insertAll(
-        index,
-        getNodesFromVargs(node0, node1, node2, node3, node4, node5, node6,
-                node7, node8, node9)
-            .expand(_nodeManager.normalize));
-  }
-
-  @override
-  void setChildren(int index, node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    children.setAll(
-        index,
-        getNodesFromVargs(node0, node1, node2, node3, node4, node5, node6,
-                node7, node8, node9)
-            .expand(_nodeManager.normalize));
   }
 
   @override

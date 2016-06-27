@@ -10,7 +10,8 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
   GroupConcatStatementImpl()
       : super(types.GROUP_CONCAT_STATEMENT, maxChildrenLength: 3);
 
-  GroupConcatStatementImpl.cloneFrom(GroupConcatStatementImpl targetNode, bool freeze)
+  GroupConcatStatementImpl.cloneFrom(
+      GroupConcatStatementImpl targetNode, bool freeze)
       : super.cloneFrom(targetNode, freeze);
 
   @override
@@ -18,7 +19,8 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
     super.onNodeRegistered();
 
     this.addInternalNode(new GroupConcatClauseImpl());
-    this.addInternalNode(new sql.ExtensionSqlNode(types.GROUP_CONCAT_ORDER_BY_CLAUSE));
+    this.addInternalNode(
+        new sql.ExtensionSqlNode(types.GROUP_CONCAT_ORDER_BY_CLAUSE));
     this.addInternalNode(new sql.ExtensionSqlNode(types.SEPARATOR_CLAUSE));
   }
 
@@ -44,8 +46,8 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
   @override
   void groupConcat(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    groupConcatClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    groupConcatClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -57,8 +59,8 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
   @override
   void orderBy(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
-    orderByClause.addChildren(
-        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+    orderByClause.children.addAll(nodeManager.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
   }
 
   @override
@@ -66,7 +68,7 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
 
   @override
   void separator(node) {
-    separatorClause.addChildren(node);
+    separatorClause.children.addAll(nodeManager.normalize(node));
   }
 
   @override
@@ -79,16 +81,26 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
 
 class GroupConcatClauseImpl extends sql.ExtensionSqlNodeBase
     implements GroupConcatClause {
-  @override
-  bool isDistinct;
+
+  bool _isDistinct;
 
   GroupConcatClauseImpl()
-      : this.isDistinct = false,
+      : this._isDistinct = false,
         super(types.GROUP_CONCAT_CLAUSE);
 
   GroupConcatClauseImpl.cloneFrom(GroupConcatClauseImpl targetNode, bool freeze)
-      : this.isDistinct = targetNode.isDistinct,
+      : this._isDistinct = targetNode.isDistinct,
         super.cloneFrom(targetNode, freeze);
+
+  @override
+  bool get isDistinct => _isDistinct;
+
+  @override
+  void set isDistinct(bool isDistinct) {
+    checkNotFreezed();
+
+    _isDistinct = isDistinct;
+  }
 
   @override
   sql.SqlNode createClone(bool freeze) =>

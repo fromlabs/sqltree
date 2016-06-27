@@ -110,8 +110,8 @@ SqlSelectStatement select(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   var parent = registerNode(new SqlSelectStatementImpl());
 
-  parent.selectClause.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.selectClause.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -144,8 +144,8 @@ SqlJoins joins(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   var parent = registerNode(new SqlJoinsImpl());
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -163,9 +163,9 @@ SqlJoin leftJoin(fromNode,
     onNode9]) {
   var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN));
 
-  parent.fromClause.addChildren(fromNode);
-  parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
-      onNode5, onNode6, onNode7, onNode8, onNode9);
+  parent.fromClause.children.addAll(node(fromNode));
+  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3, onNode4,
+      onNode5, onNode6, onNode7, onNode8, onNode9));
 
   return parent;
 }
@@ -183,9 +183,9 @@ SqlJoin join(fromNode,
     onNode9]) {
   var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN));
 
-  parent.fromClause.addChildren(fromNode);
-  parent.onClause.addChildren(onNode0, onNode1, onNode2, onNode3, onNode4,
-      onNode5, onNode6, onNode7, onNode8, onNode9);
+  parent.fromClause.children.addAll(node(fromNode));
+  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3, onNode4,
+      onNode5, onNode6, onNode7, onNode8, onNode9));
 
   return parent;
 }
@@ -410,9 +410,8 @@ SqlNodeIterable<SqlNode> node(
         node7,
         node8,
         node9]) =>
-    getNodesFromVargs(node0, node1, node2, node3, node4, node5, node6, node7,
-            node8, node9)
-        .expandNodes((node) => _NODE_MANAGER.normalize(node));
+    _NODE_MANAGER.normalize(
+        node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
 
 /* CUSTOMS */
 
@@ -423,8 +422,8 @@ SqlNode custom(String type,
 
   var parent = registerNode(new SqlCustomNodeImpl(type));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -436,8 +435,8 @@ SqlFunction function(String function,
 
   var parent = registerNode(new SqlCustomFunctionImpl(function));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -449,8 +448,8 @@ SqlOperator operator(String operator,
 
   var parent = registerNode(new SqlCustomOperatorImpl(operator));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -462,7 +461,7 @@ SqlOperator unaryOperator(String operator, node) {
   var parent =
       registerNode(new SqlCustomOperatorImpl(operator, maxChildrenLength: 1));
 
-  parent.addChildren(node);
+  parent.children.addAll(node(node));
 
   return parent;
 }
@@ -474,7 +473,7 @@ SqlOperator binaryOperator(String operator, node0, node1) {
   var parent =
       registerNode(new SqlCustomOperatorImpl(operator, maxChildrenLength: 2));
 
-  parent.addChildren(node0, node1);
+  parent.children.addAll(node(node0, node1));
 
   return parent;
 }
@@ -490,8 +489,8 @@ SqlFormattedNode formatted(String prefix, String separator, String postfix,
           isFormatEmptyChildrenEnabled: formatEmptyChildrenEnabled),
       maxChildrenLength: maxChildrenLength));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -507,8 +506,8 @@ SqlFunction _function(String function, int maxChildrenLength,
   var parent = registerNode(
       new SqlFunctionImpl(function, maxChildrenLength: maxChildrenLength));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -518,8 +517,8 @@ SqlOperator _operator(String operator, int maxChildrenLength,
   var parent = registerNode(
       new SqlOperatorImpl(operator, maxChildrenLength: maxChildrenLength));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }
@@ -529,8 +528,8 @@ SqlNode _node(String type, int maxChildrenLength,
   var parent =
       registerNode(new SqlNodeImpl(type, maxChildrenLength: maxChildrenLength));
 
-  parent.addChildren(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
+  parent.children.addAll(node(
+      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
 }

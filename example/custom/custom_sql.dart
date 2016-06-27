@@ -65,7 +65,7 @@ sql.SqlNode ifThen(condition, nodeIf, nodeThen) {
   var parent = sql.registerNode(
       new sql.ExtensionSqlFunction(types.IF, maxChildrenLength: 3));
 
-  parent.addChildren(condition, nodeIf, nodeThen);
+  parent.children.addAll(sql.node(condition, nodeIf, nodeThen));
 
   return parent;
 }
@@ -74,7 +74,7 @@ sql.SqlNode replace(node, from, to) {
   var parent = sql.registerNode(
       new sql.ExtensionSqlFunction(types.REPLACE, maxChildrenLength: 3));
 
-  parent.addChildren(node, from, to);
+  parent.children.addAll(sql.node(node, from, to));
 
   return parent;
 }

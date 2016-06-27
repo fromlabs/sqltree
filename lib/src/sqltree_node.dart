@@ -111,16 +111,7 @@ abstract class SqlNode implements Freezable {
 
   /* MULTI COMPOSITE NODE */
 
-  SqlNodeList get children;
-
-  void addChildren(node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
-
-  void setChildren(int index, node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
-
-  void insertChildren(int index, node0,
-      [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
+  SqlNodeList<SqlNode> get children;
 
   bool containsReference(String reference);
 
