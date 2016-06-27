@@ -33,7 +33,7 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
       [BaseSqlNodeTypes.types.JOIN_FROM]);
 
   void registerNodeFormatter(SqlNodeFormatterFunction formatter) {
-    _formatters.add(formatter);
+    _formatters.insert(0, formatter);
   }
 
   @override
@@ -45,16 +45,16 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
 
       List<String> formattedChildren = _getFormattedChildren(node);
 
-      formatted = _supportedFormat(node, formattedChildren);
-      if (formatted != null) {
-        return formatted;
-      }
-
       for (SqlNodeFormatterFunction formatter in _formatters) {
         formatted = formatter(node, formattedChildren);
         if (formatted != null) {
           return formatted;
         }
+      }
+
+      formatted = _supportedFormat(node, formattedChildren);
+      if (formatted != null) {
+        return formatted;
       }
 
       return _defaultFormat(node, formattedChildren);

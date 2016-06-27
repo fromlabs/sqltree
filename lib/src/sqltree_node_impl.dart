@@ -219,12 +219,15 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   @override
   bool get isCompositeNode => !isRawNode;
 
+  @override
   bool get isEmptyComposite =>
       isCompositeNode && maxChildrenLength != null && maxChildrenLength == 0;
 
+  @override
   bool get isSingleCompositeNode =>
       isCompositeNode && maxChildrenLength != null && maxChildrenLength == 1;
 
+  @override
   bool get isMultiCompositeNode =>
       isCompositeNode && (maxChildrenLength == null || maxChildrenLength > 1);
 

@@ -3,11 +3,11 @@
 
 // TODO queste classi devono essere facilmente estendibili per SqlColumnList, SQCOlumnSet, SqlColumnIterable
 
-abstract class Clonable {
-  Clonable clone();
+abstract class Cloneable {
+  Cloneable clone();
 }
 
-abstract class Freezable implements Clonable {
+abstract class Freezable implements Cloneable {
   bool get isFreezed;
 
   Freezable clone({bool freeze});
@@ -96,6 +96,8 @@ abstract class SqlNode implements Freezable {
   /* COMPOSITE NODE */
 
   bool get isCompositeNode;
+
+  bool get isEmptyComposite;
 
   bool get isSingleCompositeNode;
 
