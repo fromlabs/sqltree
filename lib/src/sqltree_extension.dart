@@ -30,8 +30,8 @@ class ExtensionSqlNodeList<E extends SqlNode>
       : super.cloneFrom(target, freeze);
 
   @override
-  ExtensionSqlNodeList createClone(bool freeze) =>
-      new ExtensionSqlNodeList.cloneFrom(this, freeze);
+  ExtensionSqlNodeList/*<E>*/ createClone(bool freeze) =>
+      new ExtensionSqlNodeList/*<E>*/.cloneFrom(this, freeze);
 }
 
 class ExtensionSqlNode extends ExtensionSqlNodeBase {

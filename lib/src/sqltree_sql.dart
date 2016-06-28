@@ -86,7 +86,7 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
 
 /* CONFIGURATION */
 
-void registerNodeType(String type, [void checkNode(SqlNode node)]) {
+void registerNodeType(String type, [bool checkNode(SqlNode node)]) {
   _NODE_MANAGER.registerNodeType(type, checkNode);
 }
 
@@ -164,8 +164,8 @@ SqlJoin leftJoin(fromNode,
   var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN));
 
   parent.fromClause.children.addAll(node(fromNode));
-  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3, onNode4,
-      onNode5, onNode6, onNode7, onNode8, onNode9));
+  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3,
+      onNode4, onNode5, onNode6, onNode7, onNode8, onNode9));
 
   return parent;
 }
@@ -184,8 +184,8 @@ SqlJoin join(fromNode,
   var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN));
 
   parent.fromClause.children.addAll(node(fromNode));
-  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3, onNode4,
-      onNode5, onNode6, onNode7, onNode8, onNode9));
+  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3,
+      onNode4, onNode5, onNode6, onNode7, onNode8, onNode9));
 
   return parent;
 }

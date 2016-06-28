@@ -67,6 +67,20 @@ abstract class SqlNodeList<E extends SqlNode>
   SqlNodeIterable<E> get reversed;
 
   SqlNodeList<E> sublist(int start, [int end]);
+
+  /* FROM SQLNODEITERABLE */
+
+  SqlNodeIterable<E> skip(int n);
+
+  SqlNodeIterable<E> skipWhile(bool test(E value));
+
+  SqlNodeIterable<E> take(int n);
+
+  SqlNodeIterable<E> takeWhile(bool test(E value));
+
+  SqlNodeList<E> toList({bool growable: true});
+
+  SqlNodeIterable<E> where(bool test(E element));
 }
 
 abstract class SqlNode implements Freezable {
@@ -117,7 +131,8 @@ abstract class SqlNode implements Freezable {
 
   SqlNodeIterable<SqlNode> whereReference(String reference);
 
-  SqlNodeIterable<SqlNode> whereDeep(bool test(SqlNode node));
+  SqlNodeIterable/*<T>*/ whereDeep/*<T extends SqlNode>*/(
+      bool test(/*=T*/ node));
 }
 
 abstract class SqlFunction implements SqlNode {}

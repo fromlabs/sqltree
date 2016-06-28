@@ -3,7 +3,7 @@
 
 import "sqltree_node.dart";
 
-typedef void SqlNodeCheck(SqlNode node);
+typedef bool SqlNodeCheck(SqlNode node);
 
 class BaseSqlNodeTypes {
   final String RAW = "#";

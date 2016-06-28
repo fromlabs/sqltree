@@ -185,16 +185,21 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
       whereDeep((node) => node.reference == reference);
 
   @override
-  SqlNodeIterable<SqlNode> whereDeep(bool test(SqlNode node)) =>
-      new DelegatingSqlNodeIterable(_whereDeepInternal(test));
+  SqlNodeIterable/*<T>*/ whereDeep/*<T extends SqlNode>*/(
+          bool test(/*=T*/ node)) =>
+      new DelegatingSqlNodeIterable/*<T>*/(_whereDeepInternal(test));
 
-  Iterable<SqlNode> _whereDeepInternal(bool test(SqlNode node)) sync* {
-    if (test(this)) {
-      yield this;
+  Iterable/*<T>*/ _whereDeepInternal/*<T extends SqlNode>*/(
+      bool test(/*=T*/ node)) sync* {
+    var/*=T*/ thisNode = this as dynamic/*=T*/;
+    if (test(thisNode)) {
+      yield thisNode;
     }
 
     if (isCompositeNode) {
-      yield* children.expand((child) => child._whereDeepInternal(test));
+      var nodes = children.expand((child) => (child as SqlAbstractNodeImpl)
+          ._whereDeepInternal((node) => test(node as SqlNode/*=T*/)));
+      yield* nodes;
     }
   }
 
@@ -285,13 +290,14 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
 
   SqlNode createClone(bool freeze);
 
-  SqlNode addInternalNode(SqlNode node) {
+  SqlNode/*=T*/ addInternalNode/*<T extends SqlNode>*/(SqlNode/*=T*/ node) {
     if (node is RegistrableSqlNode &&
         !(node as RegistrableSqlNode).isRegistered) {
-      node = nodeManager.registerNode(node);
+      node = nodeManager.registerNode(node) as SqlNode/*=T*/;
     }
 
     _children._addInternal(node);
+
     return node;
   }
 
@@ -430,9 +436,10 @@ abstract class DelegatingSqlNodeCollectionMixin<E extends SqlNode>
       base is DelegatingSqlNodeList<E>;
 
   SqlNodeIterable<E> createIterable(Iterable<E> base) =>
-      new DelegatingSqlNodeIterable(base);
+      new DelegatingSqlNodeIterable/*<E>*/(base);
 
-  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList(base);
+  SqlNodeList<E> createList(List<E> base) =>
+      new DelegatingSqlNodeList/*<E>*/(base);
 }
 
 class DelegatingSqlNodeIterable<E extends SqlNode>
@@ -450,8 +457,8 @@ class DelegatingSqlNodeList<E extends SqlNode>
       : super.cloneFrom(target, freeze);
 
   @override
-  DelegatingSqlNodeList createClone(bool freeze) =>
-      new DelegatingSqlNodeList.cloneFrom(this, freeze);
+  DelegatingSqlNodeList/*<E>*/ createClone(bool freeze) =>
+      new DelegatingSqlNodeList/*<E>*/ .cloneFrom(this, freeze);
 }
 
 abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
@@ -463,6 +470,25 @@ abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
   DelegatingSqlNodeIterableBase(Iterable<E> base)
       : this._base = base,
         super(base);
+
+  @override
+  SqlNodeIterable<E> where(bool test(E element)) => super.where(test);
+
+  @override
+  SqlNodeIterable<E> skip(int n) => super.skip(n);
+
+  @override
+  SqlNodeIterable<E> skipWhile(bool test(E value)) => super.skipWhile(test);
+
+  @override
+  SqlNodeIterable<E> take(int n) => super.take(n);
+
+  @override
+  SqlNodeIterable<E> takeWhile(bool test(E value)) => super.takeWhile(test);
+
+  @override
+  SqlNodeList<E> toList({bool growable: true}) =>
+      super.toList(growable: growable);
 }
 
 abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
@@ -580,6 +606,25 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
       DelegatingSqlNodeListBase target, bool freeze)
       : this.isFreezed = freeze,
         super(target._base.map((node) => node.clone(freeze: freeze)).toList());
+
+  @override
+  SqlNodeIterable<E> where(bool test(E element)) => super.where(test);
+
+  @override
+  SqlNodeIterable<E> skip(int n) => super.skip(n);
+
+  @override
+  SqlNodeIterable<E> skipWhile(bool test(E value)) => super.skipWhile(test);
+
+  @override
+  SqlNodeIterable<E> take(int n) => super.take(n);
+
+  @override
+  SqlNodeIterable<E> takeWhile(bool test(E value)) => super.takeWhile(test);
+
+  @override
+  SqlNodeList<E> toList({bool growable: true}) =>
+      super.toList(growable: growable);
 
   @override
   SqlNodeList<E> clone({bool freeze}) => (freeze != null && !freeze) ||
