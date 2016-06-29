@@ -56,11 +56,6 @@ void main() {
     });
 
     test('Test 2', () {
-      expect(sql.node().length, 0);
-      expect(sql.node().firstOrNull, null);
-      expect(sql.node().singleOrNull, null);
-      expect(() => sql.node().first, throwsStateError);
-      expect(() => sql.node().single, throwsStateError);
       expect(sql.node(null).length, 0);
       expect(sql.node(null, null).length, 0);
       expect(sql.node("").length, 1);

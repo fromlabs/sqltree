@@ -301,115 +301,43 @@ SqlNode lower(node) => _function(types.LOWER, 1, node);
 
 /* DECORATORS */
 
-SqlNodeIterable<SqlNode> setReference(String reference,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> setReference(String reference, node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => node..reference = reference);
 
-SqlNodeIterable<SqlNode> setEnabled(bool isEnabled,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> setEnabled(bool isEnabled, node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => node..isEnabled = isEnabled);
 
-SqlNodeIterable<SqlNode> setDisabled(bool isDisabled,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> setDisabled(bool isDisabled, node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => node..isDisabled = isDisabled);
 
-SqlNodeIterable<SqlNode> enable(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> enable(node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => node..enable());
 
-SqlNodeIterable<SqlNode> disable(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> disable(node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => node..disable());
 
-SqlNodeIterable<SqlNode> text(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> text(node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => _node(types.TEXT, 1, node));
 
-SqlNodeIterable<SqlNode> qualify(String qualifier,
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> qualify(String qualifier, node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
         .mapNodes((node) => _node(types.QUALIFIER, 2, qualifier, node));
 
-SqlNodeIterable<SqlNode> node(
-        [node0,
-        node1,
-        node2,
-        node3,
-        node4,
-        node5,
-        node6,
-        node7,
-        node8,
-        node9]) =>
+SqlNodeIterable<SqlNode> node(node0,
+        [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
     _NODE_MANAGER.normalize(
         node0, node1, node2, node3, node4, node5, node6, node7, node8, node9);
 
