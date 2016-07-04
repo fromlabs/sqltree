@@ -1,8 +1,6 @@
 // Copyright (c) 2016, Roberto Tassi. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-// TODO queste classi devono essere facilmente estendibili per SqlColumnList, SQCOlumnSet, SqlColumnIterable
-
 abstract class Cloneable {
   Cloneable clone();
 }
@@ -24,10 +22,8 @@ abstract class SqlNodeIterable<E extends SqlNode> implements Iterable<E> {
 
   void disable();
 
-  // TODO rinominare firstOrNull
   E get firstOrNull;
 
-  // TODO rinominare singleOrNull
   E get singleOrNull;
 
   bool containsReference(String reference);

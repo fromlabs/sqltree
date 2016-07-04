@@ -423,8 +423,6 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
   }
 }
 
-// TODO a cosa serve il getter statico typed sui DelegatingBase?
-
 abstract class DelegatingSqlNodeCollectionMixin<E extends SqlNode>
     implements DelegatingSqlNodeIterableBase<E> {
   @override
