@@ -75,10 +75,10 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
   sql.SqlNode get separatorClause => children[2];
 
   @override
-  GroupConcatStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  GroupConcatStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  sql.SqlNode createClone(bool freeze) =>
+  GroupConcatStatementImpl createClone(bool freeze) =>
       new GroupConcatStatementImpl.cloneFrom(this, freeze);
 }
 
@@ -105,9 +105,9 @@ class GroupConcatClauseImpl extends sql.ExtensionSqlNodeBase
   }
 
   @override
-  GroupConcatClause clone({bool freeze}) => super.clone(freeze: freeze);
+  GroupConcatClauseImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  sql.SqlNode createClone(bool freeze) =>
+  GroupConcatClauseImpl createClone(bool freeze) =>
       new GroupConcatClauseImpl.cloneFrom(this, freeze);
 }

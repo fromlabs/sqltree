@@ -6,23 +6,26 @@ import 'package:test/test.dart';
 import "package:sqltree/sqltree.dart" as sql;
 
 void main() {
-
   group('base', () {
     test('Test 1', () {
       sql.registerNodeType("PROVA", (node) => node is sql.SqlFunction);
       expect(() => sql.registerNode(new sql.ExtensionSqlNode("PROVA")),
           throwsStateError);
-      sql.registerNode(new sql.ExtensionSqlFunction("PROVA")).children.addAll(sql.node("a"));
+      sql
+          .registerNode(new sql.ExtensionSqlFunction("PROVA"))
+          .children
+          .addAll(sql.node("a"));
     });
     test('Test 2', () {
-      expect(sql.setReference("CIAO", sql.equal("a", "b")).single.reference, "CIAO");
+      expect(sql.setReference("CIAO", sql.equal("a", "b")).single.reference,
+          "CIAO");
     });
   });
 
   group('children locking tests', () {
     test('Test 1', () {
-      expect(
-          () => sql.select("a", "b").children.addAll(sql.node("c")), throwsUnsupportedError);
+      expect(() => sql.select("a", "b").children.addAll(sql.node("c")),
+          throwsUnsupportedError);
       expect(() => sql.select("a", "b").children.addAll(sql.node("c")),
           throwsUnsupportedError);
       expect(() => sql.select("a", "b").children.removeLast(),
@@ -47,7 +50,8 @@ void main() {
       expect(select.selectClause.children.length, 4);
       select = select.clone();
       expect(select.isFreezed, true);
-      expect(() => select.selectClause.children.addAll(sql.node("e")), throwsStateError);
+      expect(() => select.selectClause.children.addAll(sql.node("e")),
+          throwsStateError);
       expect(select.selectClause.children.length, 4);
       select = select.clone(freeze: false);
       expect(select.isFreezed, false);

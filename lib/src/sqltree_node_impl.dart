@@ -19,7 +19,8 @@ class SqlNodeImpl extends SqlAbstractNodeImpl {
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) => new SqlNodeImpl.cloneFrom(this, freeze);
+  SqlNodeImpl createClone(bool freeze) =>
+      new SqlNodeImpl.cloneFrom(this, freeze);
 }
 
 class SqlFunctionImpl extends SqlAbstractFunctionImpl {
@@ -30,7 +31,7 @@ class SqlFunctionImpl extends SqlAbstractFunctionImpl {
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlFunctionImpl createClone(bool freeze) =>
       new SqlFunctionImpl.cloneFrom(this, freeze);
 }
 
@@ -42,7 +43,7 @@ class SqlOperatorImpl extends SqlAbstractOperatorImpl implements SqlOperator {
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlOperatorImpl createClone(bool freeze) =>
       new SqlOperatorImpl.cloneFrom(this, freeze);
 }
 
@@ -284,11 +285,10 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   void onNodeRegistered() {}
 
   @override
-  SqlNode clone({bool freeze}) => (freeze != null && !freeze) || !isFreezed
-      ? createClone(freeze ?? isFreezed)
-      : this;
+  SqlAbstractNodeImpl clone({bool freeze}) => (freeze != null && !freeze) ||
+      !isFreezed ? createClone(freeze ?? isFreezed) : this;
 
-  SqlNode createClone(bool freeze);
+  SqlAbstractNodeImpl createClone(bool freeze);
 
   SqlNode/*=T*/ addInternalNode/*<T extends SqlNode>*/(SqlNode/*=T*/ node) {
     if (node is RegistrableSqlNode &&
@@ -627,10 +627,12 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
       super.toList(growable: growable);
 
   @override
-  SqlNodeList<E> clone({bool freeze}) => (freeze != null && !freeze) ||
-      !isFreezed ? createClone(freeze ?? isFreezed) : this;
+  DelegatingSqlNodeListBase<E> clone({bool freeze}) =>
+      (freeze != null && !freeze) || !isFreezed
+          ? createClone(freeze ?? isFreezed)
+          : this;
 
-  SqlNodeList<E> createClone(bool freeze);
+  DelegatingSqlNodeListBase<E> createClone(bool freeze);
 
   void _checkUpdatable() {
     _checkNotFreezed();

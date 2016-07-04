@@ -18,20 +18,23 @@ abstract class ExtensionSqlNodeListBase<E extends SqlNode>
       : super.cloneFrom(target, freeze);
 }
 
+class ExtensionSqlNodeIterable<E extends SqlNode>
+    extends DelegatingSqlNodeIterableBase<E>
+    with DelegatingSqlNodeCollectionMixin<E> {
+  ExtensionSqlNodeIterable(Iterable<E> base) : super(base);
+}
+
 class ExtensionSqlNodeList<E extends SqlNode>
     extends DelegatingSqlNodeListBase<E>
     with DelegatingSqlNodeCollectionMixin<E> {
-  ExtensionSqlNodeList() : super([]);
-
-  ExtensionSqlNodeList.from(Iterable<E> nodes, {bool growable: true})
-      : super(nodes.toList(growable: growable));
+  ExtensionSqlNodeList(List<E> base) : super(base);
 
   ExtensionSqlNodeList.cloneFrom(ExtensionSqlNodeList target, bool freeze)
       : super.cloneFrom(target, freeze);
 
   @override
   ExtensionSqlNodeList/*<E>*/ createClone(bool freeze) =>
-      new ExtensionSqlNodeList/*<E>*/.cloneFrom(this, freeze);
+      new ExtensionSqlNodeList/*<E>*/ .cloneFrom(this, freeze);
 }
 
 class ExtensionSqlNode extends ExtensionSqlNodeBase {

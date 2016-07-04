@@ -168,10 +168,10 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlSelectStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlSelectStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlSelectStatementImpl createClone(bool freeze) =>
       new SqlSelectStatementImpl.cloneFrom(this, freeze);
 }
 
@@ -239,10 +239,10 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   SqlNode get valuesClause => children[2];
 
   @override
-  SqlInsertStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlInsertStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlInsertStatementImpl createClone(bool freeze) =>
       new SqlInsertStatementImpl.cloneFrom(this, freeze);
 }
 
@@ -309,10 +309,10 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlUpdateStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlUpdateStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlUpdateStatementImpl createClone(bool freeze) =>
       new SqlUpdateStatementImpl.cloneFrom(this, freeze);
 }
 
@@ -379,10 +379,10 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
   SqlNode get whereClause => children[2];
 
   @override
-  SqlDeleteStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlDeleteStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlDeleteStatementImpl createClone(bool freeze) =>
       new SqlDeleteStatementImpl.cloneFrom(this, freeze);
 }
 
@@ -396,7 +396,7 @@ abstract class SqlAbstractStatementImpl extends SqlAbstractNodeImpl
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlStatement clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlAbstractStatementImpl clone({bool freeze}) => super.clone(freeze: freeze);
 }
 
 class SqlSelectClauseImpl extends SqlAbstractNodeImpl
@@ -422,10 +422,10 @@ class SqlSelectClauseImpl extends SqlAbstractNodeImpl
   }
 
   @override
-  SqlSelectClause clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlSelectClauseImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlSelectClauseImpl createClone(bool freeze) =>
       new SqlSelectClauseImpl.cloneFrom(this, freeze);
 }
 
@@ -478,10 +478,11 @@ class SqlJoinsImpl extends SqlAbstractNodeImpl implements SqlJoins {
   }
 
   @override
-  SqlJoins clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlJoinsImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) => new SqlJoinsImpl.cloneFrom(this, freeze);
+  SqlJoinsImpl createClone(bool freeze) =>
+      new SqlJoinsImpl.cloneFrom(this, freeze);
 }
 
 class SqlJoinImpl extends SqlAbstractNodeImpl
@@ -529,8 +530,9 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
   SqlNode get onClause => children[1];
 
   @override
-  SqlJoin clone({bool freeze}) => super.clone(freeze: freeze);
+  SqlJoinImpl clone({bool freeze}) => super.clone(freeze: freeze);
 
   @override
-  SqlNode createClone(bool freeze) => new SqlJoinImpl.cloneFrom(this, freeze);
+  SqlJoinImpl createClone(bool freeze) =>
+      new SqlJoinImpl.cloneFrom(this, freeze);
 }

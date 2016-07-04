@@ -29,8 +29,8 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
   static final Set<String> _whereNodes = new Set.from(
       [BaseSqlNodeTypes.types.WHERE_CLAUSE, BaseSqlNodeTypes.types.JOIN_ON]);
 
-  static final Set<String> _emptyNodes = new Set.from(
-      [BaseSqlNodeTypes.types.JOIN_FROM]);
+  static final Set<String> _emptyNodes =
+      new Set.from([BaseSqlNodeTypes.types.JOIN_FROM]);
 
   void registerNodeFormatter(SqlNodeFormatterFunction formatter) {
     _formatters.insert(0, formatter);
@@ -143,6 +143,6 @@ class SqlFormattedNodeImpl extends SqlAbstractNodeImpl
         super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlFormattedNodeImpl createClone(bool freeze) =>
       new SqlFormattedNodeImpl.cloneFrom(this, freeze);
 }

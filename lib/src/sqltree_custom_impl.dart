@@ -12,7 +12,7 @@ class SqlCustomNodeImpl extends SqlAbstractNodeImpl {
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlCustomNodeImpl createClone(bool freeze) =>
       new SqlCustomNodeImpl.cloneFrom(this, freeze);
 }
 
@@ -24,7 +24,7 @@ class SqlCustomFunctionImpl extends SqlAbstractFunctionImpl {
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlCustomFunctionImpl createClone(bool freeze) =>
       new SqlCustomFunctionImpl.cloneFrom(this, freeze);
 }
 
@@ -37,6 +37,6 @@ class SqlCustomOperatorImpl extends SqlAbstractOperatorImpl
       : super.cloneFrom(targetNode, freeze);
 
   @override
-  SqlNode createClone(bool freeze) =>
+  SqlCustomOperatorImpl createClone(bool freeze) =>
       new SqlCustomOperatorImpl.cloneFrom(this, freeze);
 }
