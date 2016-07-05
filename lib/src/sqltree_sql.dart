@@ -79,7 +79,7 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
     registerNodeType(types.IS_NOT_NULL);
     registerNodeType(types.NULL);
     registerNodeType(types.IN, (node) => node is SqlOperatorImpl);
-    registerNodeType(types.AS);
+    registerNodeType(types.AS, (node) => node is SqlOperatorImpl);
     registerNodeType(types.QUALIFIER);
   }
 }
@@ -228,7 +228,7 @@ SqlNode count([node]) => _function(types.COUNT, 1, node);
 
 SqlNode coalesce(node0, node1) => _function(types.COALESCE, 2, node0, node1);
 
-SqlNode as(node, String alias) => _node(types.AS, 2, node, alias);
+SqlNode as(node, alias) => _binaryOperator(types.AS, node, alias);
 
 SqlNode equal(node0, node1) => _binaryOperator(types.EQUAL, node0, node1);
 
@@ -485,14 +485,7 @@ void _initialize(SqlNodeTypes types) {
 
 void _registerFormatters() {
   registerNodeFormatter((node, formattedChildren) {
-    if (types.AS == node.type) {
-      if (formattedChildren.length == 2 &&
-          formattedChildren[0] == formattedChildren[1]) {
-        return formattedChildren[0];
-      } else {
-        return formatByRule(formattedChildren, separator: " AS ");
-      }
-    } else if (types.NAMED_PARAMETER == node.type) {
+    if (types.NAMED_PARAMETER == node.type) {
       return formatByRule(formattedChildren, prefix: r"${", postfix: "}");
     } else if (types.TEXT == node.type) {
       return formatByRule(
