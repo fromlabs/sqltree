@@ -113,7 +113,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void limit(node) {
-    limitClause.children.addAll(nodeManager.normalize(node));
+    limitClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override
@@ -121,7 +121,7 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void offset(node) {
-    offsetClause.children.addAll(nodeManager.normalize(node));
+    offsetClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override
@@ -221,8 +221,8 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   SqlNode get columnsClause => children[1];
 
   @override
-  void insert([node]) {
-    insertClause.children.addAll(nodeManager.normalize(node));
+  void insert(node) {
+    insertClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override
@@ -291,8 +291,8 @@ class SqlUpdateStatementImpl extends SqlAbstractStatementImpl
   SqlNode get setClause => children[1];
 
   @override
-  void update([node]) {
-    updateClause.children.addAll(nodeManager.normalize(node));
+  void update(node) {
+    updateClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override
@@ -337,7 +337,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void clearDelete() {
-    deleteClause.children.clear();
+    deleteClause.child = null;
   }
 
   @override
@@ -352,7 +352,7 @@ class SqlDeleteStatementImpl extends SqlAbstractStatementImpl
 
   @override
   void delete(node) {
-    deleteClause.children.addAll(nodeManager.normalize(node));
+    deleteClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override
@@ -513,7 +513,7 @@ class SqlJoinImpl extends SqlAbstractNodeImpl
 
   @override
   void from(node) {
-    fromClause.children.add(node);
+    fromClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override

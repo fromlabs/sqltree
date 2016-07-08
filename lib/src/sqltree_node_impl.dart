@@ -246,7 +246,7 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
 
     _checkSingleComposite();
 
-    var normalized = _nodeManager.normalize(singleChild)?.single;
+    var normalized = _nodeManager.normalize(singleChild).singleOrNull;
 
     if (normalized != null) {
       if (normalized is SqlNode) {
@@ -259,6 +259,8 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
         throw new ArgumentError.value(normalized, "child",
             "Single composite node accepts a single node child");
       }
+    } else {
+      _children.clear();
     }
   }
 
@@ -358,8 +360,9 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
 
   void _addInternal(SqlNode node) {
     // we assume that the node is already registered
-
     _checkNotFreezed();
+
+    _checkChildrenNulls(node);
 
     _checkNodesCount(length + 1);
 
@@ -642,9 +645,23 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
     }
   }
 
+  void _checkChildrenNulls(children) {
+    if (children is Iterable) {
+      children.forEach((child) {
+        if (child == null) {
+          throw new ArgumentError.notNull();
+        }
+      });
+    } else if (children == null) {
+      throw new ArgumentError.notNull();
+    }
+  }
+
   @override
   void operator []=(int index, E value) {
     _checkUpdatable();
+
+    _checkChildrenNulls(value);
 
     super[index] = value;
   }
@@ -653,12 +670,16 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void add(E value) {
     _checkUpdatable();
 
+    _checkChildrenNulls(value);
+
     super.add(value);
   }
 
   @override
   void addAll(Iterable<E> iterable) {
     _checkUpdatable();
+
+    _checkChildrenNulls(iterable);
 
     super.addAll(iterable);
   }
@@ -674,6 +695,8 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void fillRange(int start, int end, [E fillValue]) {
     _checkUpdatable();
 
+    _checkChildrenNulls(fillValue);
+
     super.fillRange(start, end, fillValue);
   }
 
@@ -685,6 +708,8 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void insert(int index, E element) {
     _checkUpdatable();
 
+    _checkChildrenNulls(element);
+
     super.insert(index, element);
   }
 
@@ -692,12 +717,19 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void insertAll(int index, Iterable<E> iterable) {
     _checkUpdatable();
 
+    _checkChildrenNulls(iterable);
+
     super.insertAll(index, iterable);
   }
 
   @override
   void set length(int newLength) {
     _checkUpdatable();
+
+    if (newLength > length) {
+      // force argument error
+      _checkChildrenNulls(null);
+    }
 
     super.length = newLength;
   }
@@ -741,6 +773,8 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void replaceRange(int start, int end, Iterable<E> iterable) {
     _checkUpdatable();
 
+    _checkChildrenNulls(iterable);
+
     super.replaceRange(start, end, iterable);
   }
 
@@ -758,12 +792,16 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   void setAll(int index, Iterable<E> iterable) {
     _checkUpdatable();
 
+    _checkChildrenNulls(iterable);
+
     super.setAll(index, iterable);
   }
 
   @override
   void setRange(int start, int end, Iterable<E> iterable, [int skipCount = 0]) {
     _checkUpdatable();
+
+    _checkChildrenNulls(iterable);
 
     super.setRange(start, end, iterable, skipCount);
   }

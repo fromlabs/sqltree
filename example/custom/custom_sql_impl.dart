@@ -68,7 +68,7 @@ class GroupConcatStatementImpl extends sql.ExtensionSqlNodeBase
 
   @override
   void separator(node) {
-    separatorClause.children.addAll(nodeManager.normalize(node));
+    separatorClause.child = nodeManager.normalize(node).singleOrNull;
   }
 
   @override

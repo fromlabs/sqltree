@@ -20,6 +20,33 @@ void main() {
       expect(sql.setReference("CIAO", sql.equal("a", "b")).single.reference,
           "CIAO");
     });
+
+    test('Test 3', () {
+      expect(sql.node(null).length, 0);
+      expect(sql.node(null, null).length, 0);
+      expect(sql.node("").length, 1);
+      expect(sql.node("").firstOrNull.rawExpression, "");
+      expect(sql.node("").singleOrNull.rawExpression, "");
+      expect(sql.node("").first.rawExpression, "");
+      expect(sql.node("").single.rawExpression, "");
+      expect(sql.node("", "").length, 2);
+      expect(sql.node("", "").firstOrNull.rawExpression, "");
+      expect(
+          () => sql.node("", "").singleOrNull.rawExpression, throwsStateError);
+      expect(sql.node("", "").first.rawExpression, "");
+      expect(() => sql.node("", "").single.rawExpression, throwsStateError);
+    });
+
+    test('Test 4', () {
+      var select = sql.select()..limit(null);
+      expect(select.limitClause.children.isEmpty, true);
+      select.limit(10);
+      expect(select.limitClause.children.isNotEmpty, true);
+      select.limit(null);
+      expect(select.limitClause.children.isEmpty, true);
+
+      expect(() => select.selectClause.children.add(null), throwsArgumentError);
+    });
   });
 
   group('children locking tests', () {
@@ -57,22 +84,6 @@ void main() {
       expect(select.isFreezed, false);
       select.selectClause.children.addAll(sql.node("e"));
       expect(select.selectClause.children.length, 5);
-    });
-
-    test('Test 2', () {
-      expect(sql.node(null).length, 0);
-      expect(sql.node(null, null).length, 0);
-      expect(sql.node("").length, 1);
-      expect(sql.node("").firstOrNull.rawExpression, "");
-      expect(sql.node("").singleOrNull.rawExpression, "");
-      expect(sql.node("").first.rawExpression, "");
-      expect(sql.node("").single.rawExpression, "");
-      expect(sql.node("", "").length, 2);
-      expect(sql.node("", "").firstOrNull.rawExpression, "");
-      expect(
-          () => sql.node("", "").singleOrNull.rawExpression, throwsStateError);
-      expect(sql.node("", "").first.rawExpression, "");
-      expect(() => sql.node("", "").single.rawExpression, throwsStateError);
     });
   });
 }
