@@ -647,11 +647,11 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
 
   void _checkChildrenNulls(children) {
     if (children is Iterable) {
-      children.forEach((child) {
+      for (var child in children) {
         if (child == null) {
           throw new ArgumentError.notNull();
         }
-      });
+      }
     } else if (children == null) {
       throw new ArgumentError.notNull();
     }
