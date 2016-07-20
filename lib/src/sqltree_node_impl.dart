@@ -186,9 +186,10 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
       whereDeep((node) => node.reference == reference);
 
   @override
-  SqlNodeIterable/*<T>*/ whereDeep/*<T extends SqlNode>*/(
+  SqlNodeIterable<SqlNode> /*<T>*/ whereDeep/*<T extends SqlNode>*/(
           bool test(/*=T*/ node)) =>
-      new DelegatingSqlNodeIterable/*<T>*/(_whereDeepInternal(test));
+      new DelegatingSqlNodeIterable/*<T>*/(
+          _whereDeepInternal(test));
 
   Iterable/*<T>*/ _whereDeepInternal/*<T extends SqlNode>*/(
       bool test(/*=T*/ node)) sync* {
@@ -200,7 +201,7 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
     if (isCompositeNode) {
       var nodes = children.expand((child) => (child as SqlAbstractNodeImpl)
           ._whereDeepInternal((node) => test(node as SqlNode/*=T*/)));
-      yield* nodes;
+      yield* nodes as Iterable/*<T>*/;
     }
   }
 
@@ -328,8 +329,7 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
   }
 }
 
-class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
-    with DelegatingSqlNodeCollectionMixin<SqlNode> {
+class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase<SqlNode> {
   @override
   final int maxLength;
 
@@ -342,6 +342,20 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
       : this.maxLength = target.maxLength,
         this.isChildrenLockingEnabled = target.isChildrenLockingEnabled,
         super.cloneFrom(target, freeze);
+
+  @override
+  bool isAlreadyWrappedIterable(Iterable<SqlNode> base) =>
+      base is DelegatingSqlNodeIterable<SqlNode>;
+
+  @override
+  bool isAlreadyWrappedList(Iterable<SqlNode> base) =>
+      base is DelegatingSqlNodeList<SqlNode>;
+
+  SqlNodeIterable<SqlNode> createIterable(Iterable<SqlNode> base) =>
+      new DelegatingSqlNodeIterable<SqlNode>(base);
+
+  SqlNodeList<SqlNode> createList(List<SqlNode> base) =>
+      new DelegatingSqlNodeList<SqlNode>(base);
 
   void registerParent(SqlNode parent) {
     this.isChildrenLockingEnabled = parent is ChildrenLockingSupport;
@@ -426,8 +440,10 @@ class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase
   }
 }
 
-abstract class DelegatingSqlNodeCollectionMixin<E extends SqlNode>
-    implements DelegatingSqlNodeIterableBase<E> {
+class DelegatingSqlNodeIterable<E extends SqlNode>
+    extends DelegatingSqlNodeIterableBase<E> {
+  DelegatingSqlNodeIterable(Iterable<E> base) : super(base);
+
   @override
   bool isAlreadyWrappedIterable(Iterable<E> base) =>
       base is DelegatingSqlNodeIterable<E>;
@@ -437,63 +453,44 @@ abstract class DelegatingSqlNodeCollectionMixin<E extends SqlNode>
       base is DelegatingSqlNodeList<E>;
 
   SqlNodeIterable<E> createIterable(Iterable<E> base) =>
-      new DelegatingSqlNodeIterable/*<E>*/(base);
+      new DelegatingSqlNodeIterable<E>(base);
 
-  SqlNodeList<E> createList(List<E> base) =>
-      new DelegatingSqlNodeList/*<E>*/(base);
-}
-
-class DelegatingSqlNodeIterable<E extends SqlNode>
-    extends DelegatingSqlNodeIterableBase<E>
-    with DelegatingSqlNodeCollectionMixin<E> {
-  DelegatingSqlNodeIterable(Iterable<E> base) : super(base);
+  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList<E>(base);
 }
 
 class DelegatingSqlNodeList<E extends SqlNode>
-    extends DelegatingSqlNodeListBase<E>
-    with DelegatingSqlNodeCollectionMixin<E> {
+    extends DelegatingSqlNodeListBase<E> {
   DelegatingSqlNodeList(List<E> base) : super(base);
 
   DelegatingSqlNodeList.cloneFrom(DelegatingSqlNodeList target, bool freeze)
       : super.cloneFrom(target, freeze);
 
   @override
-  DelegatingSqlNodeList/*<E>*/ createClone(bool freeze) =>
-      new DelegatingSqlNodeList/*<E>*/ .cloneFrom(this, freeze);
+  bool isAlreadyWrappedIterable(Iterable<E> base) =>
+      base is DelegatingSqlNodeIterable<E>;
+
+  @override
+  bool isAlreadyWrappedList(Iterable<E> base) =>
+      base is DelegatingSqlNodeList<E>;
+
+  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
+      new DelegatingSqlNodeIterable<E>(base);
+
+  SqlNodeList<E> createList(List<E> base) => new DelegatingSqlNodeList<E>(base);
+
+  @override
+  DelegatingSqlNodeList<E> createClone(bool freeze) =>
+      new DelegatingSqlNodeList<E>.cloneFrom(this, freeze);
 }
 
 abstract class DelegatingSqlNodeIterableBase<E extends SqlNode>
-    extends DelegatingIterable<E>
-    with DelegatingSqlNodeIterableMixin<E>
-    implements SqlNodeIterable<E> {
+    extends DelegatingIterable<E> implements SqlNodeIterable<E> {
   final Iterable<E> _base;
 
   DelegatingSqlNodeIterableBase(Iterable<E> base)
       : this._base = base,
         super(base);
 
-  @override
-  SqlNodeIterable<E> where(bool test(E element)) => super.where(test);
-
-  @override
-  SqlNodeIterable<E> skip(int n) => super.skip(n);
-
-  @override
-  SqlNodeIterable<E> skipWhile(bool test(E value)) => super.skipWhile(test);
-
-  @override
-  SqlNodeIterable<E> take(int n) => super.take(n);
-
-  @override
-  SqlNodeIterable<E> takeWhile(bool test(E value)) => super.takeWhile(test);
-
-  @override
-  SqlNodeList<E> toList({bool growable: true}) =>
-      super.toList(growable: growable);
-}
-
-abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
-    implements SqlNodeIterable<E> {
   bool isAlreadyWrappedIterable(Iterable<E> base);
 
   bool isAlreadyWrappedList(Iterable<E> base);
@@ -539,14 +536,15 @@ abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
       whereDeep((node) => node.reference == reference);
 
   SqlNodeIterable<E> whereDeep(bool test(E element)) =>
-      expandNodes((node) => node.whereDeep(test));
+      expandNodes((node) => node.whereDeep(test) as Iterable<E>);
 
   @override
   SqlNodeIterable<E> expandNodes(Iterable<E> f(E element)) =>
       _wrapIterable(expand(f));
 
   @override
-  SqlNodeIterable<E> mapNodes(E f(E element)) => _wrapIterable(map(f));
+  SqlNodeIterable<E> mapNodes(E f(E element)) =>
+      _wrapIterable(map(f));
 
   @override
   void disable() {
@@ -584,18 +582,8 @@ abstract class DelegatingSqlNodeIterableMixin<E extends SqlNode>
       isAlreadyWrappedList(base) ? base : createList(base);
 }
 
-abstract class DelegatingListBase<E> extends DelegatingList<E> {
-  final List<E> _base;
-
-  DelegatingListBase(List<E> base)
-      : this._base = base,
-        super(base);
-}
-
 abstract class DelegatingSqlNodeListBase<E extends SqlNode>
-    extends DelegatingListBase<E>
-    with DelegatingSqlNodeIterableMixin<E>
-    implements SqlNodeList<E> {
+    extends DelegatingListBase<E> implements SqlNodeList<E> {
   @override
   final bool isFreezed;
 
@@ -606,26 +594,38 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   DelegatingSqlNodeListBase.cloneFrom(
       DelegatingSqlNodeListBase target, bool freeze)
       : this.isFreezed = freeze,
-        super(target._base.map((node) => node.clone(freeze: freeze)).toList());
+        super(target._base.map((node) => node.clone(freeze: freeze)).toList()
+            as List<E>);
+
+  bool isAlreadyWrappedIterable(Iterable<E> base);
+
+  bool isAlreadyWrappedList(Iterable<E> base);
+
+  SqlNodeIterable<E> createIterable(Iterable<E> base);
+
+  SqlNodeList<E> createList(List<E> base);
 
   @override
-  SqlNodeIterable<E> where(bool test(E element)) => super.where(test);
+  SqlNodeIterable<E> where(bool test(E element)) =>
+      _wrapIterable(super.where(test));
 
   @override
-  SqlNodeIterable<E> skip(int n) => super.skip(n);
+  SqlNodeIterable<E> skip(int n) => _wrapIterable(super.skip(n));
 
   @override
-  SqlNodeIterable<E> skipWhile(bool test(E value)) => super.skipWhile(test);
+  SqlNodeIterable<E> skipWhile(bool test(E value)) =>
+      _wrapIterable(super.skipWhile(test));
 
   @override
-  SqlNodeIterable<E> take(int n) => super.take(n);
+  SqlNodeIterable<E> take(int n) => _wrapIterable(super.take(n));
 
   @override
-  SqlNodeIterable<E> takeWhile(bool test(E value)) => super.takeWhile(test);
+  SqlNodeIterable<E> takeWhile(bool test(E value)) =>
+      _wrapIterable(super.takeWhile(test));
 
   @override
   SqlNodeList<E> toList({bool growable: true}) =>
-      super.toList(growable: growable);
+      _wrapList(super.toList(growable: growable));
 
   @override
   DelegatingSqlNodeListBase<E> clone({bool freeze}) =>
@@ -823,4 +823,72 @@ abstract class DelegatingSqlNodeListBase<E extends SqlNode>
   @override
   SqlNodeList<E> sublist(int start, [int end]) =>
       _wrapList(super.sublist(start, end));
+
+  @override
+  E get firstOrNull => isNotEmpty ? first : null;
+
+  @override
+  E get singleOrNull => isNotEmpty ? single : null;
+
+  @override
+  bool containsReference(String reference) =>
+      whereReference(reference).firstOrNull != null;
+
+  @override
+  SqlNodeIterable<E> whereReference(String reference) =>
+      whereDeep((node) => node.reference == reference);
+
+  SqlNodeIterable<E> whereDeep(bool test(E element)) =>
+      expandNodes((node) => node.whereDeep(test) as Iterable<E>);
+
+  @override
+  SqlNodeIterable<E> expandNodes(Iterable<E> f(E element)) =>
+      _wrapIterable(expand(f));
+
+  @override
+  SqlNodeIterable<E> mapNodes(E f(E element)) =>
+      _wrapIterable(map(f));
+
+  @override
+  void disable() {
+    setEnabled(false);
+  }
+
+  @override
+  void enable() {
+    setEnabled(true);
+  }
+
+  @override
+  void setDisabled(bool isDisabled) {
+    setEnabled(!isDisabled);
+  }
+
+  @override
+  void setEnabled(bool isEnabled) {
+    for (var node in this) {
+      node.isEnabled = isEnabled;
+    }
+  }
+
+  @override
+  void setReference(String reference) {
+    for (var node in this) {
+      node.reference = reference;
+    }
+  }
+
+  SqlNodeIterable<E> _wrapIterable(Iterable<E> base) =>
+      isAlreadyWrappedIterable(base) ? base : createIterable(base);
+
+  SqlNodeList<E> _wrapList(List<E> base) =>
+      isAlreadyWrappedList(base) ? base : createList(base);
+}
+
+abstract class DelegatingListBase<E> extends DelegatingList<E> {
+  final List<E> _base;
+
+  DelegatingListBase(List<E> base)
+      : this._base = base,
+        super(base);
 }

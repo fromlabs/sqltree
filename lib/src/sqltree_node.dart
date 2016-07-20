@@ -127,7 +127,7 @@ abstract class SqlNode implements Freezable {
 
   SqlNodeIterable<SqlNode> whereReference(String reference);
 
-  SqlNodeIterable/*<T>*/ whereDeep/*<T extends SqlNode>*/(
+  SqlNodeIterable<SqlNode> /*<T>*/ whereDeep/*<T extends SqlNode>*/(
       bool test(/*=T*/ node));
 }
 

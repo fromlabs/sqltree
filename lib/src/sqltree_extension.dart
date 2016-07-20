@@ -19,22 +19,48 @@ abstract class ExtensionSqlNodeListBase<E extends SqlNode>
 }
 
 class ExtensionSqlNodeIterable<E extends SqlNode>
-    extends DelegatingSqlNodeIterableBase<E>
-    with DelegatingSqlNodeCollectionMixin<E> {
+    extends DelegatingSqlNodeIterableBase<E> {
   ExtensionSqlNodeIterable(Iterable<E> base) : super(base);
+
+  @override
+  bool isAlreadyWrappedIterable(Iterable<E> base) =>
+      base is DelegatingSqlNodeIterable<E>;
+
+  @override
+  bool isAlreadyWrappedList(Iterable<E> base) =>
+      base is DelegatingSqlNodeList<E>;
+
+  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
+      new DelegatingSqlNodeIterable<E>(base);
+
+  SqlNodeList<E> createList(List<E> base) =>
+      new DelegatingSqlNodeList<E>(base);
 }
 
 class ExtensionSqlNodeList<E extends SqlNode>
-    extends DelegatingSqlNodeListBase<E>
-    with DelegatingSqlNodeCollectionMixin<E> {
+    extends DelegatingSqlNodeListBase<E> {
   ExtensionSqlNodeList(List<E> base) : super(base);
 
-  ExtensionSqlNodeList.cloneFrom(ExtensionSqlNodeList target, bool freeze)
+  ExtensionSqlNodeList.cloneFrom(ExtensionSqlNodeList<E> target, bool freeze)
       : super.cloneFrom(target, freeze);
 
   @override
-  ExtensionSqlNodeList/*<E>*/ createClone(bool freeze) =>
-      new ExtensionSqlNodeList/*<E>*/ .cloneFrom(this, freeze);
+  bool isAlreadyWrappedIterable(Iterable<E> base) =>
+      base is DelegatingSqlNodeIterable<E>;
+
+  @override
+  bool isAlreadyWrappedList(Iterable<E> base) =>
+      base is DelegatingSqlNodeList<E>;
+
+  SqlNodeIterable<E> createIterable(Iterable<E> base) =>
+      new DelegatingSqlNodeIterable<E>(base);
+
+  SqlNodeList<E> createList(List<E> base) =>
+      new DelegatingSqlNodeList<E>(base);
+
+  @override
+  ExtensionSqlNodeList<E> createClone(bool freeze) =>
+      new ExtensionSqlNodeList<E>.cloneFrom(this, freeze);
 }
 
 class ExtensionSqlNode extends ExtensionSqlNodeBase {
