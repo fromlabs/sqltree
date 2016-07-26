@@ -224,7 +224,7 @@ SqlNode isNotNull(node) => _node(types.IS_NOT_NULL, 1, node);
 
 SqlNode not(node) => _unaryOperator(types.NOT, node);
 
-SqlNode count([node]) => _function(types.COUNT, 1, node);
+SqlNode count(node) => _function(types.COUNT, 1, node);
 
 SqlNode coalesce(node0, node1) => _function(types.COALESCE, 2, node0, node1);
 
