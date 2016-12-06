@@ -153,9 +153,10 @@ class SqlSelectStatementImpl extends SqlAbstractStatementImpl
     ..clearLimit()
     ..clearOffset()
     ..clearSelect()
-    ..select(nodeManager.registerNode(new SqlFunctionImpl(
-        BaseSqlNodeTypes.types.COUNT,
-        maxChildrenLength: 1)));
+    ..clearOrderBy()
+    ..select(nodeManager.registerNode(
+        new SqlFunctionImpl(BaseSqlNodeTypes.types.COUNT, maxChildrenLength: 1))
+      ..child = 1);
 
   @override
   void where(node0,

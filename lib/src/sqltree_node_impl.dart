@@ -330,7 +330,6 @@ abstract class SqlAbstractNodeImpl implements SqlNode, RegistrableSqlNode {
 }
 
 class _SqlNodeChildrenListImpl extends DelegatingSqlNodeListBase<SqlNode> {
-  @override
   final int maxLength;
 
   bool isChildrenLockingEnabled;

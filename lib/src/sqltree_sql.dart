@@ -27,6 +27,8 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   final String LIKE = "LIKE";
   final String UPPER = "UPPER";
   final String LOWER = "LOWER";
+  final String MIN = "MIN";
+  final String MAX = "MAX";
   final String COALESCE = "COALESCE";
   final String NOT = "NOT";
   final String EQUAL = "=";
@@ -64,6 +66,8 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
     registerNodeType(types.LIKE, (node) => node is SqlOperatorImpl);
     registerNodeType(types.UPPER, (node) => node is SqlFunctionImpl);
     registerNodeType(types.LOWER, (node) => node is SqlFunctionImpl);
+    registerNodeType(types.MIN, (node) => node is SqlFunctionImpl);
+    registerNodeType(types.MAX, (node) => node is SqlFunctionImpl);
     registerNodeType(types.NOT, (node) => node is SqlOperatorImpl);
     registerNodeType(types.EQUAL, (node) => node is SqlOperatorImpl);
     registerNodeType(types.NOT_EQUAL, (node) => node is SqlOperatorImpl);
@@ -228,7 +232,7 @@ SqlNode count(node) => _function(types.COUNT, 1, node);
 
 SqlNode coalesce(node0, node1) => _function(types.COALESCE, 2, node0, node1);
 
-SqlNode as(node, alias) => _binaryOperator(types.AS, node, alias);
+SqlNode as(node, String alias) => _binaryOperator(types.AS, node, alias);
 
 SqlNode equal(node0, node1) => _binaryOperator(types.EQUAL, node0, node1);
 
@@ -298,6 +302,10 @@ SqlNode like(node0, node1) => _binaryOperator(types.LIKE, node0, node1);
 SqlNode upper(node) => _function(types.UPPER, 1, node);
 
 SqlNode lower(node) => _function(types.LOWER, 1, node);
+
+SqlNode min(node) => _function(types.MIN, 1, node);
+
+SqlNode max(node) => _function(types.MAX, 1, node);
 
 /* DECORATORS */
 
