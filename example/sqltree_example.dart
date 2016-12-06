@@ -111,6 +111,4 @@ main() {
 
   print(sql.prettify(
       sql.format(sql.select(sql.function("coalesce", "ID", "REF_ID")))));
-
-  print(sql.format(sql.sqlIf(1, 2, 3)));
 }

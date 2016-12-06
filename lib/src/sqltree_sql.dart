@@ -144,52 +144,10 @@ SqlDeleteStatement delete([node]) {
   return parent;
 }
 
-SqlJoins joins(
-    [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
+SqlJoins joins([node]) {
   var parent = registerNode(new SqlJoinsImpl());
 
-  parent.children.addAll(node(
-      node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
-
-  return parent;
-}
-
-SqlJoin leftJoin(fromNode,
-    [onNode0,
-    onNode1,
-    onNode2,
-    onNode3,
-    onNode4,
-    onNode5,
-    onNode6,
-    onNode7,
-    onNode8,
-    onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.LEFT_JOIN));
-
-  parent.fromClause.children.addAll(node(fromNode));
-  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3,
-      onNode4, onNode5, onNode6, onNode7, onNode8, onNode9));
-
-  return parent;
-}
-
-SqlJoin join(fromNode,
-    [onNode0,
-    onNode1,
-    onNode2,
-    onNode3,
-    onNode4,
-    onNode5,
-    onNode6,
-    onNode7,
-    onNode8,
-    onNode9]) {
-  var parent = registerNode(new SqlJoinImpl(types.INNER_JOIN));
-
-  parent.fromClause.children.addAll(node(fromNode));
-  parent.onClause.children.addAll(node(onNode0, onNode1, onNode2, onNode3,
-      onNode4, onNode5, onNode6, onNode7, onNode8, onNode9));
+  parent.children.addAll(node(node));
 
   return parent;
 }
