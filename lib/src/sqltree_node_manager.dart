@@ -35,6 +35,8 @@ class BaseSqlNodeTypes {
   final String JOIN_FROM = "JOIN_FROM";
   final String JOIN_ON = "ON";
   final String COUNT = "COUNT";
+  final String EQUAL = "=";
+  final String TUPLE = "n()";
 
   final String FORMATTED = "FORMATTED";
 

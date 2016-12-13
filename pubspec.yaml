@@ -1,6 +1,6 @@
 name: sqltree
 description: A library for building sql queries through a tree representation.
-version: 0.5.0
+version: 0.6.0
 author: Roberto Tassi <roberto.tassi@fromlabs.org>
 homepage: https://github.com/fromlabs/sqltree
 

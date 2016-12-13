@@ -80,6 +80,17 @@ abstract class SqlInsertStatement implements SqlStatement {
   void values(node0,
       [node1, node2, node3, node4, node5, node6, node7, node8, node9]);
 
+  void set(equalNode0,
+      [equalNode1,
+      equalNode2,
+      equalNode3,
+      equalNode4,
+      equalNode5,
+      equalNode6,
+      equalNode7,
+      equalNode8,
+      equalNode9]);
+
   SqlNode get insertClause;
 
   SqlNode get columnsClause;

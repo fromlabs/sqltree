@@ -41,9 +41,9 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
     if (node == null || node.isDisabled) {
       return _EMPTY;
     } else if (node.isCompositeNode) {
-      String formatted;
+      var formatted;
 
-      List<String> formattedChildren = _getFormattedChildren(node);
+      var formattedChildren = _getFormattedChildren(node);
 
       for (SqlNodeFormatterFunction formatter in _formatters) {
         formatted = formatter(node, formattedChildren);
@@ -63,12 +63,11 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
     }
   }
 
-  List<String> _getFormattedChildren(SqlNode node) => node.children
-      .map((childNode) => this.format(childNode))
-      .where((formatted) => isNotEmptyString(formatted))
-      .toList(growable: false);
+  Iterable<String> _getFormattedChildren(SqlNode node) => node.children
+      .map((childNode) => format(childNode))
+      .where((formatted) => isNotEmptyString(formatted));
 
-  String _supportedFormat(SqlNode node, List<String> formattedChildren) {
+  String _supportedFormat(SqlNode node, Iterable<String> formattedChildren) {
     if (node is SqlStatement) {
       return formatByRule(formattedChildren, separator: " ");
     } else if (node is SqlSelectClause) {
@@ -113,12 +112,15 @@ class SqlNodeFormatterImpl implements SqlNodeFormatter {
       return formatByRule(formattedChildren);
     } else if (BaseSqlNodeTypes.types.JOIN_ON == node.type) {
       return formatByRule(formattedChildren, prefix: "ON ", separator: " AND ");
+    } else if (BaseSqlNodeTypes.types.TUPLE == node.type) {
+      return formatByRule(formattedChildren,
+          prefix: "(", separator: ", ", postfix: ")");
     }
 
     return null;
   }
 
-  String _defaultFormat(SqlNode node, List<String> formattedChildren) {
+  String _defaultFormat(SqlNode node, Iterable<String> formattedChildren) {
     print(
         "WARNING: undefined rule for node of type ${node.type} [${node.runtimeType}]");
 

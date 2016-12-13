@@ -21,7 +21,6 @@ final SqlNodeTypes types = new SqlNodeTypes();
 class SqlNodeTypes extends BaseSqlNodeTypes {
   final String TEXT = "'";
   final String BLOCK = "()";
-  final String TUPLE = "n()";
   final String INDEXED_PARAMETER = "?";
   final String NAMED_PARAMETER = r"$";
   final String LIKE = "LIKE";
@@ -31,7 +30,6 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   final String MAX = "MAX";
   final String COALESCE = "COALESCE";
   final String NOT = "NOT";
-  final String EQUAL = "=";
   final String NOT_EQUAL = "<>";
   final String GREATER = ">";
   final String GREATER_OR_EQUAL = ">=";
@@ -58,7 +56,6 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
   void _registerTypes(SqlNodeTypes types) {
     registerNodeType(types.TEXT);
     registerNodeType(types.BLOCK);
-    registerNodeType(types.TUPLE);
     registerNodeType(types.INDEXED_PARAMETER);
     registerNodeType(types.NAMED_PARAMETER);
     registerNodeType(types.COUNT, (node) => node is SqlFunctionImpl);
@@ -69,7 +66,6 @@ class SqlNodeTypes extends BaseSqlNodeTypes {
     registerNodeType(types.MIN, (node) => node is SqlFunctionImpl);
     registerNodeType(types.MAX, (node) => node is SqlFunctionImpl);
     registerNodeType(types.NOT, (node) => node is SqlOperatorImpl);
-    registerNodeType(types.EQUAL, (node) => node is SqlOperatorImpl);
     registerNodeType(types.NOT_EQUAL, (node) => node is SqlOperatorImpl);
     registerNodeType(types.GREATER, (node) => node is SqlOperatorImpl);
     registerNodeType(types.GREATER_OR_EQUAL, (node) => node is SqlOperatorImpl);
@@ -114,7 +110,7 @@ SqlSelectStatement select(
     [node0, node1, node2, node3, node4, node5, node6, node7, node8, node9]) {
   var parent = registerNode(new SqlSelectStatementImpl());
 
-  parent.selectClause.children.addAll(node(
+  parent.selectClause.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -147,7 +143,7 @@ SqlDeleteStatement delete([node]) {
 SqlJoins joins([node]) {
   var parent = registerNode(new SqlJoinsImpl());
 
-  parent.children.addAll(node(node));
+  parent.children.addAll(_NODE_MANAGER.normalize(node));
 
   return parent;
 }
@@ -269,37 +265,51 @@ SqlNode max(node) => _function(types.MAX, 1, node);
 
 SqlNodeIterable<SqlNode> setReference(String reference, node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => node..reference = reference);
 
 SqlNodeIterable<SqlNode> setEnabled(bool isEnabled, node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => node..isEnabled = isEnabled);
 
 SqlNodeIterable<SqlNode> setDisabled(bool isDisabled, node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => node..isDisabled = isDisabled);
 
 SqlNodeIterable<SqlNode> enable(node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => node..enable());
 
 SqlNodeIterable<SqlNode> disable(node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => node..disable());
 
 SqlNodeIterable<SqlNode> text(node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => _node(types.TEXT, 1, node));
 
 SqlNodeIterable<SqlNode> qualify(String qualifier, node0,
         [node1, node2, node3, node4, node5, node6, node7, node8, node9]) =>
-    node(node0, node1, node2, node3, node4, node5, node6, node7, node8, node9)
+    _NODE_MANAGER
+        .normalize(node0, node1, node2, node3, node4, node5, node6, node7,
+            node8, node9)
         .mapNodes((node) => _node(types.QUALIFIER, 2, qualifier, node));
 
 SqlNodeIterable<SqlNode> node(node0,
@@ -316,7 +326,7 @@ SqlNode custom(String type,
 
   var parent = registerNode(new SqlCustomNodeImpl(type));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -329,7 +339,7 @@ SqlFunction function(String function,
 
   var parent = registerNode(new SqlCustomFunctionImpl(function));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -342,7 +352,7 @@ SqlOperator operator(String operator,
 
   var parent = registerNode(new SqlCustomOperatorImpl(operator));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -367,7 +377,7 @@ SqlOperator binaryOperator(String operator, node0, node1) {
   var parent =
       registerNode(new SqlCustomOperatorImpl(operator, maxChildrenLength: 2));
 
-  parent.children.addAll(node(node0, node1));
+  parent.children.addAll(_NODE_MANAGER.normalize(node0, node1));
 
   return parent;
 }
@@ -383,7 +393,7 @@ SqlFormattedNode formatted(String prefix, String separator, String postfix,
           isFormatEmptyChildrenEnabled: formatEmptyChildrenEnabled),
       maxChildrenLength: maxChildrenLength));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -400,7 +410,7 @@ SqlFunction _function(String function, int maxChildrenLength,
   var parent = registerNode(
       new SqlFunctionImpl(function, maxChildrenLength: maxChildrenLength));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -411,7 +421,7 @@ SqlOperator _operator(String operator, int maxChildrenLength,
   var parent = registerNode(
       new SqlOperatorImpl(operator, maxChildrenLength: maxChildrenLength));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -422,7 +432,7 @@ SqlNode _node(String type, int maxChildrenLength,
   var parent =
       registerNode(new SqlNodeImpl(type, maxChildrenLength: maxChildrenLength));
 
-  parent.children.addAll(node(
+  parent.children.addAll(_NODE_MANAGER.normalize(
       node0, node1, node2, node3, node4, node5, node6, node7, node8, node9));
 
   return parent;
@@ -436,8 +446,6 @@ SqlPrettifier _SQL_PRETTIFIER = new SqlPrettifierImpl();
 
 SqlNamedParameterConverter _NODE_CONVERTER =
     new SqlNamedParameterConverterImpl();
-
-final Set<String> _blockNodes = new Set.from([types.BLOCK, types.TUPLE]);
 
 final Set<String> _postNodes =
     new Set.from([types.IS_NOT_NULL, types.IS_NULL, types.ASC, types.DESC]);
@@ -460,7 +468,7 @@ void _registerFormatters() {
           prefix: "'",
           postfix: "'",
           isFormatEmptyChildrenEnabled: true);
-    } else if (_blockNodes.contains(node.type)) {
+    } else if (types.BLOCK == node.type) {
       return formatByRule(formattedChildren,
           prefix: "(", separator: ", ", postfix: ")");
     } else if (types.QUALIFIER == node.type) {

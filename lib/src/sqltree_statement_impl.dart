@@ -197,6 +197,47 @@ class SqlInsertStatementImpl extends SqlAbstractStatementImpl
   }
 
   @override
+  void set(equalNode0,
+      [equalNode1,
+      equalNode2,
+      equalNode3,
+      equalNode4,
+      equalNode5,
+      equalNode6,
+      equalNode7,
+      equalNode8,
+      equalNode9]) {
+    if (valuesClause.children.isEmpty) {
+      values(nodeManager
+          .registerNode(new SqlNodeImpl(BaseSqlNodeTypes.types.TUPLE)));
+    } else if (valuesClause.children.length > 1 ||
+        valuesClause.children.first.type != BaseSqlNodeTypes.types.TUPLE) {
+      throw new UnsupportedError("Values should be a tuple node");
+    }
+
+    var nodes = nodeManager.normalize(
+        equalNode0,
+        equalNode1,
+        equalNode2,
+        equalNode3,
+        equalNode4,
+        equalNode5,
+        equalNode6,
+        equalNode7,
+        equalNode8,
+        equalNode9);
+
+    for (var node in nodes) {
+      if (node.type != BaseSqlNodeTypes.types.EQUAL) {
+        throw new ArgumentError.value(node.type, "type", "Should be EQUAL");
+      }
+
+      columns(node.children[0]);
+      valuesClause.children.first.children.add(node.children[1]);
+    }
+  }
+
+  @override
   void clearColumns() {
     columnsClause.children.clear();
   }

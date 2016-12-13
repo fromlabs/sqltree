@@ -50,6 +50,9 @@ class SqlNodeManagerImpl implements SqlNodeManager {
         BaseSqlNodeTypes.types.LEFT_JOIN, (node) => node is SqlJoinImpl);
     registerNodeType(BaseSqlNodeTypes.types.JOIN_FROM);
     registerNodeType(BaseSqlNodeTypes.types.JOIN_ON);
+    registerNodeType(
+        BaseSqlNodeTypes.types.EQUAL, (node) => node is SqlOperatorImpl);
+    registerNodeType(BaseSqlNodeTypes.types.TUPLE);
     registerNodeType(BaseSqlNodeTypes.types.FORMATTED,
         (node) => node is SqlFormattedNodeImpl);
   }
